@@ -1,0 +1,321 @@
+/* ═══════════════════════════════════════════
+   REJECTED FORMS — CARD + EDIT MODAL STYLES
+═══════════════════════════════════════════ */
+
+/* ── REJECTED CARD ─────────────────────── */
+.rf-card {
+  background: #fff;
+  border: 1.5px solid #f5b8b0;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all .15s;
+  box-shadow: 0 1px 4px rgba(192,57,43,.08);
+}
+.rf-card:hover {
+  box-shadow: 0 4px 16px rgba(192,57,43,.14);
+  border-color: #f09090;
+}
+
+.rf-card-header {
+  padding: 13px 16px;
+  display: flex; align-items: center; gap: 11px;
+  cursor: pointer; user-select: none;
+}
+.rf-card-header:hover { background: #fff5f5; }
+
+.rf-status-dot {
+  width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+  background: var(--red); box-shadow: 0 0 0 3px var(--red-pale);
+}
+
+.rf-card-info { flex: 1; min-width: 0; }
+.rf-card-name {
+  font-weight: 700; font-size: 13px; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rf-card-meta {
+  font-size: 11px; color: var(--muted); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.rf-badge {
+  padding: 3px 10px; border-radius: 100px;
+  font-size: 10px; letter-spacing: .5px; font-weight: 700;
+  background: var(--red-pale); color: var(--red);
+}
+.rf-declined-date { font-size: 10px; color: var(--muted); }
+.rf-chevron {
+  font-size: 11px; color: var(--muted);
+  transition: transform .2s; flex-shrink: 0;
+}
+.rf-chevron.open { transform: rotate(180deg); }
+
+/* ── CARD BODY ─────────────────────────── */
+.rf-card-body {
+  display: none;
+  border-top: 1px solid #fdecea;
+  padding: 16px;
+  animation: rfFade .2s ease;
+}
+.rf-card-body.open { display: block; }
+@keyframes rfFade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.rf-detail-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px 16px; margin-bottom: 14px;
+}
+.rf-detail-item .rf-dl {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 2px; font-weight: 500;
+}
+.rf-detail-item .rf-dv { font-size: 13px; color: var(--text); line-height: 1.4; }
+.rf-detail-item.full { grid-column: 1 / -1; }
+.rf-pkg-badge {
+  display: inline-block; background: var(--rose-pale);
+  color: var(--rose); border-radius: 6px;
+  padding: 2px 9px; font-size: 12px; font-weight: 700;
+}
+
+/* ── REJECTION NOTE ────────────────────── */
+.rf-rejection-note {
+  padding: 12px 14px; margin-bottom: 13px;
+  background: var(--red-pale);
+  border: 1.5px solid var(--red-border);
+  border-radius: 10px;
+}
+.rf-rejection-note .rn-head {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--red); font-weight: 700; margin-bottom: 5px;
+}
+.rf-rejection-note .rn-body {
+  font-size: 13px; color: #7a2020; line-height: 1.5;
+}
+.rf-no-note {
+  font-size: 12px; color: var(--muted); font-style: italic;
+}
+
+/* ── SCREENSHOT ────────────────────────── */
+.rf-ss-section { margin-bottom: 13px; }
+.rf-ss-head {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 7px; font-weight: 500;
+}
+.rf-ss-img {
+  width: 100%; max-height: 200px; object-fit: contain;
+  border-radius: 10px; border: 1px solid var(--border); display: block;
+}
+
+/* ── EDIT BUTTON ───────────────────────── */
+.rf-edit-btn {
+  width: 100%; padding: 12px;
+  background: linear-gradient(135deg, #e8728a, var(--rose));
+  border: none; border-radius: 10px; color: #fff;
+  font-family: 'Lato', sans-serif; font-size: 12px;
+  font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer; transition: all .15s;
+  box-shadow: 0 4px 12px rgba(201,79,106,.3);
+}
+.rf-edit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(201,79,106,.4);
+}
+.rf-edit-btn:active { transform: scale(.98); }
+
+.rf-submitted-time {
+  font-size: 10px; color: var(--muted);
+  margin-top: 10px; text-align: right; font-style: italic;
+}
+
+/* ═══════════════════════════════════════════
+   EDIT MODAL
+═══════════════════════════════════════════ */
+.rf-edit-overlay {
+  position: fixed; inset: 0;
+  background: rgba(58,31,40,.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 400;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 20px; overflow-y: auto;
+  opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+.rf-edit-overlay.show { opacity: 1; pointer-events: all; }
+
+.rf-edit-modal {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%; max-width: 480px;
+  margin: auto;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(201,79,106,.3);
+  transform: scale(.92) translateY(16px);
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  border: 1.5px solid var(--blush);
+}
+.rf-edit-overlay.show .rf-edit-modal { transform: scale(1) translateY(0); }
+
+.rf-edit-modal-head {
+  background: linear-gradient(135deg, var(--rose), var(--ribbon));
+  padding: 18px 22px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.rf-edit-modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; color: #fff; font-weight: 700;
+}
+.rf-edit-modal-close {
+  background: rgba(255,255,255,.2); border: none;
+  border-radius: 50%; width: 28px; height: 28px;
+  color: #fff; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.rf-edit-modal-close:hover { background: rgba(255,255,255,.35); }
+
+.rf-edit-modal-body { padding: 20px 22px 16px; }
+
+/* EDIT FORM FIELDS */
+.rf-field { margin-bottom: 12px; }
+.rf-field label {
+  display: block; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 5px; font-weight: 500;
+}
+.rf-field input[type="text"],
+.rf-field select,
+.rf-field textarea {
+  width: 100%; background: var(--rose-50);
+  border: 1.5px solid var(--border); border-radius: 9px;
+  color: var(--text); font-family: 'Lato', sans-serif;
+  font-size: 13px; padding: 9px 12px; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  -webkit-appearance: none; appearance: none;
+}
+.rf-field input[type="text"]:focus,
+.rf-field select:focus,
+.rf-field textarea:focus {
+  border-color: var(--rose-light);
+  box-shadow: 0 0 0 3px rgba(232,114,138,.1);
+  background: #fff;
+}
+.rf-field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e8728a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px;
+}
+.rf-field textarea { resize: none; }
+.rf-field-hint { font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 5px; }
+
+.rf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* RATE TOGGLE IN EDIT MODAL */
+.rf-rate-toggle { display: flex; gap: 8px; margin-bottom: 8px; }
+.rf-rate-btn { flex: 1; position: relative; }
+.rf-rate-btn input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.rf-rate-label {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px; background: #fff; border: 1.5px solid var(--border);
+  border-radius: 9px; font-size: 12px; color: var(--muted);
+  cursor: pointer; transition: all .2s; font-family: 'Lato', sans-serif;
+}
+.rf-rate-label .rb {
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0;
+  transition: all .2s; display: flex; align-items: center; justify-content: center;
+}
+.rf-rate-label .rb::after {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--rose); display: none;
+}
+.rf-rate-btn input[type="radio"]:checked + .rf-rate-label {
+  border-color: var(--rose); background: var(--rose-pale);
+  color: var(--rose); font-weight: 700;
+}
+.rf-rate-btn input[type="radio"]:checked + .rf-rate-label .rb { border-color: var(--rose); }
+.rf-rate-btn input[type="radio"]:checked + .rf-rate-label .rb::after { display: block; }
+
+.rf-pkg-box { display: none; animation: rfFade .2s ease; }
+.rf-pkg-box.show { display: block; }
+.rf-price-tag {
+  display: none; margin-top: 7px; padding: 9px 12px;
+  background: var(--rose-pale); border: 1.5px solid var(--blush);
+  border-radius: 9px; color: var(--rose); text-align: center; line-height: 1.5;
+}
+.rf-price-tag.show { display: block; }
+.rf-price-tag strong { font-size: 14px; display: block; margin-bottom: 2px; }
+.rf-price-tag span { font-size: 11px; color: var(--muted); }
+
+/* SCREENSHOT UPLOAD IN EDIT MODAL */
+.rf-upload-area {
+  border: 1.5px dashed var(--border); border-radius: 10px;
+  padding: 16px 12px; text-align: center; cursor: pointer;
+  transition: all .2s; background: var(--rose-50); position: relative;
+}
+.rf-upload-area:hover { border-color: var(--rose-light); background: var(--rose-pale); }
+.rf-upload-area input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  width: 100%; height: 100%;
+}
+.rf-upload-icon { font-size: 24px; display: block; margin-bottom: 5px; }
+.rf-upload-label { font-size: 12px; color: var(--rose); font-weight: 700; display: block; margin-bottom: 2px; }
+.rf-upload-sub { font-size: 10px; color: var(--muted); }
+
+.rf-preview { display: none; margin-top: 9px; animation: rfFade .2s ease; }
+.rf-preview.show { display: block; }
+.rf-preview img {
+  width: 100%; max-height: 180px; object-fit: contain;
+  border-radius: 8px; border: 1px solid var(--border);
+}
+.rf-preview-actions {
+  display: flex; align-items: center; gap: 8px; margin-top: 6px;
+}
+.rf-preview-label { font-size: 12px; color: #27ae60; flex: 1; font-weight: 700; }
+.rf-reupload-btn {
+  background: none; border: 1.5px solid var(--border);
+  border-radius: 8px; color: var(--muted); font-family: 'Lato', sans-serif;
+  font-size: 10px; padding: 4px 10px; cursor: pointer; transition: all .15s;
+}
+.rf-reupload-btn:hover { border-color: var(--rose); color: var(--rose); }
+
+/* EDIT MODAL FOOTER */
+.rf-edit-modal-footer {
+  padding: 14px 22px 20px;
+  display: flex; gap: 8px; border-top: 1px solid var(--rose-pale);
+}
+.rf-btn-cancel-edit {
+  flex: 1; padding: 12px; background: var(--rose-50);
+  border: 1.5px solid var(--blush); border-radius: 11px;
+  color: var(--mauve); font-family: 'Lato', sans-serif;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all .15s;
+}
+.rf-btn-cancel-edit:hover { background: var(--blush); }
+.rf-btn-resubmit {
+  flex: 2; padding: 12px;
+  background: linear-gradient(135deg, var(--rose-light), var(--rose));
+  border: none; border-radius: 11px; color: #fff;
+  font-family: 'Lato', sans-serif; font-size: 11px;
+  font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer; transition: all .15s;
+  box-shadow: 0 4px 14px rgba(201,79,106,.3);
+}
+.rf-btn-resubmit:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(201,79,106,.4); }
+.rf-btn-resubmit:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+.rf-edit-error {
+  padding: 9px 12px; background: var(--red-pale);
+  border: 1px solid var(--red-border); border-radius: 9px;
+  font-size: 12px; color: var(--red); display: none; margin-bottom: 8px;
+}
+.rf-edit-error.show { display: block; }
+
+/* ── SPINNER ───────────────────────────── */
+.rf-spinner {
+  display: inline-block; width: 11px; height: 11px;
+  border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+  border-radius: 50%; animation: rfSpin .7s linear infinite;
+  vertical-align: middle; margin-right: 5px;
+}
+@keyframes rfSpin { to { transform: rotate(360deg); } }
