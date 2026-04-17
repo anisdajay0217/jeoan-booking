@@ -220,9 +220,14 @@ function dbToBooking(row) {
 }
 
 // ─── Start ────────────────────────────────────────────────────
-initDB().then(() => {
-  app.listen(PORT, () => console.log(`🎀 Jeoan API running on port ${PORT}`));
-}).catch(e => {
-  console.error('DB init failed:', e);
-  process.exit(1);
+initDB()
+  .then(() => {
+    console.log("✅ DB connected");
+  })
+  .catch((e) => {
+    console.error("⚠️ DB failed but server will still run:", e.message);
+  });
+
+app.listen(PORT, () => {
+  console.log(`🎀 Jeoan API running on port ${PORT}`);
 });
