@@ -764,11 +764,10 @@ function compressImage(file, callback) {
     const img = new Image();
     img.onload = function() {
       const canvas = document.createElement('canvas');
-      const maxDim = 900;
-      let w = img.width, h = img.height;
-      if (w > maxDim || h > maxDim) {
-        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-        else       { w = Math.round(w * maxDim / h); h = maxDim; }
+      const maxDim = 900; let w = img.width, h = img.height;
+      if (w>maxDim || h>maxDim) {
+        if (w>h) { h = Math.round(h*maxDim/w); w = maxDim; }
+        else     { w = Math.round(w*maxDim/h); h = maxDim; }
       }
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
@@ -779,23 +778,27 @@ function compressImage(file, callback) {
   reader.readAsDataURL(file);
 }
  
-async function handleGcashUpload(input) {
-  if (!input.files || !input.files[0] || !currentBookingId) return;
-  compressImage(input.files[0], async function(dataUrl) {
+function handleGcashUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  compressImage(input.files[0], function(dataUrl) {
+    pendingImageData = dataUrl;
     document.getElementById('gcashPreviewImg').src = dataUrl;
     document.getElementById('gcashPreview').classList.add('show');
-    document.getElementById('uploadArea').style.opacity = '0.5';
-    document.getElementById('uploadArea').style.pointerEvents = 'none';
-    try {
-      await fetch(API_BASE + '/client/bookings/' + currentBookingId + '/screenshot', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + clientToken },
-        body: JSON.stringify({ gcashScreenshot: dataUrl })
-      });
-    } catch(e) { console.warn('Screenshot upload failed', e); }
-    document.getElementById('gcashSuccess').classList.add('show');
+    document.getElementById('uploadArea').style.display = 'none';
+    updateSubmitHint();
   });
 }
+ 
+function reuploadScreenshot() {
+  pendingImageData = null;
+  document.getElementById('gcashPreview').classList.remove('show');
+  document.getElementById('gcashPreviewImg').src = '';
+  document.getElementById('uploadArea').style.display = '';
+  document.getElementById('gcashFile').value = '';
+  updateSubmitHint();
+}
+ 
+function closeSsModal() { document.getElementById('ssModal').classList.remove('show'); }
 </script>
 </body>
 </html>
