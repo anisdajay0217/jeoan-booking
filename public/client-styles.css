@@ -171,47 +171,50 @@ textarea{resize:none}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ====== NEW SIDEBAR ====== */
+/* ===== SIDEBAR LAYOUT ===== */
 .layout {
   display: flex;
   min-height: 100vh;
 }
 
 .sidebar {
-  width: 220px;
-  background: #fff;
-  border-right: 1.5px solid #f0c8d4;
-  padding: 20px 12px;
+  width: 230px;
+  background: var(--white);
+  border-right: 1.5px solid var(--border);
+  padding: 20px 14px;
 }
 
 .menu-title {
+  font-family: 'Playfair Display', serif;
   font-size: 16px;
-  color: #c94f6a;
-  margin-bottom: 15px;
+  color: var(--pink-deep);
+  margin-bottom: 16px;
   text-align: center;
-  font-weight: bold;
 }
 
 .menu-btn {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 8px;
-  border: 1.5px solid #f0c8d4;
-  border-radius: 10px;
-  background: #fdf0f4;
+  padding: 11px;
+  margin-bottom: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--pink-light);
   cursor: pointer;
+  font-size: 13px;
+  transition: all .2s;
+  color: var(--mauve);
+}
+
+.menu-btn:hover {
+  background: var(--pink-pale);
 }
 
 .menu-btn.active {
-  background: #e8728a;
-  color: white;
+  background: var(--pink);
+  color: #fff;
+  border-color: var(--pink);
 }
 
 .main-content {
   flex: 1;
-}
-
-/* simple spacing for second page */
-#submittedSection {
-  padding: 20px;
 }
