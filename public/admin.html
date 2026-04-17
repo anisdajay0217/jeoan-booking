@@ -1,108 +1,479 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="admin-styles.css"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>Jeoan Admin 🎀</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rose:#c94f6a;--rose-light:#e8728a;--rose-pale:#fce8ee;
+  --rose-50:#fff0f4;--rose-100:#fce8ee;--rose-200:#f9d0dc;
+  --blush:#f7d6e0;--mauve:#9a6070;--ribbon:#d45c78;
+  --cream:#fdf8f9;--surface:#ffffff;--border:#f0c8d4;
+  --text:#2d1520;--text-2:#7a4a58;--text-3:#b08090;
+  --green:#1a7a50;--green-pale:#e8f5ee;--green-border:#9dd4b8;
+  --red:#c0392b;--red-pale:#fdecea;--red-border:#f5b8b0;
+  --orange:#d4722a;--orange-pale:#fef3e8;--orange-border:#f5cca0;
+  --amber:#9a6d00;--amber-pale:#fef8e4;--amber-border:#f0d890;
+  --sidebar-w:220px;
+  --shadow-sm:0 1px 3px rgba(201,79,106,.08);
+  --shadow-md:0 4px 16px rgba(201,79,106,.12);
+  --shadow-lg:0 12px 40px rgba(201,79,106,.18);
+}
+body{background:var(--cream);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;font-size:13px}
 
+/* ═══════════════════════════════
+   LOGIN PAGE
+═══════════════════════════════ */
+#loginPage{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#f9d0dc 0%,#fce8ee 35%,#f5c8d5 65%,#fce8ee 100%);
+  position:relative;overflow:hidden;
+}
+.login-petals{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.petal{position:absolute;top:-50px;opacity:0;font-size:var(--sz,16px);animation:floatDown var(--dur,6s) var(--del,0s) infinite ease-in-out}
+@keyframes floatDown{0%{opacity:0;transform:translateY(0) rotate(0deg)}8%{opacity:.9}85%{opacity:.6}100%{opacity:0;transform:translateY(110vh) rotate(360deg)}}
+
+.login-wrap{position:relative;z-index:1;width:100%;max-width:360px;padding:20px}
+.login-card{
+  background:rgba(255,248,250,0.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1.5px solid rgba(255,255,255,.9);
+  border-radius:28px;padding:36px 32px;
+  box-shadow:var(--shadow-lg);
+  animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes cardIn{from{opacity:0;transform:scale(.9) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.login-brand{text-align:center;margin-bottom:28px}
+.login-icon{font-size:36px;display:block;margin-bottom:12px;animation:sway 3s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+.login-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--rose);line-height:1}
+.login-sub{font-size:11px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;margin-top:5px}
+
+.form-field{margin-bottom:16px}
+.form-field label{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-2);margin-bottom:6px;font-weight:500}
+.form-field input{
+  width:100%;background:var(--rose-50);border:1.5px solid var(--border);border-radius:12px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;
+  padding:11px 14px;outline:none;transition:all .2s;
+}
+.form-field input:focus{border-color:var(--rose-light);box-shadow:0 0 0 3px rgba(232,114,138,.12);background:#fff}
+.btn-login{
+  width:100%;padding:13px;margin-top:4px;
+  background:linear-gradient(135deg,var(--rose-light),var(--rose));
+  border:none;border-radius:13px;color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;box-shadow:0 6px 20px rgba(201,79,106,.35);
+}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(201,79,106,.45)}
+.btn-login:active{transform:scale(.98)}
+.login-error{margin-top:12px;padding:9px 13px;background:var(--red-pale);border:1px solid var(--red-border);border-radius:10px;font-size:12px;color:var(--red);display:none;text-align:center}
+.login-error.show{display:block}
+
+/* ═══════════════════════════════
+   DASHBOARD SHELL
+═══════════════════════════════ */
+#dashboardPage{display:none;min-height:100vh}
+#dashboardPage.show{display:flex}
+
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar-w);min-height:100vh;flex-shrink:0;
+  background:linear-gradient(180deg,var(--rose) 0%,var(--ribbon) 60%,#b84060 100%);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;
+  box-shadow:4px 0 20px rgba(201,79,106,.2);
+}
+.sidebar-brand{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.15)}
+.sidebar-logo{font-size:26px;display:block;margin-bottom:8px;animation:sway 3s ease-in-out infinite}
+.sidebar-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:#fff;line-height:1.1}
+.sidebar-sub{font-size:9px;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+
+.sidebar-nav{flex:1;padding:16px 12px}
+.nav-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);padding:0 8px;margin-bottom:6px;margin-top:12px}
+.nav-label:first-child{margin-top:0}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:11px;
+  color:rgba(255,255,255,.75);font-size:12px;font-weight:400;
+  cursor:pointer;border:none;background:none;width:100%;text-align:left;
+  font-family:'DM Sans',sans-serif;letter-spacing:.3px;
+  transition:all .15s;margin-bottom:2px;
+}
+.nav-item:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.22);color:#fff;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.nav-item .ni{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:rgba(255,255,255,.25);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;min-width:18px;text-align:center}
+.nav-badge.alert{background:#fff;color:var(--rose)}
+
+.sidebar-footer{padding:16px 12px;border-top:1px solid rgba(255,255,255,.15)}
+.btn-logout{
+  width:100%;padding:10px 12px;
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);
+  border-radius:11px;color:rgba(255,255,255,.85);
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;
+  letter-spacing:1px;cursor:pointer;transition:all .15s;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-logout:hover{background:rgba(255,255,255,.22);color:#fff}
+
+/* MAIN CONTENT */
+.main-content{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.page-header{
+  background:#fff;border-bottom:1.5px solid var(--border);
+  padding:18px 24px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.page-header-left{display:flex;flex-direction:column;gap:2px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--rose);line-height:1}
+.page-subtitle{font-size:11px;color:var(--text-3);letter-spacing:.5px}
+.page-header-right{display:flex;align-items:center;gap:8px}
+
+/* ═══════════════════════════════
+   STATS ROW
+═══════════════════════════════ */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:18px 24px;background:var(--rose-50);border-bottom:1px solid var(--border)}
+.stat-card{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;text-align:center;transition:box-shadow .15s}
+.stat-card:hover{box-shadow:var(--shadow-md)}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--rose);line-height:1;display:block}
+.stat-num.green{color:var(--green)}
+.stat-num.red{color:var(--red)}
+.stat-num.orange{color:var(--orange)}
+.stat-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-top:3px}
+
+/* ═══════════════════════════════
+   FILTER BAR
+═══════════════════════════════ */
+.filter-bar{padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);display:flex;gap:6px;overflow-x:auto;align-items:center}
+.filter-btn{
+  flex-shrink:0;padding:6px 14px;border-radius:100px;border:1.5px solid var(--border);
+  background:transparent;color:var(--text-3);
+  font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.5px;
+  cursor:pointer;transition:all .15s;font-weight:400;white-space:nowrap;
+}
+.filter-btn.active{background:var(--rose);color:#fff;border-color:var(--rose);box-shadow:0 2px 8px rgba(201,79,106,.3)}
+.filter-btn:hover:not(.active){border-color:var(--rose-light);color:var(--rose);background:var(--rose-50)}
+
+/* ═══════════════════════════════
+   BOOKINGS AREA
+═══════════════════════════════ */
+.bookings-scroll{flex:1;overflow-y:auto;padding:18px 24px;display:flex;flex-direction:column;gap:10px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-3)}
+.empty-state .ei{font-size:44px;display:block;margin-bottom:12px}
+.empty-state p{font-size:14px;line-height:1.7;color:var(--text-2)}
+
+/* BOOKING CARD */
+.booking-card{background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:all .15s;box-shadow:var(--shadow-sm)}
+.booking-card:hover{box-shadow:var(--shadow-md);border-color:var(--rose-200)}
+.card-header{padding:13px 16px;display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none}
+.card-header:hover{background:var(--rose-50)}
+.status-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.status-dot.pending{background:var(--amber);box-shadow:0 0 0 3px var(--amber-pale)}
+.status-dot.no-ss{background:var(--orange);box-shadow:0 0 0 3px var(--orange-pale)}
+.status-dot.confirmed{background:var(--green);box-shadow:0 0 0 3px var(--green-pale)}
+.status-dot.declined{background:var(--red);box-shadow:0 0 0 3px var(--red-pale)}
+.card-info{flex:1;min-width:0}
+.card-name{font-weight:600;color:var(--text);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{font-size:11px;color:var(--text-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.status-badge{padding:3px 10px;border-radius:100px;font-size:10px;letter-spacing:.5px;font-weight:600}
+.status-badge.pending{background:var(--amber-pale);color:var(--amber)}
+.status-badge.no-ss{background:var(--orange-pale);color:var(--orange)}
+.status-badge.confirmed{background:var(--green-pale);color:var(--green)}
+.status-badge.declined{background:var(--red-pale);color:var(--red)}
+.ss-indicator{font-size:10px;color:var(--text-3)}
+.chevron{font-size:11px;color:var(--text-3);transition:transform .2s;flex-shrink:0}
+.chevron.open{transform:rotate(180deg)}
+
+.card-body{display:none;border-top:1px solid var(--rose-100);padding:16px}
+.card-body.open{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:14px}
+.detail-item .dl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:2px;font-weight:500}
+.detail-item .dv{font-size:13px;color:var(--text);line-height:1.4}
+.detail-item.full{grid-column:1/-1}
+.pkg-badge{display:inline-block;background:var(--rose-100);color:var(--rose);border-radius:6px;padding:2px 9px;font-size:12px;font-weight:600}
+
+.ss-section{margin-bottom:13px}
+.ss-section-head{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:7px;font-weight:500}
+.ss-img{width:100%;max-height:260px;object-fit:contain;border-radius:10px;border:1px solid var(--border);display:block}
+.no-ss-warning{padding:12px 14px;background:var(--orange-pale);border:1.5px solid var(--orange-border);border-radius:10px;display:flex;gap:10px;align-items:flex-start}
+.no-ss-warning .wi{font-size:20px;flex-shrink:0}
+.no-ss-warning .wt{font-size:12px;color:#7a3a10;line-height:1.6}
+.no-ss-warning .wt strong{color:var(--orange)}
+
+.action-row{display:flex;gap:8px;margin-top:4px}
+.btn-confirm,.btn-decline{flex:1;padding:11px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.btn-confirm{background:linear-gradient(135deg,#27ae60,#1a9e50);color:#fff;box-shadow:0 4px 12px rgba(27,158,80,.3)}
+.btn-confirm:hover{box-shadow:0 6px 16px rgba(27,158,80,.4);transform:translateY(-1px)}
+.btn-decline{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;box-shadow:0 4px 12px rgba(192,57,43,.3)}
+.btn-decline:hover{box-shadow:0 6px 16px rgba(192,57,43,.4);transform:translateY(-1px)}
+.btn-confirm:active,.btn-decline:active{transform:scale(.97)}
+
+.admin-note-row{margin-top:10px;margin-bottom:10px}
+.admin-note-row label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);display:block;margin-bottom:5px;font-weight:500}
+.admin-note-row textarea{width:100%;background:var(--rose-50);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 11px;outline:none;resize:none;transition:all .2s}
+.admin-note-row textarea:focus{border-color:var(--rose-light);box-shadow:0 0 0 3px rgba(232,114,138,.1)}
+
+.confirmed-banner{padding:10px 13px;background:var(--green-pale);border:1px solid var(--green-border);border-radius:10px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--green)}
+.declined-banner{padding:10px 13px;background:var(--red-pale);border:1px solid var(--red-border);border-radius:10px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--red)}
+.banner-icon{font-size:16px;flex-shrink:0}
+.btn-revert{background:none;border:1.5px solid currentColor;border-radius:7px;padding:3px 9px;font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;color:inherit;margin-left:auto;transition:all .15s;font-weight:500;letter-spacing:.5px}
+.btn-revert:hover{background:rgba(0,0,0,.06)}
+.submitted-time{font-size:10px;color:var(--text-3);margin-top:10px;text-align:right;font-style:italic}
+
+/* ═══════════════════════════════
+   CLIENTS TAB
+═══════════════════════════════ */
+.clients-content{flex:1;overflow-y:auto;padding:18px 24px;display:flex;flex-direction:column;gap:14px}
+.panel{background:#fff;border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.panel-head{background:linear-gradient(135deg,var(--rose),var(--ribbon));padding:13px 18px;display:flex;align-items:center;gap:8px}
+.panel-head-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:#fff;font-weight:600}
+.panel-body{padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:500px){.form-row{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);font-weight:500}
+.field input{background:var(--rose-50);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:all .2s}
+.field input:focus{border-color:var(--rose-light);box-shadow:0 0 0 3px rgba(232,114,138,.1);background:#fff}
+.btn-create{align-self:flex-start;padding:11px 22px;background:linear-gradient(135deg,var(--rose-light),var(--rose));border:none;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;box-shadow:0 4px 14px rgba(201,79,106,.3)}
+.btn-create:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,79,106,.4)}
+.btn-create:active{transform:scale(.98)}
+.btn-create:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.msg-error{padding:9px 12px;background:var(--red-pale);border:1px solid var(--red-border);border-radius:9px;font-size:12px;color:var(--red);display:none}
+.msg-error.show{display:block}
+.msg-success{padding:9px 12px;background:var(--green-pale);border:1px solid var(--green-border);border-radius:9px;font-size:12px;color:var(--green);display:none}
+.msg-success.show{display:block}
+
+.clients-list-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:4px}
+.clients-list-head span{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);font-weight:500}
+.client-row{background:var(--rose-50);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:11px;transition:all .15s}
+.client-row:hover{box-shadow:var(--shadow-md);background:#fff}
+.cr-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--rose-light),var(--rose));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 2px 8px rgba(201,79,106,.25)}
+.cr-info{flex:1;min-width:0}
+.cr-name{font-weight:600;font-size:13px;color:var(--text)}
+.cr-user{font-size:11px;color:var(--text-3);margin-top:1px}
+.cr-date{font-size:10px;color:var(--text-3);margin-top:2px;font-style:italic}
+.cr-actions{display:flex;gap:6px;flex-shrink:0}
+.btn-pw{background:var(--amber-pale);border:1.5px solid var(--amber-border);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--amber);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;font-weight:600}
+.btn-pw:hover{background:var(--amber);color:#fff;border-color:var(--amber)}
+.btn-del{background:var(--red-pale);border:1.5px solid var(--red-border);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--red);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;font-weight:600}
+.btn-del:hover{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* ═══════════════════════════════
+   TOAST
+═══════════════════════════════ */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;border-radius:100px;padding:11px 24px;font-size:13px;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(45,21,32,.3)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* Spinner */
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════════
+   LOGOUT MODAL
+═══════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(45,21,32,.5);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-box{
+  background:#fff;border-radius:24px;padding:32px 28px 26px;
+  max-width:300px;width:100%;text-align:center;
+  box-shadow:var(--shadow-lg);
+  transform:scale(.9) translateY(12px);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  border:1.5px solid var(--blush);
+}
+.modal-overlay.show .modal-box{transform:scale(1) translateY(0)}
+.modal-icon{font-size:38px;display:block;margin-bottom:12px;animation:sway 3s ease-in-out infinite}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--rose);margin-bottom:8px;font-weight:700}
+.modal-msg{font-size:13px;color:var(--mauve);line-height:1.65;margin-bottom:22px}
+.modal-actions{display:flex;gap:8px}
+.modal-btn-cancel{flex:1;padding:11px;background:var(--rose-50);border:1.5px solid var(--blush);border-radius:11px;color:var(--mauve);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.modal-btn-cancel:hover{background:var(--blush)}
+.modal-btn-confirm{flex:1;padding:11px;background:linear-gradient(135deg,var(--rose-light),var(--rose));border:none;border-radius:11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 14px rgba(201,79,106,.3);transition:all .15s}
+.modal-btn-confirm:hover{box-shadow:0 6px 18px rgba(201,79,106,.4);transform:translateY(-1px)}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:640px){
+  .sidebar{
+    width:100%;min-height:auto;height:auto;flex-direction:row;
+    position:sticky;top:0;z-index:100;
+    flex-shrink:0;overflow-x:auto;
+  }
+  #dashboardPage.show{flex-direction:column}
+  .sidebar-brand{display:none}
+  .sidebar-nav{display:flex;flex-direction:row;padding:0;gap:0;overflow-x:auto;flex:1;align-items:center}
+  .nav-label{display:none}
+  .nav-item{flex-direction:column;gap:3px;padding:10px 12px;border-radius:0;font-size:9px;min-width:70px;justify-content:center;align-items:center;letter-spacing:.5px;margin-bottom:0}
+  .nav-item .ni{font-size:18px;width:auto}
+  .nav-badge{display:none}
+  .sidebar-footer{padding:8px;border-top:none;border-left:1px solid rgba(255,255,255,.15);flex-shrink:0}
+  .btn-logout{padding:8px 10px;font-size:9px;border-radius:8px}
+  .stats-row{grid-template-columns:repeat(3,1fr)}
+  .stats-row .stat-card:nth-child(4),.stats-row .stat-card:nth-child(5){display:none}
+  .bookings-scroll,.clients-content{padding:12px 14px}
+  .page-header{padding:14px 16px}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
+
 <!-- ════════════ LOGIN PAGE ════════════ -->
 <div id="loginPage">
   <div class="login-petals" id="loginPetals"></div>
-  <div class="login-card">
-    <span class="login-icon">🎀</span>
-    <div class="login-title">Admin Login</div>
-    <div class="login-sub">Jeoan Gwyneth · Booking Manager</div>
-    <div class="login-field">
-      <label>Password</label>
-      <input type="password" id="passwordInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter') doLogin()"/>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-brand">
+        <span class="login-icon">🎀</span>
+        <div class="login-title">Jeoan Gwyneth</div>
+        <div class="login-sub">Booking Admin</div>
+      </div>
+      <div class="form-field">
+        <label>Password</label>
+        <input type="password" id="passwordInput" placeholder="Enter admin password" autocomplete="current-password"/>
+      </div>
+      <button class="btn-login" onclick="doLogin()">🔑 &nbsp; Sign In</button>
+      <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
     </div>
-    <button class="btn-login" onclick="doLogin()">🔑 &nbsp; Sign In</button>
-    <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
   </div>
 </div>
 
-<!-- ════════════ DASHBOARD PAGE ════════════ -->
+<!-- ════════════ DASHBOARD ════════════ -->
 <div id="dashboardPage">
-  <div class="admin-header">
-    <div class="header-left">
-      <span class="header-logo">🎀</span>
-      <div>
-        <div class="header-title">Jeoan Gwyneth</div>
-        <div class="header-sub">Booking Admin</div>
-      </div>
-    </div>
-    <button class="btn-logout" onclick="confirmLogout()">Sign Out</button>
-  </div>
 
-  <!-- MAIN TABS -->
-  <div class="main-tabs">
-    <button class="main-tab active" id="tabBookings" onclick="switchMainTab('bookings')">📋 Bookings</button>
-    <button class="main-tab" id="tabClients" onclick="switchMainTab('clients')">👤 Client Accounts</button>
-  </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="sidebar-logo">🎀</span>
+      <div class="sidebar-title">Jeoan Gwyneth</div>
+      <div class="sidebar-sub">Admin Portal</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Management</div>
+      <button class="nav-item active" id="navBookings" onclick="switchTab('bookings')">
+        <span class="ni">📋</span> Bookings
+        <span class="nav-badge" id="navBadgePending">0</span>
+      </button>
+      <button class="nav-item" id="navClients" onclick="switchTab('clients')">
+        <span class="ni">👤</span> Clients
+        <span class="nav-badge" id="navBadgeClients">0</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="confirmLogout()">↩ Sign Out</button>
+    </div>
+  </aside>
 
-  <!-- BOOKINGS TAB -->
-  <div id="bookingsTab" style="display:flex;flex:1;flex-direction:column">
-    <div class="stats-bar" id="statsBar">
-      <div class="stat-chip"><span class="sn" id="statTotal">0</span><div class="sl">Total</div></div>
-      <div class="stat-chip no-ss"><span class="sn" id="statNoSS">0</span><div class="sl">No Screenshot</div></div>
-      <div class="stat-chip"><span class="sn" id="statPending">0</span><div class="sl">Pending</div></div>
-      <div class="stat-chip confirmed"><span class="sn" id="statConfirmed">0</span><div class="sl">Confirmed</div></div>
-      <div class="stat-chip declined"><span class="sn" id="statDeclined">0</span><div class="sl">Declined</div></div>
-    </div>
-    <div class="filter-tabs" id="filterTabs">
-      <button class="tab-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
-      <button class="tab-btn" data-filter="no-ss" onclick="setFilter('no-ss',this)">⚠️ No Screenshot</button>
-      <button class="tab-btn" data-filter="pending" onclick="setFilter('pending',this)">Pending</button>
-      <button class="tab-btn" data-filter="confirmed" onclick="setFilter('confirmed',this)">Confirmed</button>
-      <button class="tab-btn" data-filter="declined" onclick="setFilter('declined',this)">Declined</button>
-    </div>
-    <div class="bookings-area" id="bookingsArea">
-      <div class="empty-state"><span class="ei">🌸</span><p>No bookings yet.<br>They'll appear here once clients fill out the form!</p></div>
-    </div>
-  </div>
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
 
-  <!-- CLIENTS TAB -->
-  <div id="clientsTab">
-    <div class="clients-area">
-      <div class="new-client-card">
-        <div class="new-client-head"><span>➕ Create Client Account</span></div>
-        <div class="new-client-body">
-          <div class="nf">
-            <label>Display Name</label>
-            <input type="text" id="newDisplayName" placeholder="e.g. Maria Santos"/>
-          </div>
-          <div class="nf">
-            <label>Username</label>
-            <input type="text" id="newUsername" placeholder="e.g. maria_santos" autocomplete="off"/>
-          </div>
-          <div class="nf">
-            <label>Password</label>
-            <input type="password" id="newPassword" placeholder="Create a password for them" autocomplete="new-password"/>
-          </div>
-          <div class="create-error" id="createError"></div>
-          <div class="create-success" id="createSuccess"></div>
-          <button class="btn-create" id="createBtn" onclick="createClientAccount()">🎀 &nbsp; Create Account</button>
+    <!-- ── BOOKINGS VIEW ── -->
+    <div id="viewBookings" style="display:flex;flex-direction:column;flex:1;min-height:0">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-title">Bookings</div>
+          <div class="page-subtitle">Manage all incoming booking requests</div>
         </div>
       </div>
-      <div class="clients-list-head">
-        <span>Existing Accounts</span>
-        <span id="clientCount" style="font-size:12px;color:var(--pink-deep);font-weight:700"></span>
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-num" id="statTotal">0</span>
+          <div class="stat-lbl">Total</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num orange" id="statNoSS">0</span>
+          <div class="stat-lbl">No Screenshot</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="statPending">0</span>
+          <div class="stat-lbl">Pending</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num green" id="statConfirmed">0</span>
+          <div class="stat-lbl">Confirmed</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num red" id="statDeclined">0</span>
+          <div class="stat-lbl">Declined</div>
+        </div>
       </div>
-      <div id="clientsList">
-        <div class="empty-state"><span class="ei">👤</span><p>No client accounts yet.<br>Create one above!</p></div>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" data-filter="no-ss" onclick="setFilter('no-ss',this)">⚠️ No Screenshot</button>
+        <button class="filter-btn" data-filter="pending" onclick="setFilter('pending',this)">⏳ Pending</button>
+        <button class="filter-btn" data-filter="confirmed" onclick="setFilter('confirmed',this)">✅ Confirmed</button>
+        <button class="filter-btn" data-filter="declined" onclick="setFilter('declined',this)">❌ Declined</button>
+      </div>
+      <div class="bookings-scroll" id="bookingsArea">
+        <div class="empty-state"><span class="ei">🌸</span><p>No bookings yet.<br>They'll appear here once clients fill out the form!</p></div>
       </div>
     </div>
-  </div>
+
+    <!-- ── CLIENTS VIEW ── -->
+    <div id="viewClients" style="display:none;flex-direction:column;flex:1;min-height:0">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-title">Client Accounts</div>
+          <div class="page-subtitle">Create and manage client login credentials</div>
+        </div>
+      </div>
+      <div class="clients-content">
+        <!-- Create Form -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-head-title">➕ Create New Client Account</span>
+          </div>
+          <div class="panel-body">
+            <div class="form-row">
+              <div class="field">
+                <label>Display Name</label>
+                <input type="text" id="newDisplayName" placeholder="e.g. Maria Santos"/>
+              </div>
+              <div class="field">
+                <label>Username</label>
+                <input type="text" id="newUsername" placeholder="e.g. maria_santos" autocomplete="off"/>
+              </div>
+            </div>
+            <div class="field">
+              <label>Password</label>
+              <input type="password" id="newPassword" placeholder="Create a password for them" autocomplete="new-password"/>
+            </div>
+            <div class="msg-error" id="createError"></div>
+            <div class="msg-success" id="createSuccess"></div>
+            <button class="btn-create" id="createBtn" onclick="createClientAccount()">🎀 &nbsp; Create Account</button>
+          </div>
+        </div>
+
+        <!-- Existing Clients -->
+        <div class="panel">
+          <div class="panel-head" style="justify-content:space-between">
+            <span class="panel-head-title">Existing Accounts</span>
+            <span id="clientCount" style="font-size:11px;color:rgba(255,255,255,.7)"></span>
+          </div>
+          <div class="panel-body" id="clientsList">
+            <div class="empty-state"><span class="ei">👤</span><p>No client accounts yet.<br>Create one above!</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- LOGOUT CONFIRM MODAL -->
+<!-- LOGOUT MODAL -->
 <div class="modal-overlay" id="logoutModal">
   <div class="modal-box">
     <span class="modal-icon">🎀</span>
@@ -114,7 +485,387 @@
     </div>
   </div>
 </div>
-  <script src="admin-scripts.js"></script>
 
+<script>
+const API_BASE = window.location.origin;
+let adminToken = sessionStorage.getItem('admin_token') || null;
+let isLoggedIn = false;
+
+// ════════ LOGIN PETALS ════════
+(function(){
+  const pc = document.getElementById('loginPetals');
+  ['🌸','🌸','🌷','🌸','🌺','🌸','🌷'].forEach(p => {
+    const count = p==='🌸' ? 5 : 3;
+    for (let i=0; i<count; i++) {
+      const el = document.createElement('div');
+      el.className='petal'; el.textContent=p;
+      el.style.left = Math.random()*100+'%';
+      el.style.setProperty('--sz',(12+Math.random()*12)+'px');
+      el.style.setProperty('--dur',(5+Math.random()*6)+'s');
+      el.style.setProperty('--del',(Math.random()*8)+'s');
+      pc.appendChild(el);
+    }
+  });
+})();
+
+// ════════ AUTO LOGIN IF TOKEN ════════
+if (adminToken) {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('dashboardPage').classList.add('show');
+  isLoggedIn = true;
+  loadDashboard();
+}
+
+// ════════ AUTH ════════
+async function doLogin() {
+  const pw = document.getElementById('passwordInput').value;
+  try {
+    const res = await fetch(API_BASE + '/admin/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      document.getElementById('loginError').classList.add('show');
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').focus();
+      return;
+    }
+    adminToken = data.token;
+    sessionStorage.setItem('admin_token', adminToken);
+    isLoggedIn = true;
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboardPage').classList.add('show');
+    loadDashboard();
+  } catch(e) {
+    document.getElementById('loginError').textContent = 'Cannot connect to server.';
+    document.getElementById('loginError').classList.add('show');
+  }
+}
+document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+
+function confirmLogout() { document.getElementById('logoutModal').classList.add('show'); }
+function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
+function doLogout() {
+  closeLogoutModal();
+  isLoggedIn = false; adminToken = null;
+  sessionStorage.removeItem('admin_token');
+  document.getElementById('dashboardPage').classList.remove('show');
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('passwordInput').value = '';
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('loginError').textContent = 'Incorrect password. Please try again.';
+}
+
+// ════════ TAB SWITCHING ════════
+function switchTab(tab) {
+  document.getElementById('navBookings').classList.toggle('active', tab==='bookings');
+  document.getElementById('navClients').classList.toggle('active', tab==='clients');
+  document.getElementById('viewBookings').style.display = tab==='bookings' ? 'flex' : 'none';
+  document.getElementById('viewClients').style.display = tab==='clients' ? 'flex' : 'none';
+  if (tab==='clients') loadClients();
+}
+
+// ════════ DASHBOARD ════════
+let currentFilter = 'all';
+let openCardId = null;
+
+function loadDashboard() {
+  updateStats();
+  renderBookings();
+  setInterval(() => { if (isLoggedIn) { updateStats(); renderBookings(); } }, 10000);
+}
+
+async function fetchBookings() {
+  try {
+    const res = await fetch(API_BASE + '/admin/bookings', {
+      headers: { 'Authorization': 'Bearer ' + adminToken }
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch { return []; }
+}
+
+async function updateStats() {
+  const all = await fetchBookings();
+  const noSS = all.filter(b => !b.gcashScreenshot && b.status==='pending').length;
+  const pending = all.filter(b => b.status==='pending' && b.gcashScreenshot).length;
+  const confirmed = all.filter(b => b.status==='confirmed').length;
+  const declined = all.filter(b => b.status==='declined').length;
+  document.getElementById('statTotal').textContent = all.length;
+  document.getElementById('statNoSS').textContent = noSS;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statConfirmed').textContent = confirmed;
+  document.getElementById('statDeclined').textContent = declined;
+  // sidebar badges
+  const alertCount = noSS + pending;
+  const pb = document.getElementById('navBadgePending');
+  pb.textContent = alertCount;
+  pb.className = 'nav-badge' + (noSS > 0 ? ' alert' : '');
+  return all;
+}
+
+async function renderBookings() {
+  let all = await fetchBookings();
+  all.sort((a, b) => {
+    const order = sc => sc==='no-ss'?0:sc==='pending'?1:sc==='confirmed'?2:3;
+    const oa = order(getStatusClass(a)), ob = order(getStatusClass(b));
+    if (oa !== ob) return oa - ob;
+    return b.id - a.id;
+  });
+  if (currentFilter !== 'all') {
+    all = all.filter(b => {
+      if (currentFilter==='no-ss') return getStatusClass(b)==='no-ss';
+      if (currentFilter==='pending') return getStatusClass(b)==='pending';
+      if (currentFilter==='confirmed') return b.status==='confirmed';
+      if (currentFilter==='declined') return b.status==='declined';
+      return true;
+    });
+  }
+  const area = document.getElementById('bookingsArea');
+  if (all.length===0) {
+    area.innerHTML='<div class="empty-state"><span class="ei">🌸</span><p>No bookings in this category yet.</p></div>';
+    return;
+  }
+  area.innerHTML = all.map(b => buildCardHTML(b)).join('');
+  if (openCardId) {
+    const body = document.getElementById('body-'+openCardId);
+    const chev = document.getElementById('chev-'+openCardId);
+    if (body) body.classList.add('open');
+    if (chev) chev.classList.add('open');
+  }
+}
+
+function getStatusClass(b) {
+  if (b.status==='confirmed') return 'confirmed';
+  if (b.status==='declined')  return 'declined';
+  if (!b.gcashScreenshot)     return 'no-ss';
+  return 'pending';
+}
+function getStatusLabel(b) {
+  if (b.status==='confirmed') return '✅ Confirmed';
+  if (b.status==='declined')  return '❌ Declined';
+  if (!b.gcashScreenshot)     return '⚠️ No Screenshot';
+  return '⏳ Pending';
+}
+function formatDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+}
+function setFilter(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderBookings();
+}
+
+function buildCardHTML(b) {
+  const sc = getStatusClass(b);
+  const sl = getStatusLabel(b);
+  const ssIcon = b.gcashScreenshot ? '📸 Screenshot' : '⚠️ No Screenshot';
+  const isSettled = b.status==='confirmed' || b.status==='declined';
+  let ssHTML = b.gcashScreenshot
+    ? `<div class="ss-section"><div class="ss-section-head">📸 GCash Screenshot</div><img class="ss-img" src="${b.gcashScreenshot}" alt="GCash Screenshot"/></div>`
+    : `<div class="ss-section"><div class="no-ss-warning"><span class="wi">⚠️</span><div class="wt"><strong>No GCash screenshot provided.</strong><br>This client hasn't uploaded their ₱200 downpayment confirmation yet.</div></div></div>`;
+  let actionHTML = '';
+  if (b.status==='confirmed') {
+    actionHTML = `<div class="confirmed-banner"><span class="banner-icon">✅</span><span>Confirmed on ${formatDate(b.updatedAt)}</span><button class="btn-revert" onclick="revertStatus(${b.id})">Revert</button></div>`;
+  } else if (b.status==='declined') {
+    actionHTML = `<div class="declined-banner"><span class="banner-icon">❌</span><span>Declined on ${formatDate(b.updatedAt)}</span><button class="btn-revert" onclick="revertStatus(${b.id})">Revert</button></div>`;
+  } else {
+    const warnText = !b.gcashScreenshot ? '⚠️ No screenshot — confirm anyway?' : '✅ Screenshot attached — confirm this booking?';
+    actionHTML = `
+      <div style="margin-bottom:8px;padding:8px 11px;background:${!b.gcashScreenshot?'var(--orange-pale)':'var(--green-pale)'};border-radius:9px;font-size:12px;color:${!b.gcashScreenshot?'#7a3a10':'#1a5a30'};">${warnText}</div>
+      <div class="admin-note-row">
+        <label>Admin Note (optional)</label>
+        <textarea id="note-${b.id}" rows="2" placeholder="e.g. Called client, waiting for payment…">${b.adminNote||''}</textarea>
+      </div>
+      <div class="action-row">
+        <button class="btn-confirm" onclick="updateBookingStatus(${b.id},'confirmed')">✅ Confirm</button>
+        <button class="btn-decline" onclick="updateBookingStatus(${b.id},'declined')">❌ Decline</button>
+      </div>`;
+  }
+  let noteDisplay = '';
+  if (isSettled && b.adminNote) {
+    noteDisplay = `<div style="margin-top:9px;padding:8px 11px;background:var(--rose-50);border-radius:9px;font-size:12px;color:var(--mauve);"><strong>Note:</strong> ${escHtml(b.adminNote)}</div>`;
+  }
+  return `
+    <div class="booking-card" id="card-${b.id}">
+      <div class="card-header" onclick="toggleCard(${b.id})">
+        <span class="status-dot ${sc}"></span>
+        <div class="card-info">
+          <div class="card-name">${escHtml(b.name)}</div>
+          <div class="card-meta">📅 ${escHtml(b.date)} · ${escHtml(b.occasion)} · ${escHtml(b.package)}</div>
+        </div>
+        <div class="card-right">
+          <span class="status-badge ${sc}">${sl}</span>
+          <span class="ss-indicator">${ssIcon}</span>
+        </div>
+        <span class="chevron" id="chev-${b.id}">▼</span>
+      </div>
+      <div class="card-body" id="body-${b.id}">
+        <div class="detail-grid">
+          <div class="detail-item"><div class="dl">Client Name</div><div class="dv">${escHtml(b.name)}</div></div>
+          <div class="detail-item"><div class="dl">Event Date</div><div class="dv">${escHtml(b.date)}</div></div>
+          <div class="detail-item"><div class="dl">Performance Time</div><div class="dv">${escHtml(b.perfTime)}</div></div>
+          <div class="detail-item"><div class="dl">Occasion</div><div class="dv">${escHtml(b.occasion)}</div></div>
+          <div class="detail-item full"><div class="dl">Venue</div><div class="dv">${escHtml(b.venue)}</div></div>
+          <div class="detail-item"><div class="dl">Rate Type</div><div class="dv">${escHtml(b.rateType)}</div></div>
+          <div class="detail-item"><div class="dl">Package</div><div class="dv"><span class="pkg-badge">${escHtml(b.package)}</span></div></div>
+          ${b.notes?`<div class="detail-item full"><div class="dl">Notes</div><div class="dv">${escHtml(b.notes)}</div></div>`:''}
+          ${b.clientUsername?`<div class="detail-item"><div class="dl">Account</div><div class="dv">@${escHtml(b.clientUsername)}</div></div>`:''}
+        </div>
+        ${ssHTML}
+        ${actionHTML}
+        ${noteDisplay}
+        <div class="submitted-time">Submitted: ${formatDate(b.submittedAt)}</div>
+      </div>
+    </div>`;
+}
+
+function toggleCard(id) {
+  const body = document.getElementById('body-'+id);
+  const chev = document.getElementById('chev-'+id);
+  const isOpen = body.classList.contains('open');
+  if (isOpen) { body.classList.remove('open'); chev.classList.remove('open'); openCardId=null; }
+  else { body.classList.add('open'); chev.classList.add('open'); openCardId=id; }
+}
+
+async function updateBookingStatus(id, status) {
+  const noteEl = document.getElementById('note-'+id);
+  const note = noteEl ? noteEl.value.trim() : '';
+  try {
+    await fetch(API_BASE+'/admin/bookings/'+id, {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
+      body: JSON.stringify({ status, adminNote: note })
+    });
+    showToast(status==='confirmed' ? '✅ Booking confirmed!' : '❌ Booking declined.');
+    updateStats(); renderBookings();
+  } catch(e) { showToast('❌ Error updating booking.'); }
+}
+
+async function revertStatus(id) {
+  try {
+    await fetch(API_BASE+'/admin/bookings/'+id, {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
+      body: JSON.stringify({ status:'pending', adminNote:'' })
+    });
+    showToast('↩️ Booking reverted to pending.');
+    updateStats(); renderBookings();
+  } catch(e) { showToast('❌ Error reverting.'); }
+}
+
+// ════════ CLIENTS ════════
+async function loadClients() {
+  const listEl = document.getElementById('clientsList');
+  listEl.innerHTML='<div class="empty-state"><span class="ei" style="font-size:24px">⏳</span><p>Loading…</p></div>';
+  try {
+    const res = await fetch(API_BASE+'/admin/clients', {
+      headers: { 'Authorization': 'Bearer ' + adminToken }
+    });
+    const clients = await res.json();
+    document.getElementById('clientCount').textContent = clients.length + ' account'+(clients.length===1?'':'s');
+    document.getElementById('navBadgeClients').textContent = clients.length;
+    if (clients.length===0) {
+      listEl.innerHTML='<div class="empty-state"><span class="ei">👤</span><p>No client accounts yet.</p></div>';
+      return;
+    }
+    listEl.innerHTML = clients.map(c => `
+      <div class="client-row" id="cr-${c.id}">
+        <div class="cr-avatar">👤</div>
+        <div class="cr-info">
+          <div class="cr-name">${escHtml(c.display_name)}</div>
+          <div class="cr-user">@${escHtml(c.username)}</div>
+          <div class="cr-date">Created ${formatDate(c.created_at)}</div>
+        </div>
+        <div class="cr-actions">
+          <button class="btn-pw" onclick="resetClientPassword(${c.id},'${escHtml(c.display_name)}')">🔑 Reset PW</button>
+          <button class="btn-del" onclick="deleteClient(${c.id},'${escHtml(c.display_name)}')">🗑️ Delete</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    listEl.innerHTML='<div class="empty-state"><p>Error loading clients.</p></div>';
+  }
+}
+
+async function createClientAccount() {
+  const displayName = document.getElementById('newDisplayName').value.trim();
+  const username = document.getElementById('newUsername').value.trim();
+  const password = document.getElementById('newPassword').value;
+  const errEl = document.getElementById('createError');
+  const sucEl = document.getElementById('createSuccess');
+  const btn = document.getElementById('createBtn');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+  if (!displayName||!username||!password) {
+    errEl.textContent='Please fill in all fields.'; errEl.classList.add('show'); return;
+  }
+  if (password.length<4) {
+    errEl.textContent='Password must be at least 4 characters.'; errEl.classList.add('show'); return;
+  }
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Creating…';
+  try {
+    const res = await fetch(API_BASE+'/admin/clients', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
+      body: JSON.stringify({ username, password, displayName })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent=data.error||'Could not create account.';
+      errEl.classList.add('show'); btn.disabled=false; btn.innerHTML='🎀 &nbsp; Create Account'; return;
+    }
+    sucEl.textContent='✅ Account created! Username: '+username+' — Share credentials with client.';
+    sucEl.classList.add('show');
+    document.getElementById('newDisplayName').value='';
+    document.getElementById('newUsername').value='';
+    document.getElementById('newPassword').value='';
+    btn.disabled=false; btn.innerHTML='🎀 &nbsp; Create Account';
+    loadClients();
+    showToast('✅ Account created for '+displayName+'!');
+  } catch(e) {
+    errEl.textContent='Server error. Please try again.';
+    errEl.classList.add('show'); btn.disabled=false; btn.innerHTML='🎀 &nbsp; Create Account';
+  }
+}
+
+async function resetClientPassword(id, name) {
+  const newPw = prompt('Set new password for '+name+':');
+  if (!newPw) return;
+  if (newPw.length<4) { alert('Password must be at least 4 characters.'); return; }
+  try {
+    await fetch(API_BASE+'/admin/clients/'+id+'/password', {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
+      body: JSON.stringify({ password: newPw })
+    });
+    showToast('🔑 Password updated for '+name+'!');
+  } catch(e) { showToast('❌ Error updating password.'); }
+}
+
+async function deleteClient(id, name) {
+  if (!confirm('Delete account for '+name+'? This cannot be undone.')) return;
+  try {
+    await fetch(API_BASE+'/admin/clients/'+id, {
+      method:'DELETE', headers:{'Authorization':'Bearer '+adminToken}
+    });
+    showToast('🗑️ Account deleted.');
+    loadClients();
+  } catch(e) { showToast('❌ Error deleting account.'); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
 </body>
 </html>
