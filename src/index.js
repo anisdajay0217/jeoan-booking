@@ -65,10 +65,19 @@ app.use(express.static(__dirname));
 // ─── Health & Root ───────────────────────────────────────────
 app.get('/health', (req, res) => res.status(200).send('OK'));
 
+// ─── ROOT ROUTE ───
+// This makes your main link show the Client page automatically
 app.get('/', (req, res) => {
-  // FIX: index.html is in the same folder as this index.js
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'Client.html'));
 });
+
+// This allows the Admin page to be accessed at /Admin.html
+app.get('/Admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Admin.html'));
+});
+
+// Keep your existing static middleware so CSS/Images load
+app.use(express.static(__dirname));
 
 // ─── ADMIN AUTH ───────────────────────────────────────────────
 app.post('/admin/login', (req, res) => {
