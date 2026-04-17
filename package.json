@@ -1,5 +1,5 @@
 {
-  "name": "jeoan-booking-api",
+  "name": "jeoan-booking",
   "version": "1.0.0",
   "description": "Jeoan Gwyneth Booking Backend",
   "main": "src/index.js",
