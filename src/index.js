@@ -86,8 +86,11 @@ function requireClient(req, res, next) {
   }
 }
 
-// This tells Express to send index.html when someone visits the base URL
-app.use(express.static(__dirname));
+// ─── ROOT ROUTE ───
+// This tells the server what to show when you click the main Railway link
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'index.html'));
+});
 
 // ─── ADMIN AUTH ───────────────────────────────────────────────
 app.post('/admin/login', (req, res) => {
