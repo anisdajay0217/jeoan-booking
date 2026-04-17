@@ -206,9 +206,54 @@ app.patch('/client/bookings/:id/screenshot', requireClient, async (req: Request,
   res.json({ ok: true });
 });
 
-// ─── CATCH-ALL ────────────────────────────────────────────────────────────────
+// ── NEW: Get client's own bookings ──────────────────────────────────────────
+app.get('/client/bookings', requireClient, async (req: AuthRequest, res: Response) => {
+  const result = await pool.query(
+    'SELECT * FROM bookings WHERE client_username = $1 ORDER BY submitted_at DESC',
+    [req.user?.username]
+  );
+  res.json(result.rows.map(mapBooking));
+});
+
+// ── NEW: Resubmit a declined booking ───────────────────────────────────────
+app.patch('/client/bookings/:id/resubmit', requireClient, async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  const { name, date, perfTime, occasion, venue, rateType, package: pkg, notes, gcashScreenshot } = req.body as {
+    name?: string; date?: string; perfTime?: string; occasion?: string; venue?: string;
+    rateType?: string; package?: string; notes?: string; gcashScreenshot?: string;
+  };
+  // Ensure the booking belongs to this client and is declined
+  const check = await pool.query(
+    'SELECT id FROM bookings WHERE id = $1 AND client_username = $2 AND status = $3',
+    [id, req.user?.username, 'declined']
+  );
+  if (check.rows.length === 0) {
+    res.status(403).json({ error: 'Booking not found or not eligible for resubmission' }); return;
+  }
+  await pool.query(
+    `UPDATE bookings SET
+      name            = COALESCE($1,  name),
+      date            = COALESCE($2,  date),
+      perf_time       = COALESCE($3,  perf_time),
+      occasion        = COALESCE($4,  occasion),
+      venue           = COALESCE($5,  venue),
+      rate_type       = COALESCE($6,  rate_type),
+      package         = COALESCE($7,  package),
+      notes           = COALESCE($8,  notes),
+      gcash_screenshot= COALESCE($9,  gcash_screenshot),
+      status          = 'pending',
+      admin_note      = '',
+      updated_at      = NOW()
+    WHERE id = $10`,
+    [name ?? null, date ?? null, perfTime ?? null, occasion ?? null, venue ?? null,
+     rateType ?? null, pkg ?? null, notes ?? null, gcashScreenshot ?? null, id]
+  );
+  res.json({ ok: true });
+});
+
+// ─── CATCH-ALL — serve clientdashboard.html as default ───────────────────────
 app.get('*', (_req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '../public/client.html'));
+  res.sendFile(path.join(__dirname, '../public/clientdashboard.html'));
 });
 
 // ─── START ────────────────────────────────────────────────────────────────────
