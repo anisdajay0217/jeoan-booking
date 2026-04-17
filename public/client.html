@@ -778,7 +778,7 @@ function compressImage(file, callback) {
   };
   reader.readAsDataURL(file);
 }
-
+ 
 async function handleGcashUpload(input) {
   if (!input.files || !input.files[0] || !currentBookingId) return;
   compressImage(input.files[0], async function(dataUrl) {
@@ -789,10 +789,7 @@ async function handleGcashUpload(input) {
     try {
       await fetch(API_BASE + '/client/bookings/' + currentBookingId + '/screenshot', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + clientToken
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + clientToken },
         body: JSON.stringify({ gcashScreenshot: dataUrl })
       });
     } catch(e) { console.warn('Screenshot upload failed', e); }
