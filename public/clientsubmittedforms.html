@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>My Submissions — Jeoan Booking 🎀</title>
+  <link rel="stylesheet" href="client-styles.css"/>
+  <link rel="stylesheet" href="clientdashboard-styles.css"/>
+  <link rel="stylesheet" href="clientsubmittedforms-styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400&family=Pinyon+Script&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="cd-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="cd-sidebar">
+    <div class="cd-brand">
+      <span class="cd-brand-icon">🎀</span>
+      <div class="cd-brand-name">Jeoan Gwyneth</div>
+      <div class="cd-brand-sub">Client Portal</div>
+    </div>
+    <nav class="cd-nav">
+      <div class="cd-nav-label">Menu</div>
+      <a class="cd-nav-item" href="clientdashboard.html">
+        <span class="ni">📋</span> Booking Form
+      </a>
+      <a class="cd-nav-item active" href="clientsubmittedforms.html">
+        <span class="ni">📂</span> My Submissions
+        <span class="cd-nav-badge" id="sfBadge"></span>
+      </a>
+      <a class="cd-nav-item" href="clientrejectedforms.html">
+        <span class="ni">❌</span> Rejected
+      </a>
+    </nav>
+    <div class="cd-sidebar-footer">
+      <div class="cd-welcome" id="sfWelcome"></div>
+      <button class="cd-signout" onclick="sfConfirmLogout()">↩ Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="cd-main">
+    <div class="cd-page-header">
+      <div class="cd-page-title">📂 My Submissions</div>
+      <div class="cd-page-subtitle">Track your pending and confirmed bookings</div>
+    </div>
+    <div class="cd-scroll" id="submittedArea">
+      <div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- LOGOUT MODAL -->
+<div class="cd-modal-overlay" id="sfLogoutModal">
+  <div class="cd-modal-box">
+    <span class="cd-modal-icon">🎀</span>
+    <div class="cd-modal-title">Sign Out?</div>
+    <div class="cd-modal-msg">Are you sure you want to sign out? 💕</div>
+    <div class="cd-modal-actions">
+      <button class="cd-modal-btn-cancel"  onclick="sfCloseLogout()">Stay</button>
+      <button class="cd-modal-btn-confirm" onclick="sfDoLogout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="cd-toast" id="sfToast"></div>
+
+<script src="clientsubmittedforms-scripts.js"></script>
+</body>
+</html>
