@@ -78,8 +78,19 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
 .header-logo{font-size:22px}
 .header-title{font-family:'Playfair Display',serif;color:#fff;font-size:16px;font-weight:700;line-height:1.1}
 .header-sub{font-size:10px;color:rgba(255,255,255,.7);letter-spacing:1.5px;text-transform:uppercase}
-.btn-logout{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;font-family:'Lato',sans-serif;font-size:11px;padding:6px 12px;cursor:pointer;transition:all .15s;letter-spacing:.5px}
-.btn-logout:hover{background:rgba(255,255,255,.3)}
+.btn-logout{
+  background:rgba(255,255,255,.2);
+  border:1.5px solid rgba(255,255,255,.4);
+  border-radius:100px;
+  color:#fff;
+  font-family:'Lato',sans-serif;
+  font-size:11px;
+  padding:6px 16px;
+  cursor:pointer;
+  transition:all .15s;
+  letter-spacing:.5px;
+}
+.btn-logout:hover{background:rgba(255,255,255,.32)}
 
 /* MAIN TABS */
 .main-tabs{display:flex;background:#fff;border-bottom:2px solid var(--border)}
@@ -211,6 +222,48 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
 /* Spinner */
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ════════════ LOGOUT CONFIRM MODAL ════════════ */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(58,31,40,.5);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  z-index:500;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-box{
+  background:#fff;
+  border-radius:24px;padding:32px 28px 26px;
+  max-width:300px;width:100%;text-align:center;
+  box-shadow:0 24px 60px rgba(201,79,106,.28);
+  transform:scale(.9) translateY(12px);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  border:1.5px solid var(--blush);
+}
+.modal-overlay.show .modal-box{transform:scale(1) translateY(0)}
+.modal-icon{font-size:42px;display:block;margin-bottom:12px;animation:sway 3s ease-in-out infinite}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--pink-deep);margin-bottom:8px}
+.modal-msg{font-size:13px;color:var(--mauve);line-height:1.65;margin-bottom:22px}
+.modal-actions{display:flex;gap:8px}
+.modal-btn-cancel{
+  flex:1;padding:11px;
+  background:var(--pink-light);border:1.5px solid var(--blush);
+  border-radius:11px;color:var(--mauve);
+  font-family:'Lato',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;transition:all .15s;
+}
+.modal-btn-cancel:hover{background:var(--blush)}
+.modal-btn-confirm{
+  flex:1;padding:11px;
+  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+  border:none;border-radius:11px;color:#fff;
+  font-family:'Lato',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;box-shadow:0 4px 14px rgba(201,79,106,.3);transition:all .15s;
+}
+.modal-btn-confirm:hover{box-shadow:0 6px 18px rgba(201,79,106,.4);transform:translateY(-1px)}
+.modal-btn-confirm:active{transform:scale(.97)}
 </style>
 </head>
 <body>
@@ -241,7 +294,7 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
         <div class="header-sub">Booking Admin</div>
       </div>
     </div>
-    <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    <button class="btn-logout" onclick="confirmLogout()">Sign Out</button>
   </div>
 
   <!-- MAIN TABS -->
@@ -274,7 +327,6 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
   <!-- CLIENTS TAB -->
   <div id="clientsTab">
     <div class="clients-area">
-      <!-- Create New Client -->
       <div class="new-client-card">
         <div class="new-client-head"><span>➕ Create Client Account</span></div>
         <div class="new-client-body">
@@ -295,8 +347,6 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
           <button class="btn-create" id="createBtn" onclick="createClientAccount()">🎀 &nbsp; Create Account</button>
         </div>
       </div>
-
-      <!-- Clients List -->
       <div class="clients-list-head">
         <span>Existing Accounts</span>
         <span id="clientCount" style="font-size:12px;color:var(--pink-deep);font-weight:700"></span>
@@ -311,21 +361,30 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script>
-// ════════════ CONFIG ════════════
-// Auto-detects the host — works on Railway and localhost
-const API_BASE = window.location.origin;
+<!-- LOGOUT CONFIRM MODAL -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal-box">
+    <span class="modal-icon">🎀</span>
+    <div class="modal-title">Sign Out?</div>
+    <div class="modal-msg">Are you sure you want to sign out of the admin dashboard?</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeLogoutModal()">Stay</button>
+      <button class="modal-btn-confirm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+</div>
 
-// ════════════ AUTH STATE ════════════
+<script>
+const API_BASE = window.location.origin;
 let adminToken = sessionStorage.getItem('admin_token') || null;
 let isLoggedIn = false;
 
-// ════════════ LOGIN PETALS ════════════
+// ════════ LOGIN PETALS ════════
 (function(){
   const pc = document.getElementById('loginPetals');
   ['🌸','🌸','🌷','🌸','🌺','🌸','🌷'].forEach(p => {
     const count = p==='🌸' ? 5 : 3;
-    for (let i = 0; i < count; i++) {
+    for (let i=0; i<count; i++) {
       const el = document.createElement('div');
       el.className='petal'; el.textContent=p;
       el.style.left = Math.random()*100+'%';
@@ -337,13 +396,20 @@ let isLoggedIn = false;
   });
 })();
 
-// ════════════ ADMIN AUTH ════════════
+// ════════ AUTO LOGIN IF TOKEN ════════
+if (adminToken) {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('dashboardPage').classList.add('show');
+  isLoggedIn = true;
+  loadDashboard();
+}
+
+// ════════ ADMIN AUTH ════════
 async function doLogin() {
   const pw = document.getElementById('passwordInput').value;
   try {
     const res = await fetch(API_BASE + '/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ password: pw })
     });
     const data = await res.json();
@@ -365,8 +431,14 @@ async function doLogin() {
   }
 }
 
+function confirmLogout() {
+  document.getElementById('logoutModal').classList.add('show');
+}
+function closeLogoutModal() {
+  document.getElementById('logoutModal').classList.remove('show');
+}
 function doLogout() {
-  if (!confirm('Are you sure you want to sign out?')) return;
+  closeLogoutModal();
   isLoggedIn = false;
   adminToken = null;
   sessionStorage.removeItem('admin_token');
@@ -381,7 +453,7 @@ document.getElementById('passwordInput').addEventListener('keydown', function(e)
   if (e.key === 'Enter') doLogin();
 });
 
-// ════════════ MAIN TAB SWITCH ════════════
+// ════════ MAIN TAB SWITCH ════════
 function switchMainTab(tab) {
   document.getElementById('tabBookings').classList.toggle('active', tab==='bookings');
   document.getElementById('tabClients').classList.toggle('active', tab==='clients');
@@ -390,7 +462,7 @@ function switchMainTab(tab) {
   if (tab === 'clients') loadClients();
 }
 
-// ════════════ DASHBOARD ════════════
+// ════════ DASHBOARD ════════
 let currentFilter = 'all';
 let openCardId = null;
 
@@ -557,30 +629,28 @@ async function updateBookingStatus(id, status) {
   const note = noteEl ? noteEl.value.trim() : '';
   try {
     await fetch(API_BASE + '/admin/bookings/' + id, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
       body: JSON.stringify({ status, adminNote: note })
     });
     showToast(status === 'confirmed' ? '✅ Booking confirmed!' : '❌ Booking declined.');
-    updateStats();
-    renderBookings();
+    updateStats(); renderBookings();
   } catch(e) { showToast('❌ Error updating booking.'); }
 }
 
 async function revertStatus(id) {
   try {
     await fetch(API_BASE + '/admin/bookings/' + id, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
       body: JSON.stringify({ status: 'pending', adminNote: '' })
     });
     showToast('↩️ Booking reverted to pending.');
-    updateStats();
-    renderBookings();
+    updateStats(); renderBookings();
   } catch(e) { showToast('❌ Error reverting booking.'); }
 }
 
-// ════════════ CLIENT ACCOUNTS ════════════
+// ════════ CLIENT ACCOUNTS ════════
 async function loadClients() {
   const listEl = document.getElementById('clientsList');
   listEl.innerHTML = '<div class="empty-state"><span class="ei" style="font-size:24px">⏳</span><p>Loading…</p></div>';
@@ -620,51 +690,36 @@ async function createClientAccount() {
   const errEl = document.getElementById('createError');
   const sucEl = document.getElementById('createSuccess');
   const btn = document.getElementById('createBtn');
-  errEl.classList.remove('show');
-  sucEl.classList.remove('show');
-
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
   if (!displayName || !username || !password) {
-    errEl.textContent = 'Please fill in all fields.';
-    errEl.classList.add('show');
-    return;
+    errEl.textContent = 'Please fill in all fields.'; errEl.classList.add('show'); return;
   }
   if (password.length < 4) {
-    errEl.textContent = 'Password must be at least 4 characters.';
-    errEl.classList.add('show');
-    return;
+    errEl.textContent = 'Password must be at least 4 characters.'; errEl.classList.add('show'); return;
   }
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Creating…';
-
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Creating…';
   try {
     const res = await fetch(API_BASE + '/admin/clients', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
       body: JSON.stringify({ username, password, displayName })
     });
     const data = await res.json();
     if (!res.ok) {
       errEl.textContent = data.error || 'Could not create account.';
-      errEl.classList.add('show');
-      btn.disabled = false;
-      btn.innerHTML = '🎀 &nbsp; Create Account';
-      return;
+      errEl.classList.add('show'); btn.disabled = false; btn.innerHTML = '🎀 &nbsp; Create Account'; return;
     }
-    sucEl.textContent = '✅ Account created! Username: ' + username + '  — Share credentials with client.';
+    sucEl.textContent = '✅ Account created! Username: ' + username + ' — Share credentials with client.';
     sucEl.classList.add('show');
     document.getElementById('newDisplayName').value = '';
     document.getElementById('newUsername').value = '';
     document.getElementById('newPassword').value = '';
-    btn.disabled = false;
-    btn.innerHTML = '🎀 &nbsp; Create Account';
+    btn.disabled = false; btn.innerHTML = '🎀 &nbsp; Create Account';
     loadClients();
     showToast('✅ Account created for ' + displayName + '!');
   } catch(e) {
     errEl.textContent = 'Server error. Please try again.';
-    errEl.classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = '🎀 &nbsp; Create Account';
+    errEl.classList.add('show'); btn.disabled = false; btn.innerHTML = '🎀 &nbsp; Create Account';
   }
 }
 
@@ -674,8 +729,8 @@ async function resetClientPassword(id, name) {
   if (newPw.length < 4) { alert('Password must be at least 4 characters.'); return; }
   try {
     await fetch(API_BASE + '/admin/clients/' + id + '/password', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
       body: JSON.stringify({ password: newPw })
     });
     showToast('🔑 Password updated for ' + name + '!');
@@ -686,8 +741,7 @@ async function deleteClient(id, name) {
   if (!confirm('Delete account for ' + name + '? This cannot be undone.')) return;
   try {
     await fetch(API_BASE + '/admin/clients/' + id, {
-      method: 'DELETE',
-      headers: { 'Authorization': 'Bearer ' + adminToken }
+      method:'DELETE', headers:{'Authorization':'Bearer '+adminToken}
     });
     showToast('🗑️ Account deleted.');
     loadClients();
@@ -696,11 +750,9 @@ async function deleteClient(id, name) {
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
-
 function escHtml(s) {
   if (!s) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
