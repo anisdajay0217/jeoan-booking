@@ -1,37 +1,76 @@
 # 🎀 Jeoan Gwyneth — Booking System
 
-A booking system for Jeoan Gwyneth, built with TypeScript + Express + SQLite.
+A booking system for Jeoan Gwyneth, built with **TypeScript + Express + SQLite**.
+
+---
 
 ## Project Structure
 
 ```
 jeoan-booking/
 ├── src/
-│   └── server.ts          ← TypeScript backend (Express + SQLite)
+│   └── server.ts            ← TypeScript backend (Express + SQLite)
 ├── public/
-│   ├── client.html        ← Client booking page
-│   └── admin.html         ← Admin dashboard (access via /admin.html)
+│   ├── styles.css           ← Shared CSS (colours, animations, modals, buttons)
+│   ├── login.html           ← Page 1 — Client login
+│   ├── welcome.html         ← Page 2 — Welcome screen after login
+│   ├── booking.html         ← Page 3 — Booking form (Submit + Cancel buttons)
+│   ├── thankyou.html        ← Page 4 — Booking confirmed + GCash upload
+│   └── admin.html           ← Admin dashboard (access via /admin.html)
 ├── package.json
 ├── tsconfig.json
 ├── railway.toml
 └── .gitignore
 ```
 
+### Why are the HTML files split up?
+
+Each page has its own `.html` file so they are short and easy to read and edit individually:
+
+| File | What it does |
+|------|-------------|
+| `styles.css` | All shared CSS variables, animations, modal styles, button styles |
+| `login.html` | Login form + login JS logic |
+| `welcome.html` | Greeting card + auth guard |
+| `booking.html` | Full booking form, rate/package picker, terms, **Submit + Cancel buttons** |
+| `thankyou.html` | Booking summary, GCash QR/number, screenshot upload |
+| `admin.html` | Jeoan's admin dashboard |
+
+Pages navigate to each other via `window.location.href`. Session data (token, display name, booking object) is passed through `sessionStorage`.
+
+---
+
+## New Features (vs. original single-file version)
+
+### ✅ Cancel Button (on Booking Form)
+
+`booking.html` now has **two action buttons** at the bottom of the form:
+
+```
+[ 🎀  Submit Booking ]   ← sends all form data to Jeoan (disabled until T&C ticked)
+[    ✕  Cancel         ]   ← shows a confirm modal, then returns to welcome.html
+```
+
+- The **Submit** button collects all encoded form data and POSTs it to `/client/bookings`.
+- The **Cancel** button opens a confirmation modal ("Keep Editing" / "Yes, Cancel"). If confirmed, it navigates back to `welcome.html` without submitting anything.
+
+---
+
 ## URLs after deployment
 
 | Page | URL |
 |------|-----|
-| Client booking | `https://your-app.up.railway.app/` |
+| Client login | `https://your-app.up.railway.app/login.html` |
+| Client booking | `https://your-app.up.railway.app/booking.html` |
 | Admin dashboard | `https://your-app.up.railway.app/admin.html` |
+
+> **Tip:** Set your server to redirect `/` → `/login.html` so clients land on the login page by default.
 
 ---
 
 ## Deploy to Railway
 
 ### Step 1 — Push to GitHub
-
-1. Create a new GitHub repo (e.g. `jeoan-booking`)
-2. Push all files to the `main` branch
 
 ```bash
 git init
@@ -48,22 +87,22 @@ git push -u origin main
 2. Select your `jeoan-booking` repo
 3. Railway will auto-detect and build it
 
-### Step 3 — Set Environment Variables in Railway
+### Step 3 — Set Environment Variables
 
-Go to your service → **Variables** tab and add:
+In Railway → your service → **Variables** tab:
 
 | Variable | Value | Notes |
 |----------|-------|-------|
-| `ADMIN_PASSWORD` | `your_secure_password` | Your admin login password |
-| `JWT_SECRET` | `some_long_random_string` | Any random 32+ char string |
+| `ADMIN_PASSWORD` | `your_secure_password` | Admin login password |
+| `JWT_SECRET` | `some_long_random_string` | Any random 32+ character string |
 
-> **Optional:** If you want to use a hashed password instead of plain text, set `ADMIN_PASSWORD_HASH` with a bcrypt hash and leave `ADMIN_PASSWORD` unset.
+> **Optional:** Use `ADMIN_PASSWORD_HASH` with a bcrypt hash instead of plain text.
 
 ### Step 4 — Add a Public Domain
 
-In Railway → your service → **Settings** → **Networking** → **Generate Domain**
+Railway → your service → **Settings** → **Networking** → **Generate Domain**
 
-That's it! 🎉
+Done! 🎉
 
 ---
 
@@ -81,5 +120,6 @@ Server runs at `http://localhost:3000`
 ## Notes
 
 - The SQLite database (`jeoan.db`) is created automatically on first run.
-- Railway's filesystem is **ephemeral** — data resets on redeploy. For persistent storage, upgrade to Railway's Volume feature or switch to PostgreSQL.
-- To add a persistent volume in Railway: service → **Volumes** → mount at `/app` and set `DB_PATH=/app/jeoan.db` in environment variables.
+- Railway's filesystem is **ephemeral** — data resets on redeploy. For persistent storage, use Railway's Volume feature or switch to PostgreSQL.
+- To add a persistent volume: service → **Volumes** → mount at `/app`, then set `DB_PATH=/app/jeoan.db` in environment variables.
+- Session data between pages uses `sessionStorage` (cleared when the browser tab is closed).
