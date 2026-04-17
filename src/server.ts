@@ -7,8 +7,8 @@ import { Pool } from 'pg';
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'jeoan-secret-change-me';
-const ADMIN_PASSWORD_PLAIN = process.env.ADMIN_PASSWORD || 'admin1234';
+const JWT_SECRET = process.env.JB_SECRET || 'JeoanChuchu';
+const ADMIN_PASSWORD_PLAIN = process.env.ADMIN_PASSWORD || 'JeoanChuchu';
 
 // ─── DATABASE (Postgres) ──────────────────────────────────────────────────────
 const pool = new Pool({
