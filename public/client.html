@@ -64,45 +64,6 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
 .login-error.show{display:block}
 .login-note{margin-top:14px;font-size:11px;color:var(--muted);line-height:1.6}
 
-/* ═══════════════════════ WELCOME PAGE ═══════════════════════ */
-#welcomePage{
-  position:fixed;inset:0;
-  background:linear-gradient(150deg,#f5c8d8 0%,#fce8ee 40%,#f0b8c8 80%,#fce8ee 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  overflow:hidden;z-index:20;transition:opacity .5s ease,transform .5s ease;
-}
-#welcomePage.hide{opacity:0;transform:translateY(-30px);pointer-events:none}
-.welcome-petals{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-.welcome-card{
-  position:relative;z-index:1;
-  background:rgba(255,248,250,0.72);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1.5px solid rgba(255,255,255,.85);
-  border-radius:28px;padding:36px 32px 30px;text-align:center;
-  max-width:340px;width:90%;
-  box-shadow:0 20px 60px rgba(201,79,106,.18),0 4px 16px rgba(201,79,106,.1);
-  animation:cardIn .6s cubic-bezier(.34,1.56,.64,1) both;
-}
-.welcome-bow{font-size:34px;display:block;margin-bottom:10px;animation:sway 3s ease-in-out infinite}
-.welcome-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--pink-deep);line-height:1.2;margin-bottom:4px}
-.welcome-greeting{font-family:'Playfair Display',serif;font-size:15px;font-style:italic;color:var(--mauve);margin-bottom:4px}
-.welcome-script{font-family:'Pinyon Script',cursive;font-size:22px;color:var(--mauve);margin-bottom:10px}
-.welcome-divider{width:60px;height:1.5px;background:linear-gradient(90deg,transparent,var(--pink),transparent);margin:0 auto 12px}
-.welcome-tagline{font-size:13px;color:var(--mauve);line-height:1.6;margin-bottom:6px}
-.welcome-loc{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.75);border:1px solid var(--border);border-radius:100px;padding:4px 14px;font-size:12px;color:var(--pink-deep);margin-bottom:22px}
-.btn-book{
-  width:100%;padding:14px 24px;
-  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
-  border:none;border-radius:14px;
-  color:#fff;font-family:'Lato',sans-serif;
-  font-size:14px;font-weight:400;letter-spacing:2.5px;text-transform:uppercase;
-  cursor:pointer;transition:all .2s;
-  box-shadow:0 8px 22px rgba(201,79,106,.4);
-}
-.btn-book:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(201,79,106,.5)}
-.btn-book:active{transform:scale(.98)}
-.welcome-note{margin-top:14px;font-size:11px;color:var(--muted);line-height:1.5}
-
 /* ─── Shared pretty logout button ─── */
 .btn-logout{
   background:rgba(201,79,106,.08);
@@ -337,23 +298,6 @@ textarea{resize:none}
   </div>
 </div>
 
-<!-- ══════════════ PAGE 0: WELCOME ══════════════ -->
-<div id="welcomePage" style="display:none">
-  <div class="welcome-petals" id="welcomePetals"></div>
-  <div class="welcome-card">
-    <span class="welcome-bow">🎀</span>
-    <div class="welcome-greeting" id="welcomeGreeting">Hello!</div>
-    <div class="welcome-name">Jeoan Gwyneth<br>Dajay Gran</div>
-    <div class="welcome-script">Singer for Hire</div>
-    <div class="welcome-divider"></div>
-    <div class="welcome-tagline">Making your special moments<br>truly unforgettable ✨</div>
-    <div class="welcome-loc">📍 South Cotabato Based</div>
-    <button class="btn-book" onclick="goToForm()">🎀 &nbsp; Book Me Now</button>
-    <div class="welcome-note">Fill out the form below and I'll reach out to confirm your booking 💕</div>
-    <button class="btn-logout" onclick="confirmLogout()">Sign Out</button>
-  </div>
-</div>
-
 <!-- ══════════════ PAGE 1: BOOKING FORM ══════════════ -->
 <div id="formPage">
   <div class="hero">
@@ -561,7 +505,8 @@ let pendingImageData = null;
 (function init() {
   spawnLoginPetals();
   spawnSparkles();
-  if (clientToken) showWelcome();
+  // If already logged in, go straight to the form
+  if (clientToken) showForm();
 })();
 
 // ══════ LOGIN ══════
@@ -592,7 +537,8 @@ async function doClientLogin() {
     sessionStorage.setItem('client_token', clientToken);
     sessionStorage.setItem('client_display_name', clientDisplayName);
     sessionStorage.setItem('client_username', clientUsername);
-    showWelcome();
+    // Go directly to the form — no welcome page
+    showForm();
   } catch(e) {
     errEl.textContent = 'Cannot connect to server. Please try again.';
     errEl.classList.add('show');
@@ -600,14 +546,14 @@ async function doClientLogin() {
   }
 }
 
-function showWelcome() {
-  document.getElementById('loginPage').classList.add('hide');
-  const wp = document.getElementById('welcomePage');
-  wp.style.display = 'flex'; wp.style.opacity = '0';
-  wp.style.transition = 'opacity .4s ease';
-  setTimeout(() => { wp.style.opacity = '1'; }, 10);
-  document.getElementById('welcomeGreeting').textContent = 'Hello, ' + (clientDisplayName || clientUsername) + '! 💕';
-  spawnWelcomePetals();
+// Show the booking form directly (replaces showWelcome + goToForm)
+function showForm() {
+  const lp = document.getElementById('loginPage');
+  lp.classList.add('hide');
+  setTimeout(() => {
+    document.getElementById('formPage').style.display = 'block';
+    initFormPetals();
+  }, 300);
 }
 
 function confirmLogout() {
@@ -622,7 +568,6 @@ function doLogout() {
   sessionStorage.removeItem('client_token');
   sessionStorage.removeItem('client_display_name');
   sessionStorage.removeItem('client_username');
-  document.getElementById('welcomePage').style.display = 'none';
   document.getElementById('formPage').style.display = 'none';
   document.getElementById('thankYouPage').classList.remove('show');
   const lp = document.getElementById('loginPage');
@@ -642,20 +587,6 @@ function spawnLoginPetals() {
       const el = document.createElement('div'); el.className='petal'; el.textContent=p;
       el.style.left = Math.random()*100+'%';
       el.style.setProperty('--sz',(13+Math.random()*12)+'px');
-      el.style.setProperty('--dur',(5+Math.random()*6)+'s');
-      el.style.setProperty('--del',(Math.random()*8)+'s');
-      pc.appendChild(el);
-    }
-  });
-}
-function spawnWelcomePetals() {
-  const pc = document.getElementById('welcomePetals');
-  if (pc.childElementCount > 0) return;
-  ['🌸','🌸','🌷','🌸','🌺','🌸','🌷','🌸','🌸','🌷'].forEach(p => {
-    for (let i = 0; i < (p==='🌸'?7:4); i++) {
-      const el = document.createElement('div'); el.className='petal'; el.textContent=p;
-      el.style.left = Math.random()*100+'%';
-      el.style.setProperty('--sz',(13+Math.random()*13)+'px');
       el.style.setProperty('--dur',(5+Math.random()*6)+'s');
       el.style.setProperty('--del',(Math.random()*8)+'s');
       pc.appendChild(el);
@@ -688,17 +619,6 @@ function spawnSparkles() {
     s.style.color=colors[Math.floor(Math.random()*colors.length)];
     sc.appendChild(s);
   }
-}
-
-// ══════ NAVIGATION ══════
-function goToForm() {
-  const wp = document.getElementById('welcomePage');
-  wp.classList.add('hide');
-  setTimeout(() => {
-    wp.style.display = 'none';
-    document.getElementById('formPage').style.display = 'block';
-    initFormPetals();
-  }, 500);
 }
 
 // ══════ FORM LOGIC ══════
