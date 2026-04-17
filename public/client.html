@@ -254,6 +254,32 @@
     <div class="modal-msg">Your booking and GCash screenshot have been submitted! Jeoan will review and reach out to you shortly. 🎀</div>
     <button class="modal-btn-done" onclick="closeSsModal()">🎀 &nbsp; Done</button>
   </div>
+  
+  <!-- SIDEBAR -->
+   
+  <div class="sidebar">
+      <div class="menu-title">🎀 Menu</div>
+      <button class="menu-btn active" onclick="showSection('booking')">📄 Booking Form</button>
+      <button class="menu-btn" onclick="showSection('submitted')">📂 Submitted / Rejected</button>
+    </div>
+<!-- MAIN CONTENT -->
+    <div class="main-content">
+
+      <!-- BOOKING SECTION -->
+      <div id="bookingSection">
+
+        <div class="hero" style="padding:20px; text-align:center;">
+          <h2>🎀 Booking Form</h2>
+        </div>
+
+        <div style="padding:20px;">
+          <input type="text" placeholder="Client Name"/><br><br>
+          <input type="text" placeholder="Event Date"/><br><br>
+          <input type="text" placeholder="Performance Time"/><br><br>
+
+          <button>Submit Booking</button>
+        </div>
+
 </div>
 </body>
 </html>
