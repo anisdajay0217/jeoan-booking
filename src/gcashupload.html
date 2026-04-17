@@ -1,0 +1,152 @@
+<script>
+// ══════════════ FORM LOGIC ══════════════
+function switchRate() {
+  const type = document.querySelector('input[name="rateType"]:checked').value;
+  document.getElementById('songBox').classList.toggle('show', type==='song');
+  document.getElementById('hourBox').classList.toggle('show', type==='hour');
+  document.getElementById('songPkg').value = '';
+  document.getElementById('hourPkg').value = '';
+  document.getElementById('songPrice').classList.remove('show');
+  document.getElementById('hourPrice').classList.remove('show');
+}
+
+const songNotes = {
+  '1–6 Songs':  'Up to 6 songs of live performance 🎵',
+  '1–10 Songs': 'Up to 10 songs of live performance 🎵',
+  '1–15 Songs': 'Up to 15 songs of live performance 🎵',
+  'Band Sub':   'Rate is negotiable — please discuss with Jeoan',
+};
+const hourNotes = {
+  '1 Hour':       '1 hour of live performance 🎤',
+  '1 Hr 30 Mins': '1 hour and 30 minutes of live performance 🎤',
+  '2 Hours':      '2 hours of live performance 🎤',
+};
+
+function showPrice(type) {
+  const sel  = document.getElementById(type==='song' ? 'songPkg' : 'hourPkg');
+  const tag  = document.getElementById(type==='song' ? 'songPrice' : 'hourPrice');
+  const parts = sel.value.split('|');
+  const label = parts[0], price = parts[1];
+  const note  = type==='song' ? songNotes[label] : hourNotes[label];
+  tag.innerHTML = '<strong>'+label+' — '+price+'</strong><span>'+(note||'')+'</span>';
+  tag.classList.add('show');
+}
+
+function toggleCB() {
+  setTimeout(() => {
+    const cb = document.getElementById('agreeCheck');
+    document.getElementById('customCB').classList.toggle('checked', cb.checked);
+    document.getElementById('submitBtn').disabled = !cb.checked;
+  }, 0);
+}
+
+async function submitForm() {
+  const name     = document.getElementById('clientName').value.trim();
+  const date     = document.getElementById('eventDate').value.trim();
+  const perfTime = document.getElementById('perfTime').value.trim();
+  const occ      = document.getElementById('occasion').value;
+  const venue    = document.getElementById('venue').value.trim();
+  const notes    = document.getElementById('notes').value.trim();
+  const rateRadio = document.querySelector('input[name="rateType"]:checked');
+  if (!rateRadio) { alert('Please select a Rate Type.'); return; }
+  const rateType = rateRadio.value;
+  const pkgRaw   = rateType==='song' ? document.getElementById('songPkg').value : document.getElementById('hourPkg').value;
+  if (!name||!date||!perfTime||!occ||!venue||!pkgRaw) { alert('Please fill in all required fields (*).'); return; }
+  const parts = pkgRaw.split('|');
+  const pkg   = parts[0]+' — '+parts[1];
+
+  const booking = {
+    id: Date.now(),
+    name, date, perfTime, occasion: occ, venue,
+    rateType: rateType==='song' ? '🎵 Per Song' : '⏱️ Per Hour',
+    package: pkg,
+    notes: notes || '',
+  };
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  try {
+    const res = await fetch(API_BASE + '/client/bookings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + clientToken
+      },
+      body: JSON.stringify(booking)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      alert('Error: ' + (err.error || 'Could not submit booking.'));
+      btn.disabled = false;
+      btn.textContent = '🎀  Submit Booking';
+      return;
+    }
+  } catch (e) {
+    alert('Cannot connect to server. Please check your connection.');
+    btn.disabled = false;
+    btn.textContent = '🎀  Submit Booking';
+    return;
+  }
+
+  currentBookingId = booking.id;
+
+  const rows = [
+    ['Client Name', name],['Event Date', date],['Time', perfTime],
+    ['Occasion', occ],['Venue', venue],['Rate Type', booking.rateType],['Package', pkg],
+  ];
+  if (notes) rows.push(['Notes', notes]);
+  document.getElementById('summaryRows').innerHTML = rows.map(r =>
+    '<div class="cc-row"><span class="lbl">'+r[0]+'</span><span class="val">'+r[1]+'</span></div>'
+  ).join('');
+
+  document.getElementById('formPage').style.display = 'none';
+  document.getElementById('thankYouPage').classList.add('show');
+}
+
+// ══════════════ GCASH UPLOAD ══════════════
+function compressImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxDim = 900;
+      let w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else       { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.72));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function handleGcashUpload(input) {
+  if (!input.files || !input.files[0] || !currentBookingId) return;
+  compressImage(input.files[0], async function(dataUrl) {
+    document.getElementById('gcashPreviewImg').src = dataUrl;
+    document.getElementById('gcashPreview').classList.add('show');
+    document.getElementById('uploadArea').style.opacity = '0.5';
+    document.getElementById('uploadArea').style.pointerEvents = 'none';
+    try {
+      await fetch(API_BASE + '/client/bookings/' + currentBookingId + '/screenshot', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + clientToken
+        },
+        body: JSON.stringify({ gcashScreenshot: dataUrl })
+      });
+    } catch(e) { console.warn('Screenshot upload failed', e); }
+    document.getElementById('gcashSuccess').classList.add('show');
+  });
+}
+</script>
+</body>
+</html>
