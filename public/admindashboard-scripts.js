@@ -31,11 +31,11 @@ function doLogout() {
 // TAB SWITCHING
 // ════════════════════════════════════════
 function switchTab(tab) {
-  document.getElementById('navBookings').classList.toggle('active', tab==='bookings');
-  document.getElementById('navClients').classList.toggle('active', tab==='clients');
-  document.getElementById('viewBookings').style.display = tab==='bookings' ? 'flex' : 'none';
-  document.getElementById('viewClients').style.display  = tab==='clients'  ? 'flex' : 'none';
-  if (tab==='clients') loadClients();
+  document.getElementById('navBookings').classList.toggle('active', tab === 'bookings');
+  document.getElementById('navClients').classList.toggle('active', tab === 'clients');
+  document.getElementById('viewBookings').style.display = tab === 'bookings' ? 'flex' : 'none';
+  document.getElementById('viewClients').style.display  = tab === 'clients'  ? 'flex' : 'none';
+  if (tab === 'clients') loadClients();
 }
 
 // ════════════════════════════════════════
@@ -69,10 +69,10 @@ async function fetchBookings() {
 
 async function updateStats() {
   const all = await fetchBookings();
-  const noSS      = all.filter(b => !b.gcashScreenshot && b.status==='pending').length;
-  const pending   = all.filter(b =>  b.gcashScreenshot && b.status==='pending').length;
-  const confirmed = all.filter(b => b.status==='confirmed').length;
-  const declined  = all.filter(b => b.status==='declined').length;
+  const noSS      = all.filter(b => !b.gcashScreenshot && b.status === 'pending').length;
+  const pending   = all.filter(b =>  b.gcashScreenshot && b.status === 'pending').length;
+  const confirmed = all.filter(b => b.status === 'confirmed').length;
+  const declined  = all.filter(b => b.status === 'declined').length;
 
   document.getElementById('statTotal').textContent     = all.length;
   document.getElementById('statNoSS').textContent      = noSS;
@@ -90,54 +90,57 @@ async function updateStats() {
 
 async function renderBookings() {
   let all = await fetchBookings();
-  console.log('Bookings fetched:', all.length, all); 
+
+  // Fix: use String comparison to handle BIGINT ids from Postgres
   all.sort((a, b) => {
-    const order = sc => sc==='no-ss'?0 : sc==='pending'?1 : sc==='confirmed'?2 : 3;
+    const order = sc => sc === 'no-ss' ? 0 : sc === 'pending' ? 1 : sc === 'confirmed' ? 2 : 3;
     const oa = order(getStatusClass(a)), ob = order(getStatusClass(b));
     if (oa !== ob) return oa - ob;
-return String(b.id) > String(a.id) ? -1 : 1;
+    return String(b.id) > String(a.id) ? 1 : -1;
   });
+
   if (currentFilter !== 'all') {
     all = all.filter(b => {
-      if (currentFilter==='no-ss')     return getStatusClass(b)==='no-ss';
-      if (currentFilter==='pending')   return getStatusClass(b)==='pending';
-      if (currentFilter==='confirmed') return b.status==='confirmed';
-      if (currentFilter==='declined')  return b.status==='declined';
+      if (currentFilter === 'no-ss')     return getStatusClass(b) === 'no-ss';
+      if (currentFilter === 'pending')   return getStatusClass(b) === 'pending';
+      if (currentFilter === 'confirmed') return b.status === 'confirmed';
+      if (currentFilter === 'declined')  return b.status === 'declined';
       return true;
     });
   }
+
   const area = document.getElementById('bookingsArea');
-  if (all.length===0) {
+  if (all.length === 0) {
     area.innerHTML = '<div class="empty-state"><span class="ei">🌸</span><p>No bookings in this category yet.</p></div>';
     return;
   }
   area.innerHTML = all.map(b => buildCardHTML(b)).join('');
   if (openCardId) {
-    const body = document.getElementById('body-'+openCardId);
-    const chev = document.getElementById('chev-'+openCardId);
+    const body = document.getElementById('body-' + openCardId);
+    const chev = document.getElementById('chev-' + openCardId);
     if (body) body.classList.add('open');
     if (chev) chev.classList.add('open');
   }
 }
 
 function getStatusClass(b) {
-  if (b.status==='confirmed') return 'confirmed';
-  if (b.status==='declined')  return 'declined';
-  if (!b.gcashScreenshot)     return 'no-ss';
+  if (b.status === 'confirmed') return 'confirmed';
+  if (b.status === 'declined')  return 'declined';
+  if (!b.gcashScreenshot)       return 'no-ss';
   return 'pending';
 }
 function getStatusLabel(b) {
-  if (b.status==='confirmed') return '✅ Confirmed';
-  if (b.status==='declined')  return '❌ Declined';
-  if (!b.gcashScreenshot)     return '⚠️ No Screenshot';
+  if (b.status === 'confirmed') return '✅ Confirmed';
+  if (b.status === 'declined')  return '❌ Declined';
+  if (!b.gcashScreenshot)       return '⚠️ No Screenshot';
   return '⏳ Pending';
 }
 function formatDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
-  return d.toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'})
+  return d.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
        + ' · '
-       + d.toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+       + d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
 }
 function setFilter(filter, el) {
   currentFilter = filter;
@@ -150,7 +153,7 @@ function buildCardHTML(b) {
   const sc = getStatusClass(b);
   const sl = getStatusLabel(b);
   const ssIcon = b.gcashScreenshot ? '📸 Screenshot' : '⚠️ No Screenshot';
-  const isSettled = b.status==='confirmed' || b.status==='declined';
+  const isSettled = b.status === 'confirmed' || b.status === 'declined';
 
   let ssHTML = b.gcashScreenshot
     ? `<div class="ss-section">
@@ -165,13 +168,13 @@ function buildCardHTML(b) {
        </div>`;
 
   let actionHTML = '';
-  if (b.status==='confirmed') {
+  if (b.status === 'confirmed') {
     actionHTML = `<div class="confirmed-banner">
       <span class="banner-icon">✅</span>
       <span>Confirmed on ${formatDate(b.updatedAt)}</span>
       <button class="btn-revert" onclick="revertStatus(${b.id})">Revert</button>
     </div>`;
-  } else if (b.status==='declined') {
+  } else if (b.status === 'declined') {
     actionHTML = `<div class="declined-banner">
       <span class="banner-icon">❌</span>
       <span>Declined on ${formatDate(b.updatedAt)}</span>
@@ -185,7 +188,7 @@ function buildCardHTML(b) {
       <div style="margin-bottom:8px;padding:8px 11px;background:${warnBg};border-radius:9px;font-size:12px;color:${warnColor};">${warnText}</div>
       <div class="admin-note-row">
         <label>Admin Note (optional)</label>
-        <textarea id="note-${b.id}" rows="2" placeholder="e.g. Called client, waiting for payment…">${b.adminNote||''}</textarea>
+        <textarea id="note-${b.id}" rows="2" placeholder="e.g. Called client, waiting for payment…">${b.adminNote || ''}</textarea>
       </div>
       <div class="action-row">
         <button class="btn-confirm" onclick="updateBookingStatus(${b.id},'confirmed')">✅ Confirm</button>
@@ -233,18 +236,18 @@ function buildCardHTML(b) {
 }
 
 function toggleCard(id) {
-  const body = document.getElementById('body-'+id);
-  const chev = document.getElementById('chev-'+id);
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
   const isOpen = body.classList.contains('open');
   if (isOpen) {
     body.classList.remove('open'); chev.classList.remove('open'); openCardId = null;
   } else {
-    body.classList.add('open');  chev.classList.add('open');  openCardId = id;
+    body.classList.add('open'); chev.classList.add('open'); openCardId = id;
   }
 }
 
 async function updateBookingStatus(id, status) {
-  const noteEl = document.getElementById('note-'+id);
+  const noteEl = document.getElementById('note-' + id);
   const note = noteEl ? noteEl.value.trim() : '';
   try {
     await fetch(API_BASE + '/admin/bookings/' + id, {
@@ -252,9 +255,9 @@ async function updateBookingStatus(id, status) {
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
       body: JSON.stringify({ status, adminNote: note })
     });
-    showToast(status==='confirmed' ? '✅ Booking confirmed!' : '❌ Booking declined.');
+    showToast(status === 'confirmed' ? '✅ Booking confirmed!' : '❌ Booking declined.');
     updateStats(); renderBookings();
-  } catch(e) { showToast('❌ Error updating booking.'); }
+  } catch (e) { showToast('❌ Error updating booking.'); }
 }
 
 async function revertStatus(id) {
@@ -266,7 +269,7 @@ async function revertStatus(id) {
     });
     showToast('↩️ Booking reverted to pending.');
     updateStats(); renderBookings();
-  } catch(e) { showToast('❌ Error reverting.'); }
+  } catch (e) { showToast('❌ Error reverting.'); }
 }
 
 // ════════════════════════════════════════
@@ -280,9 +283,9 @@ async function loadClients() {
       headers: { 'Authorization': 'Bearer ' + adminToken }
     });
     const clients = await res.json();
-    document.getElementById('clientCount').textContent = clients.length + ' account' + (clients.length===1 ? '' : 's');
+    document.getElementById('clientCount').textContent = clients.length + ' account' + (clients.length === 1 ? '' : 's');
     document.getElementById('navBadgeClients').textContent = clients.length;
-    if (clients.length===0) {
+    if (clients.length === 0) {
       listEl.innerHTML = '<div class="empty-state"><span class="ei">👤</span><p>No client accounts yet.</p></div>';
       return;
     }
@@ -300,7 +303,7 @@ async function loadClients() {
         </div>
       </div>
     `).join('');
-  } catch(e) {
+  } catch (e) {
     listEl.innerHTML = '<div class="empty-state"><p>Error loading clients.</p></div>';
   }
 }
@@ -339,7 +342,7 @@ async function createClientAccount() {
     btn.disabled = false; btn.innerHTML = '🎀 &nbsp; Create Account';
     loadClients();
     showToast('✅ Account created for ' + displayName + '!');
-  } catch(e) {
+  } catch (e) {
     errEl.textContent = 'Server error. Please try again.';
     errEl.classList.add('show'); btn.disabled = false; btn.innerHTML = '🎀 &nbsp; Create Account';
   }
@@ -356,7 +359,7 @@ async function resetClientPassword(id, name) {
       body: JSON.stringify({ password: newPw })
     });
     showToast('🔑 Password updated for ' + name + '!');
-  } catch(e) { showToast('❌ Error updating password.'); }
+  } catch (e) { showToast('❌ Error updating password.'); }
 }
 
 async function deleteClient(id, name) {
@@ -368,7 +371,7 @@ async function deleteClient(id, name) {
     });
     showToast('🗑️ Account deleted.');
     loadClients();
-  } catch(e) { showToast('❌ Error deleting account.'); }
+  } catch (e) { showToast('❌ Error deleting account.'); }
 }
 
 // ════════════════════════════════════════
@@ -381,5 +384,5 @@ function showToast(msg) {
 }
 function escHtml(s) {
   if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
