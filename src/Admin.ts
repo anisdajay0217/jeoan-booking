@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────
 // CONFIG
 // ─────────────────────────────────────────────
-const API_BASE = 'https://YOUR-RAILWAY-APP.up.railway.app';
+const API_BASE = 'https://jeoan-booking-production.up.railway.app/';
 
 // ─────────────────────────────────────────────
 // TYPES
