@@ -13,40 +13,30 @@ let pendingImageData = null;
 
 // ══════ LOGIN ══════
 async function doClientLogin() {
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const errEl = document.getElementById('loginError');
-  const btn = document.getElementById('loginBtn');
-  errEl.classList.remove('show');
-  if (!username || !password) {
-    errEl.textContent = 'Please enter your username and password.';
-    errEl.classList.add('show'); return;
-  }
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Signing in…';
-  try {
-    const res = await fetch(API_BASE + '/client/login', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      errEl.textContent = data.error || 'Login failed. Please try again.';
-      errEl.classList.add('show');
-      btn.disabled = false; btn.innerHTML = '🔑 &nbsp; Sign In'; return;
-    }
-    clientToken = data.token; clientDisplayName = data.displayName; clientUsername = data.username;
-    sessionStorage.setItem('client_token', clientToken);
-    sessionStorage.setItem('client_display_name', clientDisplayName);
-    sessionStorage.setItem('client_username', clientUsername);
-    showForm();
-  } catch(e) {
-    errEl.textContent = 'Cannot connect to server. Please try again.';
-    errEl.classList.add('show');
-    btn.disabled = false; btn.innerHTML = '🔑 &nbsp; Sign In';
-  }
+ const bookingId = Date.now();
+const res = await fetch(API_BASE + '/client/bookings', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + clientToken },
+  body: JSON.stringify({
+    id: bookingId, name, date, perfTime,
+    occasion: occ, venue, rateType: booking.rateType,
+    package: pkg, notes
+  })
+});
+if (!res.ok) {
+  // show error
+  btn.disabled = false;
+  btn.innerHTML = '🎀 Submit Booking';
+  document.getElementById('submitHintEl').textContent = 'Could not save booking. Please try again.';
+  document.getElementById('submitHintEl').classList.add('error');
+  return;
 }
-
+// Then upload screenshot
+await fetch(API_BASE + '/client/bookings/' + bookingId + '/screenshot', {
+  method: 'PATCH',
+  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + clientToken },
+  body: JSON.stringify({ gcashScreenshot: pendingImageData })
+});
 function showForm() {
   const lp = document.getElementById('loginPage');
   lp.classList.add('hide');
