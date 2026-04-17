@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Rejected Bookings — Jeoan Booking 🎀</title>
+  <link rel="stylesheet" href="client-styles.css"/>
+  <link rel="stylesheet" href="clientdashboard-styles.css"/>
+  <link rel="stylesheet" href="clientrejectedforms-styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400&family=Pinyon+Script&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="cd-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="cd-sidebar">
+    <div class="cd-brand">
+      <span class="cd-brand-icon">🎀</span>
+      <div class="cd-brand-name">Jeoan Gwyneth</div>
+      <div class="cd-brand-sub">Client Portal</div>
+    </div>
+    <nav class="cd-nav">
+      <div class="cd-nav-label">Menu</div>
+      <a class="cd-nav-item" href="clientdashboard.html">
+        <span class="ni">📋</span> Booking Form
+      </a>
+      <a class="cd-nav-item" href="clientsubmittedforms.html">
+        <span class="ni">📂</span> My Submissions
+      </a>
+      <a class="cd-nav-item active" href="clientrejectedforms.html">
+        <span class="ni">❌</span> Rejected
+        <span class="cd-nav-badge alert" id="rfBadge"></span>
+      </a>
+    </nav>
+    <div class="cd-sidebar-footer">
+      <div class="cd-welcome" id="rfWelcome"></div>
+      <button class="cd-signout" onclick="rfConfirmLogout()">↩ Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="cd-main">
+    <div class="cd-page-header">
+      <div class="cd-page-title">❌ Rejected Bookings</div>
+      <div class="cd-page-subtitle">Edit and resubmit your declined bookings</div>
+    </div>
+    <div class="cd-scroll" id="rejectedArea">
+      <div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════ EDIT MODAL ═══════ -->
+<div class="rf-edit-overlay" id="rfEditOverlay">
+  <div class="rf-edit-modal">
+    <div class="rf-edit-modal-head">
+      <div class="rf-edit-modal-title">✏️ Edit &amp; Resubmit</div>
+      <button class="rf-edit-modal-close" onclick="rfCloseEdit()">✕</button>
+    </div>
+    <div class="rf-edit-modal-body">
+      <input type="hidden" id="rfEditId"/>
+      <div class="rf-edit-error" id="rfEditError"></div>
+
+      <div class="rf-row">
+        <div class="rf-field">
+          <label>Event Date *</label>
+          <input type="text" id="rfDate" placeholder="e.g. June 15, 2025"/>
+        </div>
+        <div class="rf-field">
+          <label>Performance Time *</label>
+          <input type="text" id="rfPerfTime" placeholder="e.g. 6:00 PM"/>
+        </div>
+      </div>
+
+      <div class="rf-field">
+        <label>Event Occasion *</label>
+        <select id="rfOccasion">
+          <option value="" disabled>— Choose occasion —</option>
+          <option>Birthday Party</option>
+          <option>Session Vocalist / Band Sub</option>
+          <option>Party</option>
+          <option>Resto Bar</option>
+          <option>Wedding</option>
+          <option>Reception</option>
+        </select>
+      </div>
+
+      <div class="rf-field">
+        <label>Venue Address *</label>
+        <textarea id="rfVenue" rows="2" placeholder="Full venue address…"></textarea>
+      </div>
+
+      <div class="rf-field">
+        <label>Rate Type *</label>
+        <p class="rf-field-hint">Change your package if needed</p>
+        <div class="rf-rate-toggle">
+          <div class="rf-rate-btn">
+            <input type="radio" name="rfRateType" id="rfRateSong" value="song" onchange="rfSwitchRate()"/>
+            <label class="rf-rate-label" for="rfRateSong"><span class="rb"></span> 🎵 Per Song</label>
+          </div>
+          <div class="rf-rate-btn">
+            <input type="radio" name="rfRateType" id="rfRateHour" value="hour" onchange="rfSwitchRate()"/>
+            <label class="rf-rate-label" for="rfRateHour"><span class="rb"></span> ⏱️ Per Hour</label>
+          </div>
+        </div>
+        <div class="rf-pkg-box" id="rfSongBox">
+          <select id="rfSongPkg" onchange="rfShowPrice('song')">
+            <option value="" disabled selected>— Choose song package —</option>
+            <option value="1–6 Songs|₱400">1–6 Songs — ₱400</option>
+            <option value="1–10 Songs|₱450">1–10 Songs — ₱450</option>
+            <option value="1–15 Songs|₱500">1–15 Songs — ₱500</option>
+            <option value="Band Sub|Negotiable">Band Sub — Negotiable</option>
+          </select>
+          <div class="rf-price-tag" id="rfSongPrice"></div>
+        </div>
+        <div class="rf-pkg-box" id="rfHourBox">
+          <select id="rfHourPkg" onchange="rfShowPrice('hour')">
+            <option value="" disabled selected>— Choose hour package —</option>
+            <option value="1 Hour|₱500">1 Hour — ₱500</option>
+            <option value="1 Hr 30 Mins|₱600">1 Hour 30 Mins — ₱600</option>
+            <option value="2 Hours|₱650">2 Hours — ₱650</option>
+          </select>
+          <div class="rf-price-tag" id="rfHourPrice"></div>
+        </div>
+      </div>
+
+      <div class="rf-field">
+        <label>Notes / Song Requests</label>
+        <textarea id="rfNotes" rows="2" placeholder="Special requests, changes…"></textarea>
+      </div>
+
+      <div class="rf-field">
+        <label>GCash Screenshot *</label>
+        <p class="rf-field-hint">Upload a new screenshot or keep the existing one</p>
+        <div class="rf-upload-area" id="rfUploadArea">
+          <input type="file" id="rfGcashFile" accept="image/*" onchange="rfHandleUpload(this)"/>
+          <span class="rf-upload-icon">📱</span>
+          <span class="rf-upload-label">Tap to upload new screenshot</span>
+          <span class="rf-upload-sub">JPG, PNG — your GCash confirmation receipt</span>
+        </div>
+        <div class="rf-preview" id="rfPreview">
+          <img id="rfPreviewImg" src="" alt="Screenshot Preview"/>
+          <div class="rf-preview-actions">
+            <span class="rf-preview-label">✅ Screenshot ready</span>
+            <button class="rf-reupload-btn" onclick="rfClearUpload()">Change photo</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end modal-body -->
+
+    <div class="rf-edit-modal-footer">
+      <button class="rf-btn-cancel-edit" onclick="rfCloseEdit()">Cancel</button>
+      <button class="rf-btn-resubmit" id="rfResubmitBtn" onclick="rfSubmitEdit()">🎀 &nbsp; Resubmit Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOUT MODAL -->
+<div class="cd-modal-overlay" id="rfLogoutModal">
+  <div class="cd-modal-box">
+    <span class="cd-modal-icon">🎀</span>
+    <div class="cd-modal-title">Sign Out?</div>
+    <div class="cd-modal-msg">Are you sure you want to sign out? 💕</div>
+    <div class="cd-modal-actions">
+      <button class="cd-modal-btn-cancel"  onclick="rfCloseLogout()">Stay</button>
+      <button class="cd-modal-btn-confirm" onclick="rfDoLogout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="cd-toast" id="rfToast"></div>
+
+<script src="clientrejectedforms-scripts.js"></script>
+</body>
+</html>
