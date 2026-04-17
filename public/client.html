@@ -429,42 +429,17 @@ textarea{resize:none}
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  ACCOUNTS — hardcoded credentials (no server needed)
-//  To add/remove clients, edit this object.
-//  Format:  "username": { password: "...", displayName: "..." }
-// ═══════════════════════════════════════════════════════════════
-const ACCOUNTS = {
-  "client1":  { password: "booking123",   displayName: "Client 1" },
-  "client2":  { password: "booking456",   displayName: "Client 2" },
-  "maricel":  { password: "maricel2025",  displayName: "Maricel" },
-  "john":     { password: "john2025",     displayName: "John" }
-};
-
-// ── session state ──
+const API_BASE = window.location.origin;
+let clientToken = sessionStorage.getItem('client_token') || null;
 let clientDisplayName = sessionStorage.getItem('client_display_name') || '';
-let clientUsername    = sessionStorage.getItem('client_username') || '';
-let isLoggedIn        = sessionStorage.getItem('logged_in') === 'yes';
-let pendingImageData  = null;
+let clientUsername = sessionStorage.getItem('client_username') || '';
+let currentBookingId = null;
+let pendingImageData = null;
 
-// ── storage helpers ──
-async function saveBooking(booking) {
-  // store under shared key so the admin panel can read it
-  const key = 'booking:' + booking.id;
-  try {
-    await fetch('/client/bookings');
-    return true;
-  } catch(e) {
-    console.error('Storage save error:', e);
-    return false;
-  }
-}
-
-// ── init ──
 (function init() {
   spawnLoginPetals();
   spawnSparkles();
-  if (isLoggedIn) showForm();
+  if (clientToken) showForm();
 })();
 
 // ══════ LOGIN ══════
@@ -511,13 +486,15 @@ function showForm() {
     initFormPetals();
   }, 300);
 }
-function confirmLogout()  { document.getElementById('logoutModal').classList.add('show'); }
-function closeLogoutModal(){ document.getElementById('logoutModal').classList.remove('show'); }
 
+function confirmLogout() { document.getElementById('logoutModal').classList.add('show'); }
+function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
 function doLogout() {
   closeLogoutModal();
-  isLoggedIn = false; clientDisplayName = ''; clientUsername = '';
-  sessionStorage.clear();
+  clientToken = null; clientDisplayName = ''; clientUsername = '';
+  sessionStorage.removeItem('client_token');
+  sessionStorage.removeItem('client_display_name');
+  sessionStorage.removeItem('client_username');
   document.getElementById('formPage').style.display = 'none';
   document.getElementById('thankYouPage').classList.remove('show');
   const lp = document.getElementById('loginPage');
@@ -528,7 +505,6 @@ function doLogout() {
   document.getElementById('loginBtn').innerHTML = '🔑 &nbsp; Sign In';
   document.getElementById('loginError').classList.remove('show');
 }
-
 // ══════ CANCEL FORM ══════
 function confirmCancel()  { document.getElementById('cancelModal').classList.add('show'); }
 function closeCancelModal(){ document.getElementById('cancelModal').classList.remove('show'); }
