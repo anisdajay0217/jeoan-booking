@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>  <link rel="stylesheet" href="admindashboard-styles.css"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Jeoan Admin — Dashboard 🎀</title>
+  <link rel="stylesheet" href="admindashboard-styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<script src="admindashboard-scripts.js"></script>
+<div id="dashboardPage" class="show">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="sidebar-logo">🎀</span>
+      <div class="sidebar-title">Jeoan Gwyneth</div>
+      <div class="sidebar-sub">Admin Portal</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Management</div>
+      <button class="nav-item active" id="navBookings" onclick="switchTab('bookings')">
+        <span class="ni">📋</span> Bookings
+        <span class="nav-badge" id="navBadgePending">0</span>
+      </button>
+      <button class="nav-item" id="navClients" onclick="switchTab('clients')">
+        <span class="ni">👤</span> Clients
+        <span class="nav-badge" id="navBadgeClients">0</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="confirmLogout()">↩ Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- ── BOOKINGS VIEW ── -->
+    <div id="viewBookings" style="display:flex;flex-direction:column;flex:1;min-height:0">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-title">Bookings</div>
+          <div class="page-subtitle">Manage all incoming booking requests</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-num" id="statTotal">0</span>
+          <div class="stat-lbl">Total</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num orange" id="statNoSS">0</span>
+          <div class="stat-lbl">No Screenshot</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="statPending">0</span>
+          <div class="stat-lbl">Pending</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num green" id="statConfirmed">0</span>
+          <div class="stat-lbl">Confirmed</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num red" id="statDeclined">0</span>
+          <div class="stat-lbl">Declined</div>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" data-filter="no-ss" onclick="setFilter('no-ss',this)">⚠️ No Screenshot</button>
+        <button class="filter-btn" data-filter="pending" onclick="setFilter('pending',this)">⏳ Pending</button>
+        <button class="filter-btn" data-filter="confirmed" onclick="setFilter('confirmed',this)">✅ Confirmed</button>
+        <button class="filter-btn" data-filter="declined" onclick="setFilter('declined',this)">❌ Declined</button>
+      </div>
+      <div class="bookings-scroll" id="bookingsArea">
+        <div class="empty-state"><span class="ei">🌸</span><p>No bookings yet.<br>They'll appear here once clients fill out the form!</p></div>
+      </div>
+    </div>
+
+    <!-- ── CLIENTS VIEW ── -->
+    <div id="viewClients" style="display:none;flex-direction:column;flex:1;min-height:0">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-title">Client Accounts</div>
+          <div class="page-subtitle">Create and manage client login credentials</div>
+        </div>
+      </div>
+      <div class="clients-content">
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-head-title">➕ Create New Client Account</span>
+          </div>
+          <div class="panel-body">
+            <div class="form-row">
+              <div class="field">
+                <label>Display Name</label>
+                <input type="text" id="newDisplayName" placeholder="e.g. Maria Santos"/>
+              </div>
+              <div class="field">
+                <label>Username</label>
+                <input type="text" id="newUsername" placeholder="e.g. maria_santos" autocomplete="off"/>
+              </div>
+            </div>
+            <div class="field">
+              <label>Password</label>
+              <input type="password" id="newPassword" placeholder="Create a password for them" autocomplete="new-password"/>
+            </div>
+            <div class="msg-error" id="createError"></div>
+            <div class="msg-success" id="createSuccess"></div>
+            <button class="btn-create" id="createBtn" onclick="createClientAccount()">🎀 &nbsp; Create Account</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head" style="justify-content:space-between">
+            <span class="panel-head-title">Existing Accounts</span>
+            <span id="clientCount" style="font-size:11px;color:rgba(255,255,255,.7)"></span>
+          </div>
+          <div class="panel-body" id="clientsList">
+            <div class="empty-state"><span class="ei">👤</span><p>No client accounts yet.<br>Create one above!</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOGOUT MODAL -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal-box">
+    <span class="modal-icon">🎀</span>
+    <div class="modal-title">Sign Out?</div>
+    <div class="modal-msg">Are you sure you want to sign out of the admin dashboard?</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeLogoutModal()">Stay</button>
+      <button class="modal-btn-confirm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<script src="admindashboard-scripts.js"></script>
+</body>
+</html>
