@@ -92,6 +92,7 @@ function requireClient(req, res, next) {
 
 // ─── ROOT ROUTE ───
 // FIX: Serves the index.html located in the same folder as this script
+// This works because index.js and index.html are in the same 'src' folder
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
