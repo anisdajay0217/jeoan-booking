@@ -1,0 +1,124 @@
+<script>
+// ════════════ CLIENT ACCOUNTS ════════════
+async function loadClients() {
+  const listEl = document.getElementById('clientsList');
+  listEl.innerHTML = '<div class="empty-state"><span class="ei" style="font-size:24px">⏳</span><p>Loading…</p></div>';
+  try {
+    const res = await fetch(API_BASE + '/admin/clients', {
+      headers: { 'Authorization': 'Bearer ' + adminToken }
+    });
+    const clients = await res.json();
+    document.getElementById('clientCount').textContent = clients.length + ' account' + (clients.length===1?'':'s');
+    if (clients.length === 0) {
+      listEl.innerHTML = '<div class="empty-state"><span class="ei">👤</span><p>No client accounts yet.<br>Create one above!</p></div>';
+      return;
+    }
+    listEl.innerHTML = clients.map(c => `
+      <div class="client-row" id="cr-${c.id}">
+        <div class="cr-icon">👤</div>
+        <div class="cr-info">
+          <div class="cr-name">${escHtml(c.display_name)}</div>
+          <div class="cr-user">@${escHtml(c.username)}</div>
+          <div class="cr-date">Created ${formatDate(c.created_at)}</div>
+        </div>
+        <div class="cr-actions">
+          <button class="btn-pw" onclick="resetClientPassword(${c.id}, '${escHtml(c.display_name)}')">🔑</button>
+          <button class="btn-del" onclick="deleteClient(${c.id}, '${escHtml(c.display_name)}')">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    listEl.innerHTML = '<div class="empty-state"><p>Error loading clients.</p></div>';
+  }
+}
+
+async function createClientAccount() {
+  const displayName = document.getElementById('newDisplayName').value.trim();
+  const username = document.getElementById('newUsername').value.trim();
+  const password = document.getElementById('newPassword').value;
+  const errEl = document.getElementById('createError');
+  const sucEl = document.getElementById('createSuccess');
+  const btn = document.getElementById('createBtn');
+  errEl.classList.remove('show');
+  sucEl.classList.remove('show');
+
+  if (!displayName || !username || !password) {
+    errEl.textContent = 'Please fill in all fields.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (password.length < 4) {
+    errEl.textContent = 'Password must be at least 4 characters.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Creating…';
+
+  try {
+    const res = await fetch(API_BASE + '/admin/clients', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+      body: JSON.stringify({ username, password, displayName })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent = data.error || 'Could not create account.';
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.innerHTML = '🎀 &nbsp; Create Account';
+      return;
+    }
+    sucEl.textContent = '✅ Account created! Username: ' + username + '  — Share credentials with client.';
+    sucEl.classList.add('show');
+    document.getElementById('newDisplayName').value = '';
+    document.getElementById('newUsername').value = '';
+    document.getElementById('newPassword').value = '';
+    btn.disabled = false;
+    btn.innerHTML = '🎀 &nbsp; Create Account';
+    loadClients();
+    showToast('✅ Account created for ' + displayName + '!');
+  } catch(e) {
+    errEl.textContent = 'Server error. Please try again.';
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = '🎀 &nbsp; Create Account';
+  }
+}
+
+async function resetClientPassword(id, name) {
+  const newPw = prompt('Set new password for ' + name + ':');
+  if (!newPw) return;
+  if (newPw.length < 4) { alert('Password must be at least 4 characters.'); return; }
+  try {
+    await fetch(API_BASE + '/admin/clients/' + id + '/password', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+      body: JSON.stringify({ password: newPw })
+    });
+    showToast('🔑 Password updated for ' + name + '!');
+  } catch(e) { showToast('❌ Error updating password.'); }
+}
+
+async function deleteClient(id, name) {
+  if (!confirm('Delete account for ' + name + '? This cannot be undone.')) return;
+  try {
+    await fetch(API_BASE + '/admin/clients/' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + adminToken }
+    });
+    showToast('🗑️ Account deleted.');
+    loadClients();
+  } catch(e) { showToast('❌ Error deleting account.'); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
