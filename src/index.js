@@ -231,3 +231,9 @@ initDB()
 app.listen(PORT, () => {
   console.log(`🎀 Jeoan API running on port ${PORT}`);
 });
+const express = require('express');
+const path = require('path');
+const app = express();
+
+// Add this line to serve your HTML files
+app.use(express.static(path.join(__dirname, 'src')));
