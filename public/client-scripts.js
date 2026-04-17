@@ -348,20 +348,21 @@ function compressImage(file, callback) {
   reader.readAsDataURL(file);
 }
  
-async function handleGcashUpload(input) {
-  if (!input.files || !input.files[0] || !currentBookingId) return;
-  compressImage(input.files[0], async function(dataUrl) {
+function handleGcashUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  compressImage(input.files[0], function(dataUrl) {
+    pendingImageData = dataUrl;
     document.getElementById('gcashPreviewImg').src = dataUrl;
     document.getElementById('gcashPreview').classList.add('show');
-    document.getElementById('uploadArea').style.opacity = '0.5';
-    document.getElementById('uploadArea').style.pointerEvents = 'none';
-    try {
-      await fetch(API_BASE + '/client/bookings/' + currentBookingId + '/screenshot', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + clientToken },
-        body: JSON.stringify({ gcashScreenshot: dataUrl })
-      });
-    } catch(e) { console.warn('Screenshot upload failed', e); }
-    document.getElementById('gcashSuccess').classList.add('show');
+    document.getElementById('uploadArea').style.display = 'none';
+    updateSubmitHint();
   });
+}
+function reuploadScreenshot() {
+  pendingImageData = null;
+  document.getElementById('gcashPreview').classList.remove('show');
+  document.getElementById('gcashPreviewImg').src = '';
+  document.getElementById('uploadArea').style.display = '';
+  document.getElementById('gcashFile').value = '';
+  updateSubmitHint();
 }
