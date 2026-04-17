@@ -1,5 +1,4 @@
-<link rel="stylesheet" href="client-styles.css"/>
-<style>
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --pink:#e8728a;--pink-deep:#c94f6a;--pink-pale:#fce8ee;
@@ -171,4 +170,3 @@ textarea{resize:none}
 .modal-btn-done:hover{box-shadow:0 6px 18px rgba(201,79,106,.4);transform:translateY(-1px)}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-</style>
