@@ -2,7 +2,7 @@
   "name": "jeoan-booking",
   "version": "1.0.0",
   "description": "Jeoan Gwyneth Booking Backend",
-  "main": "src/index.js",
+  "main": "jeoan-booking/src/index.js",
   "scripts": {
     "start": "jeoan-booking/src/index.js",
     "dev": "jeoan-booking/src/index.js"
