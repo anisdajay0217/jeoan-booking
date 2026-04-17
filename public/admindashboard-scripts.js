@@ -1,8 +1,17 @@
 const API_BASE = window.location.origin;
+
+// ════════════════════════════════════════
+// ALL STATE VARIABLES — declared first
+// ════════════════════════════════════════
 let adminToken = sessionStorage.getItem('admin_token') || null;
 let isLoggedIn = false;
+let currentFilter = 'all';
+let openCardId = null;
+let refreshInterval = null;
 
-// Guard: no token = back to login
+// ════════════════════════════════════════
+// GUARD: no token = back to login
+// ════════════════════════════════════════
 if (!adminToken) {
   window.location.href = 'admin.html';
 } else {
@@ -41,10 +50,6 @@ function switchTab(tab) {
 // ════════════════════════════════════════
 // DASHBOARD INIT
 // ════════════════════════════════════════
-let currentFilter = 'all';
-let openCardId = null;
-let refreshInterval = null;
-
 function loadDashboard() {
   updateStats();
   renderBookings();
@@ -91,7 +96,6 @@ async function updateStats() {
 async function renderBookings() {
   let all = await fetchBookings();
 
-  // Fix: use String comparison to handle BIGINT ids from Postgres
   all.sort((a, b) => {
     const order = sc => sc === 'no-ss' ? 0 : sc === 'pending' ? 1 : sc === 'confirmed' ? 2 : 3;
     const oa = order(getStatusClass(a)), ob = order(getStatusClass(b));
