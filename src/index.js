@@ -87,7 +87,7 @@ function requireClient(req, res, next) {
 }
 
 // ─── Health ───────────────────────────────────────────────────
-app.get('/', (req, res) => res.json({ status: 'ok', app: 'Jeoan Booking API 🎀' }));
+app.get('/api/health', (req, res) => res.json({ status: 'ok', app: 'Jeoan Booking API 🎀' }));
 
 // ─── ADMIN AUTH ───────────────────────────────────────────────
 app.post('/admin/login', (req, res) => {
