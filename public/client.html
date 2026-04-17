@@ -223,6 +223,18 @@ textarea{resize:none}
 /* Spinner */
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ═══ SUBMIT MODAL ═══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(58,31,40,.55);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-box{background:#fff;border-radius:22px;padding:32px 28px;max-width:320px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(201,79,106,.25);animation:cardIn .4s cubic-bezier(.34,1.56,.64,1) both}
+.modal-emoji{font-size:44px;display:block;margin-bottom:10px}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--pink-deep);margin-bottom:6px}
+.modal-msg{font-size:13px;color:var(--mauve);line-height:1.6;margin-bottom:20px}
+.modal-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--pink),var(--pink-deep));border:none;border-radius:12px;color:#fff;font-family:'Lato',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 6px 18px rgba(201,79,106,.35)}
+.btn-submit-ss{width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,#27ae60,#1a9e50);border:none;border-radius:10px;color:#fff;font-family:'Lato',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 12px rgba(27,158,80,.3);display:none}
+.btn-submit-ss.show{display:block;animation:fadeIn .3s ease}
+.btn-submit-ss:disabled{opacity:.4;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -267,16 +279,16 @@ textarea{resize:none}
 
 <!-- ══════════════ PAGE 1: BOOKING FORM ══════════════ -->
 <div id="formPage">
-  <div class="hero">
-    <div class="petals" id="petals"></div>
-    <div class="hero-content">
-      <span class="hero-bow">🎀</span>
-      <div class="hero-name">Jeoan Gwyneth<br>Dajay Gran</div>
-      <div class="hero-script">Singer for Hire</div>
-      <div class="hero-tagline">Making your event unforgettable</div>
-      <div class="loc-chip">📍 South Cotabato Based</div>
-    </div>
+<div class="hero-content">
+  <span class="hero-bow">🎀</span>
+  <div class="hero-name">Jeoan Gwyneth<br>Dajay Gran</div>
+  <div class="hero-script">Singer for Hire</div>
+  <div class="hero-tagline">Making your event unforgettable</div>
+  <div class="loc-chip">📍 South Cotabato Based</div>
+  <div style="margin-top:10px">
+    <button onclick="doLogout()" style="background:rgba(255,255,255,.55);border:1px solid var(--blush);border-radius:100px;padding:5px 16px;font-size:11px;color:var(--pink-deep);cursor:pointer;font-family:'Lato',sans-serif;letter-spacing:1px">Sign Out</button>
   </div>
+</div>
 
   <div class="form-bg">
     <div class="body">
@@ -409,27 +421,28 @@ textarea{resize:none}
         <div class="gc-badge">₱200 DP</div>
       </div>
     </div>
-    <div class="gcash-upload-box">
-      <div class="gcash-upload-head">
-        <span>📸</span>
-        <span>Upload GCash Screenshot</span>
-      </div>
-      <div class="gcash-upload-body">
-        <p>After paying ₱200 via GCash, upload your payment confirmation screenshot here to complete your booking. 💕</p>
-        <div class="upload-area" id="uploadArea">
-          <input type="file" id="gcashFile" accept="image/*" onchange="handleGcashUpload(this)"/>
-          <span class="upload-icon">📱</span>
-          <span class="upload-label">Tap to upload GCash screenshot</span>
-          <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
-        </div>
-        <div class="gcash-preview" id="gcashPreview">
-          <img id="gcashPreviewImg" src="" alt="GCash Screenshot"/>
-        </div>
-        <div class="gcash-success" id="gcashSuccess">
-          <span style="font-size:18px">✅</span>
-          <span><strong>Screenshot uploaded!</strong> Your booking is now pending Jeoan's confirmation. She will reach out to you shortly! 🎀</span>
-        </div>
-      </div>
+<div class="gcash-upload-box">
+  <div class="gcash-upload-head">
+    <span>📸</span>
+    <span>Upload GCash Screenshot</span>
+  </div>
+  <div class="gcash-upload-body">
+    <p>After paying ₱200 via GCash, upload your confirmation screenshot below, then tap <strong>Submit</strong> to finalize your booking. 💕</p>
+    <div class="upload-area" id="uploadArea">
+      <input type="file" id="gcashFile" accept="image/*" onchange="handleGcashUpload(this)"/>
+      <span class="upload-icon">📱</span>
+      <span class="upload-label">Tap to upload GCash screenshot</span>
+      <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
+    </div>
+    <div class="gcash-preview" id="gcashPreview">
+      <img id="gcashPreviewImg" src="" alt="GCash Screenshot"/>
+    </div>
+    <button class="btn-submit-ss" id="submitSsBtn" onclick="submitGcashScreenshot()">✅ &nbsp; Submit Screenshot</button>
+  </div>
+</div>
+<div style="text-align:center;margin-top:8px">
+  <button onclick="doLogout()" style="background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline;font-family:'Lato',sans-serif">Sign out</button>
+</div>
     </div>
     <div class="ss-note">
       📸 You may also <strong>screenshot this page</strong> + your GCash confirmation<br>
@@ -517,6 +530,7 @@ function showWelcome() {
 }
 
 function doLogout() {
+  if (!confirm('Are you sure you want to sign out?')) return;
   clientToken = null;
   clientDisplayName = '';
   clientUsername = '';
@@ -739,25 +753,39 @@ function compressImage(file, callback) {
   reader.readAsDataURL(file);
 }
 
-async function handleGcashUpload(input) {
-  if (!input.files || !input.files[0] || !currentBookingId) return;
-  compressImage(input.files[0], async function(dataUrl) {
+function handleGcashUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  compressImage(input.files[0], function(dataUrl) {
     document.getElementById('gcashPreviewImg').src = dataUrl;
     document.getElementById('gcashPreview').classList.add('show');
     document.getElementById('uploadArea').style.opacity = '0.5';
     document.getElementById('uploadArea').style.pointerEvents = 'none';
-    try {
-      await fetch(API_BASE + '/client/bookings/' + currentBookingId + '/screenshot', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + clientToken
-        },
-        body: JSON.stringify({ gcashScreenshot: dataUrl })
-      });
-    } catch(e) { console.warn('Screenshot upload failed', e); }
-    document.getElementById('gcashSuccess').classList.add('show');
+    const btn = document.getElementById('submitSsBtn');
+    btn.classList.add('show');
+    btn._imageData = dataUrl;
   });
+}
+  async function submitGcashScreenshot() {
+  const btn = document.getElementById('submitSsBtn');
+  const dataUrl = btn._imageData;
+  if (!dataUrl || !currentBookingId) return;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…';
+  try {
+    await fetch(API_BASE + '/client/bookings/' + currentBookingId + '/screenshot', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + clientToken
+      },
+      body: JSON.stringify({ gcashScreenshot: dataUrl })
+    });
+  } catch(e) { console.warn('Screenshot upload failed', e); }
+  document.getElementById('thankYouModal').classList.add('show');
+}
+
+function closeThankYouModal() {
+  document.getElementById('thankYouModal').classList.remove('show');
 }
 </script>
 </body>
