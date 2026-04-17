@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Book Jeoan Gwyneth 🎀</title>
+  <link rel="stylesheet" href="client-styles.css"/>
+  <link rel="stylesheet" href="clientdashboard-styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400&family=Pinyon+Script&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- ═══════════ LOGIN PAGE ═══════════ -->
+<div id="loginPage">
+  <div class="login-petals" id="loginPetals"></div>
+  <div class="login-card">
+    <span class="login-icon">🎀</span>
+    <div class="login-title">Hello po!</div>
+    <div class="login-sub">Use the account Jeoan made for you 💕</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="loginUsername" placeholder="Your username" autocomplete="username"/>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') doClientLogin()"/>
+    </div>
+    <button class="btn-login" id="loginBtn" onclick="doClientLogin()">🔑 &nbsp; Sign In</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-note">Don't have an account? Contact Jeoan and she'll set one up for you! 🌸</div>
+  </div>
+</div>
+
+<!-- ═══════════ DASHBOARD ═══════════ -->
+<div id="dashPage" style="display:none">
+  <div class="cd-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="cd-sidebar">
+      <div class="cd-brand">
+        <span class="cd-brand-icon">🎀</span>
+        <div class="cd-brand-name">Jeoan Gwyneth</div>
+        <div class="cd-brand-sub">Client Portal</div>
+      </div>
+      <nav class="cd-nav">
+        <div class="cd-nav-label">Menu</div>
+        <a class="cd-nav-item active" href="clientdashboard.html">
+          <span class="ni">📋</span> Booking Form
+        </a>
+        <a class="cd-nav-item" href="clientsubmittedforms.html">
+          <span class="ni">📂</span> My Submissions
+        </a>
+        <a class="cd-nav-item" href="clientrejectedforms.html">
+          <span class="ni">❌</span> Rejected
+        </a>
+      </nav>
+      <div class="cd-sidebar-footer">
+        <div class="cd-welcome" id="cdWelcome"></div>
+        <button class="cd-signout" onclick="confirmLogout()">↩ Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- MAIN: BOOKING FORM -->
+    <div class="cd-main">
+      <div class="hero">
+        <div class="petals" id="petals"></div>
+        <div class="hero-content">
+          <span class="hero-bow">🎀</span>
+          <div class="hero-name">Jeoan Gwyneth<br>Dajay Gran</div>
+          <div class="hero-script">Singer for Hire</div>
+          <div class="hero-tagline">Making your event unforgettable</div>
+          <div class="loc-chip">📍 South Cotabato Based</div>
+        </div>
+      </div>
+
+      <div class="form-bg">
+        <div class="body">
+
+          <div class="section-head">🎀 Booking Form</div>
+
+          <div class="field">
+            <label>Client Name *</label>
+            <input type="text" id="clientName" placeholder="Your full name"/>
+          </div>
+          <div class="field">
+            <label>Event Date *</label>
+            <input type="text" id="eventDate" placeholder="e.g. June 15, 2025"/>
+          </div>
+          <div class="field">
+            <label>Performance Time *</label>
+            <input type="text" id="perfTime" placeholder="e.g. 6:00 PM"/>
+          </div>
+          <div class="field">
+            <label>Event Occasion *</label>
+            <p class="field-hint">What type of event is it?</p>
+            <select id="occasion">
+              <option value="" disabled selected>— Choose occasion —</option>
+              <option>Birthday Party</option>
+              <option>Session Vocalist / Band Sub</option>
+              <option>Party</option>
+              <option>Resto Bar</option>
+              <option>Wedding</option>
+              <option>Reception</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Venue Address *</label>
+            <textarea id="venue" rows="2" placeholder="Full venue address…"></textarea>
+          </div>
+
+          <div class="field">
+            <label>Rate Type *</label>
+            <p class="field-hint">Choose how you'd like to book her</p>
+            <div class="rate-toggle">
+              <div class="rate-btn">
+                <input type="radio" name="rateType" id="rateSong" value="song" onchange="switchRate()"/>
+                <label class="rate-label" for="rateSong"><span class="rb"></span> 🎵 Per Song</label>
+              </div>
+              <div class="rate-btn">
+                <input type="radio" name="rateType" id="rateHour" value="hour" onchange="switchRate()"/>
+                <label class="rate-label" for="rateHour"><span class="rb"></span> ⏱️ Per Hour</label>
+              </div>
+            </div>
+            <div class="pkg-box" id="songBox">
+              <p class="field-hint">Pick the number of songs you need 🎵</p>
+              <select id="songPkg" onchange="showPrice('song')">
+                <option value="" disabled selected>— Choose song package —</option>
+                <option value="1–6 Songs|₱400">1–6 Songs — ₱400</option>
+                <option value="1–10 Songs|₱450">1–10 Songs — ₱450</option>
+                <option value="1–15 Songs|₱500">1–15 Songs — ₱500</option>
+                <option value="Band Sub|Negotiable">Band Sub — Negotiable</option>
+              </select>
+              <div class="price-tag" id="songPrice"></div>
+            </div>
+            <div class="pkg-box" id="hourBox">
+              <p class="field-hint">Pick how many hours you need her ⏱️</p>
+              <select id="hourPkg" onchange="showPrice('hour')">
+                <option value="" disabled selected>— Choose hour package —</option>
+                <option value="1 Hour|₱500">1 Hour — ₱500</option>
+                <option value="1 Hr 30 Mins|₱600">1 Hour 30 Mins — ₱600</option>
+                <option value="2 Hours|₱650">2 Hours — ₱650</option>
+              </select>
+              <div class="price-tag" id="hourPrice"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Song Requests / Notes</label>
+            <textarea id="notes" rows="2" placeholder="Special requests, attire preferences, etc."></textarea>
+          </div>
+
+          <div class="section-head">📜 Terms &amp; Conditions</div>
+          <div class="terms-card">
+            <div class="terms-card-head"><span>🎀 Please read before booking</span></div>
+            <div class="terms-list">
+              <div class="term"><div class="term-dot">1</div><div><strong>Downpayment:</strong> ₱200 non-refundable to reserve your date. Deducted from total.</div></div>
+              <div class="term"><div class="term-dot">2</div><div><strong>Payment:</strong> Balance paid (Cash / GCash) immediately after the performance.</div></div>
+              <div class="term"><div class="term-dot">3</div><div><strong>Technical:</strong> Venue/Client must provide a functional sound system and microphone.</div></div>
+              <div class="term"><div class="term-dot">4</div><div><strong>Setup:</strong> I will arrive 30 minutes early for soundcheck.</div></div>
+              <div class="term"><div class="term-dot">5</div><div><strong>Cancellation:</strong> Downpayment is forfeited if the client cancels. If I cancel due to an emergency, 100% refund.</div></div>
+              <div class="term"><div class="term-dot">6</div><div><strong>Safety:</strong> Outdoor venues must have a covered area for the performer.</div></div>
+            </div>
+          </div>
+
+          <label class="agree-row" for="agreeCheck" onclick="toggleCB()">
+            <input type="checkbox" id="agreeCheck"/>
+            <div class="custom-cb" id="customCB">
+              <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
+                <path d="M1 4L4 7L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="agree-label">I have read and <strong>agree</strong> to all Terms &amp; Conditions above.</span>
+          </label>
+
+          <div class="section-head">💚 Downpayment via GCash</div>
+          <div class="gcash-form-box">
+            <div class="gcash-form-head"><span>📸</span><span>Pay ₱200 &amp; Upload Screenshot</span></div>
+            <div class="gcash-form-body">
+              <div class="gc-inline">
+                <div class="gc-inline-head">💚 GCash Number</div>
+                <div class="gc-inline-body">
+                  <div>
+                    <div class="gc-inline-name">JEOAN GWYNETH G.</div>
+                    <div class="gc-inline-num">0912 797 7245</div>
+                  </div>
+                  <div class="gc-inline-badge">₱200 DP</div>
+                </div>
+              </div>
+              <p>Send <strong>₱200</strong> to the number above, then upload your GCash confirmation screenshot here. <strong>Screenshot is required</strong> before your booking can be submitted. 💕</p>
+              <div class="upload-area" id="uploadArea">
+                <input type="file" id="gcashFile" accept="image/*" onchange="handleGcashUpload(this)"/>
+                <span class="upload-icon">📱</span>
+                <span class="upload-label">Tap to upload GCash screenshot</span>
+                <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
+              </div>
+              <div class="gcash-preview" id="gcashPreview">
+                <img id="gcashPreviewImg" src="" alt="GCash Screenshot Preview"/>
+                <div class="gcash-preview-actions">
+                  <span class="gcash-preview-label">✅ Screenshot ready</span>
+                  <button class="btn-reupload" onclick="reuploadScreenshot()">Change photo</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-head">✅ Confirm Booking</div>
+          <div id="submitHintEl" class="submit-hint">Fill in all required fields and upload your GCash screenshot to proceed.</div>
+          <div class="action-bar">
+            <button class="btn-cancel" onclick="confirmCancel()">✕ Cancel</button>
+            <button class="btn-submit" id="submitBtn" onclick="submitForm()" disabled>🎀 Submit Booking</button>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- end cd-main -->
+
+  </div><!-- end cd-layout -->
+</div><!-- end dashPage -->
+
+<!-- ═══════════ THANK YOU PAGE ═══════════ -->
+<div id="thankYouPage">
+  <div class="sparkles" id="sparkles"></div>
+  <div class="ty-compact">
+    <div class="ty-top">
+      <span class="emoji">🌸</span>
+      <h2>Booking submitted! 🎀</h2>
+      <p>Jeoan will review your booking and reach out to you shortly. 💕</p>
+    </div>
+    <div class="cc">
+      <div class="cc-head">🌸 Booking Summary</div>
+      <div id="summaryRows"></div>
+    </div>
+    <div class="cc">
+      <div class="cc-head light">📜 Terms &amp; Conditions</div>
+      <div class="tc-row"><span class="tc-n">1.</span><span>₱200 non-refundable downpayment. Deducted from total.</span></div>
+      <div class="tc-row"><span class="tc-n">2.</span><span>Balance paid (Cash/GCash) after performance.</span></div>
+      <div class="tc-row"><span class="tc-n">3.</span><span>Client provides sound system &amp; microphone.</span></div>
+      <div class="tc-row"><span class="tc-n">4.</span><span>Performer arrives 30 mins early for soundcheck.</span></div>
+      <div class="tc-row"><span class="tc-n">5.</span><span>Client cancels = DP forfeited. Performer cancels = 100% refund.</span></div>
+      <div class="tc-row"><span class="tc-n">6.</span><span>Outdoor venues must have covered area for performer.</span></div>
+    </div>
+    <div class="ty-ss-box">
+      <div class="ty-ss-head">📱 GCash Screenshot Submitted</div>
+      <div class="ty-ss-body"><img id="tyScreenshot" src="" alt="GCash Payment Screenshot"/></div>
+    </div>
+    <div class="ty-footer">
+      <a href="clientsubmittedforms.html" class="btn-logout" style="text-decoration:none">📂 View My Submissions</a>
+    </div>
+    <div class="ty-sig">Jeoan Gwyneth Dajay Gran ✦ Singer for Hire</div>
+  </div>
+</div>
+
+<!-- LOGOUT MODAL -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal-box">
+    <span class="modal-icon">🎀</span>
+    <div class="modal-title">Sign Out?</div>
+    <div class="modal-msg">Are you sure you want to sign out? 💕</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeLogoutModal()">Stay</button>
+      <button class="modal-btn-confirm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- CANCEL MODAL -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal-box">
+    <span class="modal-icon">🗑️</span>
+    <div class="modal-title">Cancel Booking?</div>
+    <div class="modal-msg">This will <strong>clear all details</strong> you've entered. Are you sure?</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeCancelModal()">Go Back</button>
+      <button class="modal-btn-confirm-danger" onclick="doCancelForm()">Yes, Clear Form</button>
+    </div>
+  </div>
+</div>
+
+<script src="clientdashboard-scripts.js"></script>
+</body>
+</html>
