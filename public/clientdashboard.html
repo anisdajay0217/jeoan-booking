@@ -6,140 +6,136 @@
   <title>Book Jeoan Gwyneth 🎀</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400;700&family=Pinyon+Script&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="client-styles.css"/>
-  <link rel="stylesheet" href="clientdashboard-layout.css"/>
-
   <style>
-    /* ── HAMBURGER BUTTON ───────────────────── */
-    .cd-hamburger {
-      display: none;
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      z-index: 300;
-      background: var(--rose);
-      border: none;
-      border-radius: 10px;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      font-size: 20px;
-      color: #fff;
-      box-shadow: var(--shadow-md);
-      transition: background .15s;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
+    :root {
+      --rose:#c94f6a; --rose-light:#e8728a; --rose-pale:#fce8ee;
+      --rose-50:#fff0f4; --blush:#f7d6e0; --ribbon:#d45c78;
+      --cream:#fff8fa; --border:#f0c8d4; --text:#3a1f28;
+      --muted:#b08090; --mauve:#9a6070;
+      --green:#1a7a50; --red:#c0392b;
+      --cd-sidebar-w:220px;
+      --shadow-sm:0 1px 4px rgba(201,79,106,.08);
+      --shadow-md:0 4px 16px rgba(201,79,106,.14);
     }
-    .cd-hamburger:hover { background: var(--rose-light); }
-
-    /* ── DIM OVERLAY ────────────────────────── */
-    .cd-sidebar-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(58,31,40,.45);
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
-      z-index: 149;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--text);}
+    .cd-layout{display:flex;min-height:100vh;}
+    /* SIDEBAR */
+    .cd-sidebar{
+      width:var(--cd-sidebar-w);min-height:100vh;flex-shrink:0;
+      background:linear-gradient(180deg,var(--rose) 0%,var(--ribbon) 60%,#b84060 100%);
+      display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+      box-shadow:4px 0 20px rgba(201,79,106,.2);overflow-y:auto;
     }
-    .cd-sidebar-overlay.show { display: block; }
-
-    /* ── MOBILE ─────────────────────────────── */
-    @media (max-width: 768px) {
-      .cd-hamburger { display: flex; }
-
-      .cd-sidebar {
-        position: fixed !important;
-        top: 0 !important; left: 0 !important;
-        width: 240px !important;
-        height: 100vh !important;
-        min-height: 100vh !important;
-        z-index: 200;
-        transform: translateX(-100%);
-        transition: transform .32s cubic-bezier(.34,1.2,.64,1);
-        flex-direction: column !important;
-        overflow-y: auto;
-      }
-      .cd-sidebar.open { transform: translateX(0); }
-
-      .cd-brand { display: flex !important; flex-direction: column; align-items: center; }
-      .cd-nav {
-        flex-direction: column !important;
-        overflow-x: unset !important;
-        align-items: stretch !important;
-        padding: 14px 12px !important;
-      }
-      .cd-nav-label  { display: block !important; }
-      .cd-nav-item {
-        flex-direction: row !important;
-        font-size: 13px !important;
-        padding: 11px 14px !important;
-        border-radius: 11px !important;
-        min-width: unset !important;
-        justify-content: flex-start !important;
-        align-items: center !important;
-        gap: 9px !important;
-      }
-      .cd-nav-item .ni  { font-size: 16px !important; width: 20px !important; }
-      .cd-nav-badge     { display: inline-block !important; }
-      .cd-welcome       { display: block !important; }
-      .cd-sidebar-footer {
-        border-left: none !important;
-        border-top: 1px solid rgba(255,255,255,.15) !important;
-        padding: 14px 12px !important;
-      }
-      .cd-main        { padding-top: 60px; }
-      .cd-page-header { top: 60px; }
+    .cd-brand{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.15);text-align:center;}
+    .cd-brand-icon{font-size:28px;display:block;margin-bottom:6px;animation:cdSway 3s ease-in-out infinite;}
+    @keyframes cdSway{0%,100%{transform:rotate(-7deg);}50%{transform:rotate(7deg);}}
+    .cd-brand-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#fff;line-height:1.1;}
+    .cd-brand-sub{font-size:9px;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+    .cd-nav{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:3px;}
+    .cd-nav-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);padding:0 8px;margin:10px 0 5px;}
+    .cd-nav-item{
+      display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:11px;
+      color:rgba(255,255,255,.78);font-size:12px;font-family:'Lato',sans-serif;font-weight:400;
+      text-decoration:none;cursor:pointer;border:none;background:none;width:100%;
+      text-align:left;letter-spacing:.3px;transition:all .15s;
+    }
+    .cd-nav-item:hover{background:rgba(255,255,255,.15);color:#fff;}
+    .cd-nav-item.active{background:rgba(255,255,255,.22);color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+    .cd-nav-item .ni{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+    .cd-sidebar-footer{padding:14px 12px;border-top:1px solid rgba(255,255,255,.15);}
+    .cd-welcome{font-size:11px;color:rgba(255,255,255,.7);text-align:center;margin-bottom:8px;line-height:1.4;}
+    .cd-welcome strong{color:#fff;display:block;font-size:12px;}
+    .cd-signout{
+      width:100%;padding:9px 12px;background:rgba(255,255,255,.12);
+      border:1.5px solid rgba(255,255,255,.25);border-radius:10px;
+      color:rgba(255,255,255,.85);font-family:'Lato',sans-serif;font-size:11px;
+      letter-spacing:1px;cursor:pointer;transition:all .15s;text-transform:uppercase;
+    }
+    .cd-signout:hover{background:rgba(255,255,255,.22);color:#fff;}
+    /* MAIN */
+    .cd-main{flex:1;min-width:0;overflow-y:auto;display:flex;flex-direction:column;}
+    .cd-page-header{background:#fff;border-bottom:1.5px solid var(--border);padding:18px 24px;position:sticky;top:0;z-index:50;}
+    .cd-page-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--rose);line-height:1;margin-bottom:3px;}
+    .cd-page-subtitle{font-size:11px;color:var(--muted);letter-spacing:.5px;}
+    .cd-scroll{flex:1;overflow-y:auto;padding:18px 24px;display:flex;flex-direction:column;gap:10px;}
+    .cd-empty{text-align:center;padding:60px 20px;color:var(--muted);}
+    .cd-empty .cd-ei{font-size:44px;display:block;margin-bottom:12px;}
+    .cd-empty p{font-size:14px;line-height:1.7;color:var(--mauve);}
+    .cd-spinner-wrap{display:flex;align-items:center;justify-content:center;padding:60px 20px;}
+    .cd-spinner{width:28px;height:28px;border:3px solid var(--rose-pale);border-top-color:var(--rose);border-radius:50%;animation:cdSpin .7s linear infinite;}
+    @keyframes cdSpin{to{transform:rotate(360deg);}}
+    /* TOAST */
+    .cd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;border-radius:100px;padding:11px 24px;font-size:13px;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(58,31,40,.3);}
+    .cd-toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+    /* MODALS */
+    .cd-modal-overlay{position:fixed;inset:0;background:rgba(58,31,40,.5);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .cd-modal-overlay.show{opacity:1;pointer-events:all;}
+    .cd-modal-box{background:#fff;border-radius:24px;padding:32px 28px 26px;max-width:300px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(201,79,106,.28);transform:scale(.9) translateY(12px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);border:1.5px solid var(--blush);}
+    .cd-modal-overlay.show .cd-modal-box{transform:scale(1) translateY(0);}
+    .cd-modal-icon{font-size:38px;display:block;margin-bottom:10px;animation:cdSway 3s ease-in-out infinite;}
+    .cd-modal-title{font-family:'Playfair Display',serif;font-size:19px;color:var(--rose);margin-bottom:7px;font-weight:700;}
+    .cd-modal-msg{font-size:13px;color:var(--mauve);line-height:1.65;margin-bottom:20px;}
+    .cd-modal-actions{display:flex;gap:8px;}
+    .cd-modal-btn-cancel{flex:1;padding:11px;background:var(--rose-50);border:1.5px solid var(--blush);border-radius:11px;color:var(--mauve);font-family:'Lato',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+    .cd-modal-btn-cancel:hover{background:var(--blush);}
+    .cd-modal-btn-confirm{flex:1;padding:11px;background:linear-gradient(135deg,var(--rose-light),var(--rose));border:none;border-radius:11px;color:#fff;font-family:'Lato',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 14px rgba(201,79,106,.3);transition:all .15s;}
+    .cd-modal-btn-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,79,106,.4);}
+    /* HAMBURGER */
+    .cd-hamburger{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--rose);border:none;border-radius:10px;width:40px;height:40px;cursor:pointer;font-size:20px;color:#fff;box-shadow:var(--shadow-md);transition:background .15s;align-items:center;justify-content:center;line-height:1;}
+    .cd-hamburger:hover{background:var(--rose-light);}
+    .cd-sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(58,31,40,.45);backdrop-filter:blur(3px);z-index:149;}
+    .cd-sidebar-overlay.show{display:block;}
+    /* MOBILE */
+    @media(max-width:768px){
+      .cd-hamburger{display:flex;}
+      .cd-sidebar{position:fixed!important;top:0!important;left:0!important;width:240px!important;height:100vh!important;min-height:100vh!important;z-index:200;transform:translateX(-100%);transition:transform .32s cubic-bezier(.34,1.2,.64,1);flex-direction:column!important;overflow-y:auto;}
+      .cd-sidebar.open{transform:translateX(0);}
+      .cd-brand{display:flex!important;flex-direction:column;align-items:center;}
+      .cd-nav{flex-direction:column!important;overflow-x:unset!important;align-items:stretch!important;padding:14px 12px!important;}
+      .cd-nav-label{display:block!important;}
+      .cd-nav-item{flex-direction:row!important;font-size:13px!important;padding:11px 14px!important;border-radius:11px!important;min-width:unset!important;justify-content:flex-start!important;align-items:center!important;gap:9px!important;}
+      .cd-nav-item .ni{font-size:16px!important;width:20px!important;}
+      .cd-welcome{display:block!important;}
+      .cd-sidebar-footer{border-left:none!important;border-top:1px solid rgba(255,255,255,.15)!important;padding:14px 12px!important;}
+      .cd-main{padding-top:60px;}
+      .cd-page-header{top:60px;}
     }
   </style>
 </head>
 <body>
 
-<!-- ── HAMBURGER (mobile) ──────────────────── -->
-<button class="cd-hamburger" id="cdHamburger" onclick="toggleSidebar()" aria-label="Open menu">☰</button>
-
-<!-- ── DIM OVERLAY ────────────────────────── -->
+<button class="cd-hamburger" id="cdHamburger" onclick="toggleSidebar()">☰</button>
 <div class="cd-sidebar-overlay" id="cdSidebarOverlay" onclick="closeSidebar()"></div>
 
-<!-- ════════════════════════════════════════
-     DASHBOARD
-════════════════════════════════════════ -->
 <div id="dashPage">
   <div class="cd-layout">
-
-    <!-- SIDEBAR -->
     <aside class="cd-sidebar" id="cdSidebar">
       <div class="cd-brand">
         <span class="cd-brand-icon">🎀</span>
         <div class="cd-brand-name">Jeoan Gwyneth</div>
         <div class="cd-brand-sub">Client Portal</div>
       </div>
-
       <nav class="cd-nav">
         <div class="cd-nav-label">Menu</div>
-        <a class="cd-nav-item active" id="navBooking" onclick="showTab('booking'); closeSidebar();">
+        <a class="cd-nav-item active" id="navBooking" onclick="showTab('booking');closeSidebar();">
           <span class="ni">📋</span> Booking Form
         </a>
-        <a class="cd-nav-item" id="navSubmitted" onclick="showTab('submitted'); closeSidebar();">
+        <a class="cd-nav-item" id="navSubmitted" onclick="showTab('submitted');closeSidebar();">
           <span class="ni">📂</span> My Submissions
-          <span class="cd-nav-badge" id="submittedBadge" style="display:none;">0</span>
         </a>
-        <a class="cd-nav-item" id="navRejected" onclick="showTab('rejected'); closeSidebar();">
+        <a class="cd-nav-item" id="navRejected" onclick="showTab('rejected');closeSidebar();">
           <span class="ni">✖</span> Rejected
-          <span class="cd-nav-badge alert" id="rejectedBadge" style="display:none;">0</span>
         </a>
       </nav>
-
       <div class="cd-sidebar-footer">
         <div class="cd-welcome" id="cdWelcome"><strong>Welcome!</strong></div>
         <button class="cd-signout" onclick="confirmLogout()">⇥ Sign Out</button>
       </div>
     </aside>
 
-    <!-- MAIN -->
     <main class="cd-main">
-
-      <!-- ── BOOKING FORM TAB ────────────────── -->
+      <!-- BOOKING FORM TAB -->
       <div id="tabBooking">
         <div class="hero">
           <div class="petals" id="petals"></div>
@@ -151,23 +147,12 @@
             <div class="loc-chip">📍 South Cotabato Based</div>
           </div>
         </div>
-
         <div class="form-bg">
           <div class="body">
             <div class="section-head">🎀 Booking Form</div>
-
-            <div class="field">
-              <label>Client Name *</label>
-              <input type="text" id="clientName" placeholder="Your full name"/>
-            </div>
-            <div class="field">
-              <label>Event Date *</label>
-              <input type="text" id="eventDate" placeholder="e.g. June 15, 2025"/>
-            </div>
-            <div class="field">
-              <label>Performance Time *</label>
-              <input type="text" id="perfTime" placeholder="e.g. 6:00 PM"/>
-            </div>
+            <div class="field"><label>Client Name *</label><input type="text" id="clientName" placeholder="Your full name"/></div>
+            <div class="field"><label>Event Date *</label><input type="text" id="eventDate" placeholder="e.g. June 15, 2025"/></div>
+            <div class="field"><label>Performance Time *</label><input type="text" id="perfTime" placeholder="e.g. 6:00 PM"/></div>
             <div class="field">
               <label>Event Occasion *</label>
               <p class="field-hint">What type of event is it?</p>
@@ -181,10 +166,7 @@
                 <option>Reception</option>
               </select>
             </div>
-            <div class="field">
-              <label>Venue Address *</label>
-              <textarea id="venue" rows="2" placeholder="Full venue address…"></textarea>
-            </div>
+            <div class="field"><label>Venue Address *</label><textarea id="venue" rows="2" placeholder="Full venue address…"></textarea></div>
             <div class="field">
               <label>Rate Type *</label>
               <p class="field-hint">Choose how you'd like to book her</p>
@@ -220,11 +202,7 @@
                 <div class="price-tag" id="hourPrice"></div>
               </div>
             </div>
-            <div class="field">
-              <label>Song Requests / Notes</label>
-              <textarea id="notes" rows="2" placeholder="Special requests, attire preferences, etc."></textarea>
-            </div>
-
+            <div class="field"><label>Song Requests / Notes</label><textarea id="notes" rows="2" placeholder="Special requests, attire preferences, etc."></textarea></div>
             <div class="section-head">📜 Terms &amp; Conditions</div>
             <div class="terms-card">
               <div class="terms-card-head"><span>🎀 Please read before booking</span></div>
@@ -237,32 +215,21 @@
                 <div class="term"><div class="term-dot">6</div><div><strong>Safety:</strong> Outdoor venues must have a covered area for the performer.</div></div>
               </div>
             </div>
-
             <label class="agree-row" for="agreeCheck" onclick="toggleCB()">
               <input type="checkbox" id="agreeCheck"/>
               <div class="custom-cb" id="customCB">
-                <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
-                  <path d="M1 4L4 7L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
               <span class="agree-label">I have read and <strong>agree</strong> to all Terms &amp; Conditions above.</span>
             </label>
-
-            <!-- GCASH SECTION -->
             <div class="section-head">💚 Downpayment via GCash</div>
             <div class="gcash-form-box">
-              <div class="gcash-form-head">
-                <span>📸</span>
-                <span>Pay ₱200 &amp; Upload Screenshot</span>
-              </div>
+              <div class="gcash-form-head"><span>📸</span><span>Pay ₱200 &amp; Upload Screenshot</span></div>
               <div class="gcash-form-body">
                 <div class="gc-inline">
                   <div class="gc-inline-head">💚 GCash Number</div>
                   <div class="gc-inline-body">
-                    <div>
-                      <div class="gc-inline-name">JEOAN GWYNETH G.</div>
-                      <div class="gc-inline-num">0912 797 7245</div>
-                    </div>
+                    <div><div class="gc-inline-name">JEOAN GWYNETH G.</div><div class="gc-inline-num">0912 797 7245</div></div>
                     <div class="gc-inline-badge">₱200 DP</div>
                   </div>
                 </div>
@@ -282,8 +249,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- SUBMIT -->
             <div class="section-head">✅ Confirm Booking</div>
             <div id="submitHintEl" class="submit-hint">Fill in all required fields and upload your GCash screenshot to proceed.</div>
             <div class="action-bar">
@@ -293,9 +258,8 @@
           </div>
         </div>
       </div>
-      <!-- END tabBooking -->
 
-      <!-- ── MY SUBMISSIONS TAB ──────────────── -->
+      <!-- MY SUBMISSIONS TAB -->
       <div id="tabSubmitted" style="display:none;">
         <div class="cd-page-header">
           <div class="cd-page-title">My Submissions</div>
@@ -306,7 +270,7 @@
         </div>
       </div>
 
-      <!-- ── REJECTED TAB ────────────────────── -->
+      <!-- REJECTED TAB -->
       <div id="tabRejected" style="display:none;">
         <div class="cd-page-header">
           <div class="cd-page-title">Rejected Bookings</div>
@@ -316,14 +280,11 @@
           <div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>
         </div>
       </div>
-
     </main>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════
-     THANK YOU PAGE
-════════════════════════════════════════ -->
+<!-- THANK YOU PAGE -->
 <div id="thankYouPage">
   <div class="sparkles" id="sparkles"></div>
   <div class="ty-compact">
@@ -347,20 +308,14 @@
     </div>
     <div class="ty-ss-box">
       <div class="ty-ss-head">📱 GCash Screenshot Submitted</div>
-      <div class="ty-ss-body">
-        <img id="tyScreenshot" src="" alt="GCash Payment Screenshot"/>
-      </div>
+      <div class="ty-ss-body"><img id="tyScreenshot" src="" alt="GCash Payment Screenshot"/></div>
     </div>
-    <div class="ty-footer">
-      <button class="btn-logout" onclick="confirmLogout()">Sign Out</button>
-    </div>
+    <div class="ty-footer"><button class="btn-logout" onclick="confirmLogout()">Sign Out</button></div>
     <div class="ty-sig">Jeoan Gwyneth Dajay Gran ✦ Singer for Hire</div>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════
-     MODALS
-════════════════════════════════════════ -->
+<!-- MODALS -->
 <div class="cd-modal-overlay" id="logoutModal">
   <div class="cd-modal-box">
     <span class="cd-modal-icon">🎀</span>
@@ -372,168 +327,105 @@
     </div>
   </div>
 </div>
-
 <div class="cd-modal-overlay" id="cancelModal">
   <div class="cd-modal-box">
     <span class="cd-modal-icon">🗑️</span>
     <div class="cd-modal-title">Cancel Booking?</div>
-    <div class="cd-modal-msg">This will <strong>clear all the details</strong> you've entered. Are you sure you want to start over?</div>
+    <div class="cd-modal-msg">This will <strong>clear all the details</strong> you've entered. Are you sure?</div>
     <div class="cd-modal-actions">
       <button class="cd-modal-btn-cancel" onclick="closeCancelModal()">Go Back</button>
       <button class="cd-modal-btn-confirm" style="background:linear-gradient(135deg,#e05555,#c0392b);" onclick="doCancelForm()">Yes, Clear Form</button>
     </div>
   </div>
 </div>
-
 <div class="cd-toast" id="cdToast"></div>
 
-<!-- ════════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════ -->
 <script src="client-scripts.js"></script>
 <script>
-  // API_BASE is already declared in client-scripts.js — do not redeclare
+(function guard(){
+  if(!sessionStorage.getItem('client_token')){window.location.href='client.html';return;}
+  initDashboard();
+})();
 
-  // ── GUARD: redirect to login if no token ──
-  (function guard() {
-    if (!sessionStorage.getItem('client_token')) {
-      window.location.href = 'client.html';
-      return;
-    }
-    initDashboard();
-    spawnSparkles();
-  })();
+function initDashboard(){
+  initFormPetals();
+  var dn=sessionStorage.getItem('client_display_name')||'';
+  var un=sessionStorage.getItem('client_username')||'';
+  var el=document.getElementById('cdWelcome');
+  if(el) el.innerHTML='<strong>'+escHtml(dn||un)+'</strong>@'+escHtml(un);
+}
 
-  function initDashboard() {
-    initFormPetals();
-    const dn = sessionStorage.getItem('client_display_name') || '';
-    const un = sessionStorage.getItem('client_username') || '';
-    const welcomeEl = document.getElementById('cdWelcome');
-    if (welcomeEl) {
-      welcomeEl.innerHTML = `<strong>${escHtml(dn || un)}</strong>@${escHtml(un)}`;
-    }
-  }
+function toggleSidebar(){
+  var s=document.getElementById('cdSidebar');
+  var o=document.getElementById('cdSidebarOverlay');
+  var b=document.getElementById('cdHamburger');
+  var open=s.classList.toggle('open');
+  o.classList.toggle('show',open);
+  b.textContent=open?'✕':'☰';
+}
+function closeSidebar(){
+  document.getElementById('cdSidebar').classList.remove('open');
+  document.getElementById('cdSidebarOverlay').classList.remove('show');
+  document.getElementById('cdHamburger').textContent='☰';
+}
 
-  // ── HAMBURGER / SIDEBAR ──────────────────
-  function toggleSidebar() {
-    const sidebar = document.getElementById('cdSidebar');
-    const overlay = document.getElementById('cdSidebarOverlay');
-    const btn     = document.getElementById('cdHamburger');
-    const isOpen  = sidebar.classList.toggle('open');
-    overlay.classList.toggle('show', isOpen);
-    btn.textContent = isOpen ? '✕' : '☰';
-  }
+function showTab(tab){
+  ['tabBooking','tabSubmitted','tabRejected'].forEach(function(id){document.getElementById(id).style.display='none';});
+  ['navBooking','navSubmitted','navRejected'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  if(tab==='booking'){document.getElementById('tabBooking').style.display='';document.getElementById('navBooking').classList.add('active');}
+  else if(tab==='submitted'){document.getElementById('tabSubmitted').style.display='';document.getElementById('navSubmitted').classList.add('active');loadSubmissions();}
+  else if(tab==='rejected'){document.getElementById('tabRejected').style.display='';document.getElementById('navRejected').classList.add('active');loadRejected();}
+}
 
-  function closeSidebar() {
-    document.getElementById('cdSidebar').classList.remove('open');
-    document.getElementById('cdSidebarOverlay').classList.remove('show');
-    document.getElementById('cdHamburger').textContent = '☰';
-  }
+async function loadSubmissions(){
+  var el=document.getElementById('submittedList');
+  el.innerHTML='<div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>';
+  try{
+    var res=await fetch(window.location.origin+'/client/bookings',{headers:{'Authorization':'Bearer '+sessionStorage.getItem('client_token')}});
+    var data=await res.json();
+    var list=Array.isArray(data)?data:(data.bookings||[]);
+    el.innerHTML=list.length?list.map(function(b){return bookingCard(b,false);}).join(''):'<div class="cd-empty"><span class="cd-ei">📂</span><p>No submissions yet.<br>Fill out the Booking Form to get started! 🌸</p></div>';
+  }catch(e){el.innerHTML='<div class="cd-empty"><span class="cd-ei">⚠️</span><p>Could not load submissions.</p></div>';}
+}
 
-  // ── TAB SWITCHING ────────────────────────
-  function showTab(tab) {
-    ['tabBooking','tabSubmitted','tabRejected'].forEach(id => {
-      document.getElementById(id).style.display = 'none';
-    });
-    ['navBooking','navSubmitted','navRejected'].forEach(id => {
-      document.getElementById(id).classList.remove('active');
-    });
+async function loadRejected(){
+  var el=document.getElementById('rejectedList');
+  el.innerHTML='<div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>';
+  try{
+    var res=await fetch(window.location.origin+'/client/bookings/rejected',{headers:{'Authorization':'Bearer '+sessionStorage.getItem('client_token')}});
+    var data=await res.json();
+    var list=Array.isArray(data)?data:(data.bookings||[]);
+    el.innerHTML=list.length?list.map(function(b){return bookingCard(b,true);}).join(''):'<div class="cd-empty"><span class="cd-ei">✖</span><p>No rejected bookings. 🎉</p></div>';
+  }catch(e){el.innerHTML='<div class="cd-empty"><span class="cd-ei">⚠️</span><p>Could not load rejections.</p></div>';}
+}
 
-    if (tab === 'booking') {
-      document.getElementById('tabBooking').style.display = '';
-      document.getElementById('navBooking').classList.add('active');
-    } else if (tab === 'submitted') {
-      document.getElementById('tabSubmitted').style.display = '';
-      document.getElementById('navSubmitted').classList.add('active');
-      loadSubmissions();
-    } else if (tab === 'rejected') {
-      document.getElementById('tabRejected').style.display = '';
-      document.getElementById('navRejected').classList.add('active');
-      loadRejected();
-    }
-  }
+function bookingCard(b,rejected){
+  return '<div style="background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 2px 10px rgba(201,79,106,.09);border:1.5px solid var(--border);margin-bottom:10px;">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'
+    +'<div style="font-family:\'Playfair Display\',serif;font-size:15px;color:var(--rose);font-weight:700;">'+escHtml(b.name||'—')+'</div>'
+    +'<div style="font-size:11px;font-weight:700;color:'+(rejected?'var(--red)':'var(--green)')+';">'+(rejected?'✖ Rejected':'📋 Submitted')+'</div>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mauve);">'
+    +'<div>📅 '+escHtml(b.date||'—')+' · ⏰ '+escHtml(b.perfTime||'—')+'</div>'
+    +'<div>🎉 '+escHtml(b.occasion||'—')+'</div>'
+    +'<div>📍 '+escHtml(b.venue||'—')+'</div>'
+    +'<div>💳 '+escHtml(b.package||'—')+'</div>'
+    +(b.notes?'<div>📝 '+escHtml(b.notes)+'</div>':'')
+    +(rejected&&b.rejectReason?'<div style="margin-top:6px;color:var(--red);font-weight:700;">Reason: '+escHtml(b.rejectReason)+'</div>':'')
+    +'</div></div>';
+}
 
-  // ── LOAD DATA ────────────────────────────
-  async function loadSubmissions() {
-    const el = document.getElementById('submittedList');
-    el.innerHTML = '<div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>';
-    try {
-      const res  = await fetch(API_BASE + '/client/bookings', {
-        headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('client_token') }
-      });
-      const data = await res.json();
-      const list = Array.isArray(data) ? data : (data.bookings || []);
-      el.innerHTML = list.length
-        ? list.map(b => bookingCard(b, false)).join('')
-        : `<div class="cd-empty"><span class="cd-ei">📂</span><p>No submissions yet.<br>Fill out the Booking Form to get started! 🌸</p></div>`;
-    } catch(e) {
-      el.innerHTML = `<div class="cd-empty"><span class="cd-ei">⚠️</span><p>Could not load submissions.<br>Please try again.</p></div>`;
-    }
-  }
+function confirmLogout(){document.getElementById('logoutModal').classList.add('show');}
+function closeLogoutModal(){document.getElementById('logoutModal').classList.remove('show');}
+function closeCancelModal(){document.getElementById('cancelModal').classList.remove('show');}
 
-  async function loadRejected() {
-    const el = document.getElementById('rejectedList');
-    el.innerHTML = '<div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>';
-    try {
-      const res  = await fetch(API_BASE + '/client/bookings/rejected', {
-        headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('client_token') }
-      });
-      const data = await res.json();
-      const list = Array.isArray(data) ? data : (data.bookings || []);
-      el.innerHTML = list.length
-        ? list.map(b => bookingCard(b, true)).join('')
-        : `<div class="cd-empty"><span class="cd-ei">✖</span><p>No rejected bookings. 🎉<br>All good!</p></div>`;
-    } catch(e) {
-      el.innerHTML = `<div class="cd-empty"><span class="cd-ei">⚠️</span><p>Could not load rejections.<br>Please try again.</p></div>`;
-    }
-  }
-
-  function bookingCard(b, rejected) {
-    const statusColor = rejected ? 'var(--red)' : 'var(--green)';
-    const statusLabel = rejected ? '✖ Rejected' : '📋 Submitted';
-    return `
-      <div style="background:#fff;border-radius:16px;padding:16px 18px;
-                  box-shadow:0 2px 10px rgba(201,79,106,.09);
-                  border:1.5px solid var(--border);margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--rose);font-weight:700;">
-            ${escHtml(b.name || '—')}
-          </div>
-          <div style="font-size:11px;font-weight:700;color:${statusColor};">${statusLabel}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mauve);">
-          <div>📅 ${escHtml(b.date || '—')} &nbsp;·&nbsp; ⏰ ${escHtml(b.perfTime || '—')}</div>
-          <div>🎉 ${escHtml(b.occasion || '—')}</div>
-          <div>📍 ${escHtml(b.venue || '—')}</div>
-          <div>💳 ${escHtml(b.package || '—')}</div>
-          ${b.notes ? `<div>📝 ${escHtml(b.notes)}</div>` : ''}
-          ${rejected && b.rejectReason
-            ? `<div style="margin-top:6px;color:var(--red);font-weight:700;">Reason: ${escHtml(b.rejectReason)}</div>`
-            : ''}
-        </div>
-      </div>`;
-  }
-
-  // ── LOGOUT ───────────────────────────────
-  function confirmLogout()    { document.getElementById('logoutModal').classList.add('show'); }
-  function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
-  function closeCancelModal() { document.getElementById('cancelModal').classList.remove('show'); }
-
-  function doLogout() {
-    closeLogoutModal();
-    sessionStorage.removeItem('client_token');
-    sessionStorage.removeItem('client_display_name');
-    sessionStorage.removeItem('client_username');
-    window.location.href = 'client.html';
-  }
-
-  // ── TOAST ────────────────────────────────
-  function showToast(msg) {
-    const t = document.getElementById('cdToast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
-  }
+function doLogout(){
+  closeLogoutModal();
+  sessionStorage.removeItem('client_token');
+  sessionStorage.removeItem('client_display_name');
+  sessionStorage.removeItem('client_username');
+  window.location.href='client.html';
+}
 </script>
 </body>
 </html>
