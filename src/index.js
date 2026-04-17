@@ -86,7 +86,10 @@ function requireClient(req, res, next) {
   }
 }
 
-// ─── Health ───────────────────────────────────────────────────
+// This tells Express to send index.html when someone visits the base URL
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'index.html'));
+});
 
 // ─── ADMIN AUTH ───────────────────────────────────────────────
 app.post('/admin/login', (req, res) => {
