@@ -14,27 +14,12 @@
   --muted:#b08090;--border:#f0c8d4;--white:#ffffff;
 }
 body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;font-size:12px}
-
-/* ═══════════════════════ LOGIN PAGE ═══════════════════════ */
-#loginPage{
-  position:fixed;inset:0;
-  background:linear-gradient(150deg,#f5c8d8 0%,#fce8ee 40%,#f0b8c8 80%,#fce8ee 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  overflow:hidden;z-index:30;transition:opacity .5s ease,transform .5s ease;
-}
+#loginPage{position:fixed;inset:0;background:linear-gradient(150deg,#f5c8d8 0%,#fce8ee 40%,#f0b8c8 80%,#fce8ee 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;z-index:30;transition:opacity .5s ease,transform .5s ease}
 #loginPage.hide{opacity:0;transform:translateY(-30px);pointer-events:none;display:none!important}
 .login-petals{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
 .petal{position:absolute;top:-50px;opacity:0;font-size:var(--sz,16px);animation:floatDown var(--dur,6s) var(--del,0s) infinite ease-in-out}
 @keyframes floatDown{0%{opacity:0;transform:translateY(0) rotate(0deg)}8%{opacity:1}85%{opacity:.7}100%{opacity:0;transform:translateY(110vh) rotate(400deg)}}
-.login-card{
-  position:relative;z-index:1;width:90%;max-width:340px;
-  background:rgba(255,248,250,0.88);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1.5px solid rgba(255,255,255,.85);
-  border-radius:24px;padding:32px 28px 26px;text-align:center;
-  box-shadow:0 20px 60px rgba(201,79,106,.18);
-  animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;
-}
+.login-card{position:relative;z-index:1;width:90%;max-width:340px;background:rgba(255,248,250,0.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1.5px solid rgba(255,255,255,.85);border-radius:24px;padding:32px 28px 26px;text-align:center;box-shadow:0 20px 60px rgba(201,79,106,.18);animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes cardIn{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .login-icon{font-size:32px;display:block;margin-bottom:10px;animation:sway 3s ease-in-out infinite}
 @keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
@@ -42,64 +27,21 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
 .login-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5}
 .login-field{margin-bottom:12px;text-align:left}
 .login-field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
-.login-field input{
-  width:100%;background:#fff;border:1.5px solid var(--border);border-radius:10px;
-  color:var(--text);font-family:'Lato',sans-serif;font-size:14px;
-  padding:10px 14px;outline:none;transition:border-color .2s,box-shadow .2s;
-}
+.login-field input{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Lato',sans-serif;font-size:14px;padding:10px 14px;outline:none;transition:border-color .2s,box-shadow .2s}
 .login-field input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(232,114,138,.12)}
-.btn-login{
-  width:100%;padding:12px;margin-top:4px;
-  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
-  border:none;border-radius:12px;color:#fff;
-  font-family:'Lato',sans-serif;font-size:13px;font-weight:400;
-  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
-  transition:all .2s;box-shadow:0 6px 18px rgba(201,79,106,.35);
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
+.btn-login{width:100%;padding:12px;margin-top:4px;background:linear-gradient(135deg,var(--pink),var(--pink-deep));border:none;border-radius:12px;color:#fff;font-family:'Lato',sans-serif;font-size:13px;font-weight:400;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;box-shadow:0 6px 18px rgba(201,79,106,.35);display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(201,79,106,.45)}
 .btn-login:active{transform:scale(.98)}
 .btn-login:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .login-error{margin-top:10px;padding:8px 12px;background:#fdecea;border:1px solid #f5b8b0;border-radius:8px;font-size:12px;color:#c0392b;display:none}
 .login-error.show{display:block}
 .login-note{margin-top:14px;font-size:11px;color:var(--muted);line-height:1.6}
-
-/* ─── Shared pretty logout button ─── */
-.btn-logout{
-  background:rgba(201,79,106,.08);
-  border:1.5px solid rgba(201,79,106,.25);
-  border-radius:100px;
-  color:var(--pink-deep);
-  font-family:'Lato',sans-serif;
-  font-size:11px;
-  padding:6px 16px;
-  cursor:pointer;
-  transition:all .18s;
-  letter-spacing:.5px;
-  margin-top:12px;
-  display:inline-block;
-}
+.btn-logout{background:rgba(201,79,106,.08);border:1.5px solid rgba(201,79,106,.25);border-radius:100px;color:var(--pink-deep);font-family:'Lato',sans-serif;font-size:11px;padding:6px 16px;cursor:pointer;transition:all .18s;letter-spacing:.5px;margin-top:12px;display:inline-block}
 .btn-logout:hover{background:var(--pink-deep);color:#fff;border-color:var(--pink-deep)}
-
-.btn-logout-white{
-  background:rgba(255,255,255,.2);
-  border:1.5px solid rgba(255,255,255,.45);
-  border-radius:100px;
-  color:#fff;
-  font-family:'Lato',sans-serif;
-  font-size:11px;
-  padding:6px 16px;
-  cursor:pointer;
-  transition:all .18s;
-  letter-spacing:.5px;
-}
+.btn-logout-white{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.45);border-radius:100px;color:#fff;font-family:'Lato',sans-serif;font-size:11px;padding:6px 16px;cursor:pointer;transition:all .18s;letter-spacing:.5px}
 .btn-logout-white:hover{background:rgba(255,255,255,.35)}
-
-/* ═══════════════════════ FORM PAGE ═══════════════════════ */
 #formPage{display:none}
 #thankYouPage{display:none}
-
-/* HERO */
 .hero{background:linear-gradient(150deg,#f9d6e4 0%,#fce8ee 50%,#f5c8d8 100%);padding:28px 20px 22px;text-align:center;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 80% at 50% 0%,rgba(232,114,138,.2) 0%,transparent 70%);pointer-events:none;z-index:0}
 .petals{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
@@ -111,8 +53,6 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
 .hero-tagline{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--mauve);margin-bottom:12px}
 .loc-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.75);border:1px solid var(--border);border-radius:100px;padding:4px 14px;font-size:12px;color:var(--pink-deep)}
 .hero-logout-wrap{position:absolute;top:12px;right:14px;z-index:2}
-
-/* FORM */
 .form-bg{background:var(--cream)}
 .body{padding:0 13px 36px;max-width:480px;margin:0 auto}
 .section-head{display:flex;align-items:center;gap:8px;margin:14px 0 9px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--pink);font-weight:400}
@@ -155,8 +95,6 @@ textarea{resize:none}
 .custom-cb.checked svg{display:block}
 .agree-label{font-size:12px;color:var(--mauve);line-height:1.5;margin-top:1px}
 .agree-label strong{color:var(--pink-deep)}
-
-/* ═══ GCASH SECTION (inside the form, before submit) ═══ */
 .gcash-form-box{background:var(--white);border:1.5px dashed var(--pink);border-radius:12px;overflow:hidden;margin-top:2px}
 .gcash-form-head{background:linear-gradient(135deg,var(--pink-pale),#fde8ef);padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
 .gcash-form-head span{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pink-deep);font-weight:400}
@@ -181,35 +119,15 @@ textarea{resize:none}
 .gcash-preview-label{font-size:12px;color:#27ae60;font-weight:400;flex:1}
 .btn-reupload{background:none;border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Lato',sans-serif;font-size:11px;padding:5px 12px;cursor:pointer;transition:all .15s}
 .btn-reupload:hover{border-color:var(--pink);color:var(--pink-deep)}
-
-/* ═══ ACTION BUTTONS ═══ */
 .action-bar{display:flex;gap:9px;margin-top:14px}
-.btn-submit{
-  flex:1;padding:14px;
-  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
-  border:none;border-radius:12px;color:#fff;
-  font-family:'Lato',sans-serif;font-size:13px;font-weight:400;
-  letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;
-  transition:opacity .2s,transform .1s;
-  box-shadow:0 6px 18px rgba(201,79,106,.35);
-}
+.btn-submit{flex:1;padding:14px;background:linear-gradient(135deg,var(--pink),var(--pink-deep));border:none;border-radius:12px;color:#fff;font-family:'Lato',sans-serif;font-size:13px;font-weight:400;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:opacity .2s,transform .1s;box-shadow:0 6px 18px rgba(201,79,106,.35)}
 .btn-submit:active{transform:scale(.98)}
 .btn-submit:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
-.btn-cancel{
-  padding:14px 20px;
-  background:rgba(201,79,106,.06);
-  border:1.5px solid var(--blush);
-  border-radius:12px;color:var(--mauve);
-  font-family:'Lato',sans-serif;font-size:13px;font-weight:400;
-  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
-  transition:all .15s;white-space:nowrap;
-}
+.btn-cancel{padding:14px 20px;background:rgba(201,79,106,.06);border:1.5px solid var(--blush);border-radius:12px;color:var(--mauve);font-family:'Lato',sans-serif;font-size:13px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap}
 .btn-cancel:hover{background:var(--pink-pale);border-color:var(--pink);color:var(--pink-deep)}
 .btn-cancel:active{transform:scale(.98)}
 .submit-hint{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5}
 .submit-hint.error{color:#c0392b;background:#fdecea;border:1px solid #f5b8b0;border-radius:8px;padding:7px 10px}
-
-/* ═══════════════════════ THANK YOU PAGE ═══════════════════════ */
 #thankYouPage{position:fixed;inset:0;background:linear-gradient(160deg,#fce8ee 0%,#fdf0f5 50%,#fce8ee 100%);flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;z-index:10;padding-bottom:40px}
 #thankYouPage.show{display:flex;animation:fadeSlide .4s ease}
 @keyframes fadeSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -238,26 +156,9 @@ textarea{resize:none}
 .ty-ss-body img{width:100%;max-height:220px;object-fit:contain;border-radius:6px;border:1px solid var(--border)}
 .ty-footer{display:flex;justify-content:center;margin-top:6px;padding-bottom:4px}
 .ty-sig{text-align:center;font-family:'Pinyon Script',cursive;font-size:15px;color:var(--mauve);opacity:.45;margin-top:4px}
-
-/* ═══════════════════════ MODALS ═══════════════════════ */
-.modal-overlay{
-  position:fixed;inset:0;
-  background:rgba(58,31,40,.5);
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  z-index:500;
-  display:flex;align-items:center;justify-content:center;padding:20px;
-  opacity:0;pointer-events:none;transition:opacity .25s ease;
-}
+.modal-overlay{position:fixed;inset:0;background:rgba(58,31,40,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s ease}
 .modal-overlay.show{opacity:1;pointer-events:all}
-.modal-box{
-  background:#fff;
-  border-radius:24px;padding:32px 28px 26px;
-  max-width:300px;width:100%;text-align:center;
-  box-shadow:0 24px 60px rgba(201,79,106,.28);
-  transform:scale(.9) translateY(12px);
-  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
-  border:1.5px solid var(--blush);
-}
+.modal-box{background:#fff;border-radius:24px;padding:32px 28px 26px;max-width:300px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(201,79,106,.28);transform:scale(.9) translateY(12px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);border:1.5px solid var(--blush)}
 .modal-overlay.show .modal-box{transform:scale(1) translateY(0)}
 .modal-icon{font-size:42px;display:block;margin-bottom:12px;animation:sway 3s ease-in-out infinite}
 .modal-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--pink-deep);margin-bottom:8px}
@@ -274,15 +175,13 @@ textarea{resize:none}
 .modal-btn-confirm-danger:active{transform:scale(.97)}
 .modal-btn-done{width:100%;padding:12px;background:linear-gradient(135deg,var(--pink),var(--pink-deep));border:none;border-radius:12px;color:#fff;font-family:'Lato',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 14px rgba(201,79,106,.3);transition:all .15s}
 .modal-btn-done:hover{box-shadow:0 6px 18px rgba(201,79,106,.4);transform:translateY(-1px)}
-
-/* Spinner */
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
-<!-- ══════════════ PAGE -1: CLIENT LOGIN ══════════════ -->
+<!-- LOGIN PAGE -->
 <div id="loginPage">
   <div class="login-petals" id="loginPetals"></div>
   <div class="login-card">
@@ -303,7 +202,7 @@ textarea{resize:none}
   </div>
 </div>
 
-<!-- ══════════════ PAGE 1: BOOKING FORM ══════════════ -->
+<!-- BOOKING FORM PAGE -->
 <div id="formPage">
   <div class="hero">
     <div class="petals" id="petals"></div>
@@ -414,7 +313,7 @@ textarea{resize:none}
         <span class="agree-label">I have read and <strong>agree</strong> to all Terms &amp; Conditions above.</span>
       </label>
 
-      <!-- ═══ GCASH DOWNPAYMENT SECTION ═══ -->
+      <!-- GCASH DOWNPAYMENT SECTION -->
       <div class="section-head">💚 Downpayment via GCash</div>
       <div class="gcash-form-box">
         <div class="gcash-form-head">
@@ -449,7 +348,7 @@ textarea{resize:none}
         </div>
       </div>
 
-      <!-- ═══ FINAL ACTION BUTTONS ═══ -->
+      <!-- SUBMIT -->
       <div class="section-head">✅ Confirm Booking</div>
       <div id="submitHintEl" class="submit-hint">Fill in all required fields and upload your GCash screenshot to proceed.</div>
       <div class="action-bar">
@@ -460,7 +359,7 @@ textarea{resize:none}
   </div>
 </div>
 
-<!-- ══════════════ PAGE 2: THANK YOU ══════════════ -->
+<!-- THANK YOU PAGE -->
 <div id="thankYouPage">
   <div class="sparkles" id="sparkles"></div>
   <div class="ty-compact">
@@ -495,7 +394,7 @@ textarea{resize:none}
   </div>
 </div>
 
-<!-- ══════════════ LOGOUT CONFIRM MODAL ══════════════ -->
+<!-- MODALS -->
 <div class="modal-overlay" id="logoutModal">
   <div class="modal-box">
     <span class="modal-icon">🎀</span>
@@ -508,7 +407,6 @@ textarea{resize:none}
   </div>
 </div>
 
-<!-- ══════════════ CANCEL BOOKING MODAL ══════════════ -->
 <div class="modal-overlay" id="cancelModal">
   <div class="modal-box">
     <span class="modal-icon">🗑️</span>
@@ -521,7 +419,6 @@ textarea{resize:none}
   </div>
 </div>
 
-<!-- ══════════════ SUBMIT SUCCESS MODAL ══════════════ -->
 <div class="modal-overlay" id="ssModal">
   <div class="modal-box">
     <span class="modal-icon">🌸</span>
@@ -532,53 +429,73 @@ textarea{resize:none}
 </div>
 
 <script>
-const API_BASE = window.location.origin;
-let clientToken = sessionStorage.getItem('client_token') || null;
-let clientDisplayName = sessionStorage.getItem('client_display_name') || '';
-let clientUsername = sessionStorage.getItem('client_username') || '';
-let currentBookingId = null;
-let pendingImageData = null;
+// ═══════════════════════════════════════════════════════════════
+//  ACCOUNTS — hardcoded credentials (no server needed)
+//  To add/remove clients, edit this object.
+//  Format:  "username": { password: "...", displayName: "..." }
+// ═══════════════════════════════════════════════════════════════
+const ACCOUNTS = {
+  "client1":  { password: "booking123",   displayName: "Client 1" },
+  "client2":  { password: "booking456",   displayName: "Client 2" },
+  "maricel":  { password: "maricel2025",  displayName: "Maricel" },
+  "john":     { password: "john2025",     displayName: "John" }
+};
 
+// ── session state ──
+let clientDisplayName = sessionStorage.getItem('client_display_name') || '';
+let clientUsername    = sessionStorage.getItem('client_username') || '';
+let isLoggedIn        = sessionStorage.getItem('logged_in') === 'yes';
+let pendingImageData  = null;
+
+// ── storage helpers ──
+async function saveBooking(booking) {
+  // store under shared key so the admin panel can read it
+  const key = 'booking:' + booking.id;
+  try {
+    await window.storage.set(key, JSON.stringify(booking), true); // shared=true → visible to admin
+    return true;
+  } catch(e) {
+    console.error('Storage save error:', e);
+    return false;
+  }
+}
+
+// ── init ──
 (function init() {
   spawnLoginPetals();
   spawnSparkles();
-  if (clientToken) showForm();
+  if (isLoggedIn) showForm();
 })();
 
 // ══════ LOGIN ══════
-async function doClientLogin() {
-  const username = document.getElementById('loginUsername').value.trim();
+function doClientLogin() {
+  const username = document.getElementById('loginUsername').value.trim().toLowerCase();
   const password = document.getElementById('loginPassword').value;
-  const errEl = document.getElementById('loginError');
-  const btn = document.getElementById('loginBtn');
+  const errEl    = document.getElementById('loginError');
+  const btn      = document.getElementById('loginBtn');
   errEl.classList.remove('show');
+
   if (!username || !password) {
     errEl.textContent = 'Please enter your username and password.';
     errEl.classList.add('show'); return;
   }
+
+  const account = ACCOUNTS[username];
+  if (!account || account.password !== password) {
+    errEl.textContent = 'Incorrect username or password.';
+    errEl.classList.add('show'); return;
+  }
+
+  clientDisplayName = account.displayName;
+  clientUsername    = username;
+  isLoggedIn        = true;
+  sessionStorage.setItem('logged_in',           'yes');
+  sessionStorage.setItem('client_display_name', clientDisplayName);
+  sessionStorage.setItem('client_username',     clientUsername);
+
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Signing in…';
-  try {
-    const res = await fetch(API_BASE + '/client/login', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      errEl.textContent = data.error || 'Login failed. Please try again.';
-      errEl.classList.add('show');
-      btn.disabled = false; btn.innerHTML = '🔑 &nbsp; Sign In'; return;
-    }
-    clientToken = data.token; clientDisplayName = data.displayName; clientUsername = data.username;
-    sessionStorage.setItem('client_token', clientToken);
-    sessionStorage.setItem('client_display_name', clientDisplayName);
-    sessionStorage.setItem('client_username', clientUsername);
-    showForm();
-  } catch(e) {
-    errEl.textContent = 'Cannot connect to server. Please try again.';
-    errEl.classList.add('show');
-    btn.disabled = false; btn.innerHTML = '🔑 &nbsp; Sign In';
-  }
+  setTimeout(showForm, 400);
 }
 
 function showForm() {
@@ -590,14 +507,13 @@ function showForm() {
   }, 300);
 }
 
-function confirmLogout() { document.getElementById('logoutModal').classList.add('show'); }
-function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
+function confirmLogout()  { document.getElementById('logoutModal').classList.add('show'); }
+function closeLogoutModal(){ document.getElementById('logoutModal').classList.remove('show'); }
+
 function doLogout() {
   closeLogoutModal();
-  clientToken = null; clientDisplayName = ''; clientUsername = '';
-  sessionStorage.removeItem('client_token');
-  sessionStorage.removeItem('client_display_name');
-  sessionStorage.removeItem('client_username');
+  isLoggedIn = false; clientDisplayName = ''; clientUsername = '';
+  sessionStorage.clear();
   document.getElementById('formPage').style.display = 'none';
   document.getElementById('thankYouPage').classList.remove('show');
   const lp = document.getElementById('loginPage');
@@ -610,17 +526,14 @@ function doLogout() {
 }
 
 // ══════ CANCEL FORM ══════
-function confirmCancel() { document.getElementById('cancelModal').classList.add('show'); }
-function closeCancelModal() { document.getElementById('cancelModal').classList.remove('show'); }
+function confirmCancel()  { document.getElementById('cancelModal').classList.add('show'); }
+function closeCancelModal(){ document.getElementById('cancelModal').classList.remove('show'); }
+
 function doCancelForm() {
   closeCancelModal();
-  // Clear all fields
-  document.getElementById('clientName').value = '';
-  document.getElementById('eventDate').value = '';
-  document.getElementById('perfTime').value = '';
+  ['clientName','eventDate','perfTime','venue','notes'].forEach(id =>
+    (document.getElementById(id).value = ''));
   document.getElementById('occasion').value = '';
-  document.getElementById('venue').value = '';
-  document.getElementById('notes').value = '';
   document.querySelectorAll('input[name="rateType"]').forEach(r => r.checked = false);
   document.getElementById('songBox').classList.remove('show');
   document.getElementById('hourBox').classList.remove('show');
@@ -630,27 +543,22 @@ function doCancelForm() {
   document.getElementById('hourPrice').classList.remove('show');
   document.getElementById('agreeCheck').checked = false;
   document.getElementById('customCB').classList.remove('checked');
-  // Clear screenshot
   pendingImageData = null;
   document.getElementById('gcashPreview').classList.remove('show');
   document.getElementById('gcashPreviewImg').src = '';
-  document.getElementById('uploadArea').style.opacity = '';
-  document.getElementById('uploadArea').style.pointerEvents = '';
+  document.getElementById('uploadArea').style.display = '';
   document.getElementById('gcashFile').value = '';
-  // Reset submit
   document.getElementById('submitBtn').disabled = true;
   updateSubmitHint();
-  // Scroll to top
-  document.getElementById('formPage').scrollTop = 0;
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
-// ══════ PETALS ══════
+// ══════ PETALS & SPARKLES ══════
 function spawnLoginPetals() {
   const pc = document.getElementById('loginPetals');
   ['🌸','🌸','🌷','🌸','🌺','🌸','🌷'].forEach(p => {
     for (let i = 0; i < (p==='🌸'?5:3); i++) {
-      const el = document.createElement('div'); el.className='petal'; el.textContent=p;
+      const el = document.createElement('div'); el.className = 'petal'; el.textContent = p;
       el.style.left = Math.random()*100+'%';
       el.style.setProperty('--sz',(13+Math.random()*12)+'px');
       el.style.setProperty('--dur',(5+Math.random()*6)+'s');
@@ -664,7 +572,7 @@ function initFormPetals() {
   if (pc.childElementCount > 0) return;
   ['🌸','🌸','🌷','🌸','🌺','🌸','🌷','🌸','🌸','🌷'].forEach(p => {
     for (let i = 0; i < (p==='🌸'?7:4); i++) {
-      const el = document.createElement('div'); el.className='petal'; el.textContent=p;
+      const el = document.createElement('div'); el.className = 'petal'; el.textContent = p;
       el.style.left = Math.random()*100+'%';
       el.style.setProperty('--sz',(13+Math.random()*13)+'px');
       el.style.setProperty('--dur',(5+Math.random()*6)+'s');
@@ -677,12 +585,12 @@ function spawnSparkles() {
   const sc = document.getElementById('sparkles');
   const sizes=[8,9,10,11,12]; const colors=['#e8728a','#c94f6a','#d4a853','#e8728a','#b07080'];
   for (let i=0;i<28;i++) {
-    const s=document.createElement('div'); s.className='sparkle';
-    s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*100+'%';
-    s.style.setProperty('--ts',sizes[Math.floor(Math.random()*sizes.length)]+'px');
-    s.style.setProperty('--td',(1.5+Math.random()*2.5)+'s');
-    s.style.setProperty('--tl',(Math.random()*3)+'s');
-    s.style.color=colors[Math.floor(Math.random()*colors.length)];
+    const s = document.createElement('div'); s.className = 'sparkle';
+    s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
+    s.style.setProperty('--ts', sizes[Math.floor(Math.random()*sizes.length)]+'px');
+    s.style.setProperty('--td', (1.5+Math.random()*2.5)+'s');
+    s.style.setProperty('--tl', (Math.random()*3)+'s');
+    s.style.color = colors[Math.floor(Math.random()*colors.length)];
     sc.appendChild(s);
   }
 }
@@ -710,8 +618,8 @@ const hourNotes = {
   '2 Hours':'2 hours of live performance 🎤',
 };
 function showPrice(type) {
-  const sel = document.getElementById(type==='song'?'songPkg':'hourPkg');
-  const tag = document.getElementById(type==='song'?'songPrice':'hourPrice');
+  const sel = document.getElementById(type==='song' ? 'songPkg' : 'hourPkg');
+  const tag = document.getElementById(type==='song' ? 'songPrice' : 'hourPrice');
   const parts = sel.value.split('|'); const label=parts[0], price=parts[1];
   const note = type==='song' ? songNotes[label] : hourNotes[label];
   tag.innerHTML = '<strong>'+label+' — '+price+'</strong><span>'+(note||'')+'</span>';
@@ -727,12 +635,12 @@ function toggleCB() {
 }
 
 function isFormValid() {
-  const name = document.getElementById('clientName').value.trim();
-  const date = document.getElementById('eventDate').value.trim();
-  const perf = document.getElementById('perfTime').value.trim();
-  const occ = document.getElementById('occasion').value;
-  const venue = document.getElementById('venue').value.trim();
-  const agreed = document.getElementById('agreeCheck').checked;
+  const name    = document.getElementById('clientName').value.trim();
+  const date    = document.getElementById('eventDate').value.trim();
+  const perf    = document.getElementById('perfTime').value.trim();
+  const occ     = document.getElementById('occasion').value;
+  const venue   = document.getElementById('venue').value.trim();
+  const agreed  = document.getElementById('agreeCheck').checked;
   const rateRadio = document.querySelector('input[name="rateType"]:checked');
   let pkgOk = false;
   if (rateRadio) {
@@ -747,10 +655,10 @@ function isFormValid() {
 function getMissingFields() {
   const missing = [];
   if (!document.getElementById('clientName').value.trim()) missing.push('Client Name');
-  if (!document.getElementById('eventDate').value.trim()) missing.push('Event Date');
-  if (!document.getElementById('perfTime').value.trim()) missing.push('Performance Time');
-  if (!document.getElementById('occasion').value) missing.push('Event Occasion');
-  if (!document.getElementById('venue').value.trim()) missing.push('Venue Address');
+  if (!document.getElementById('eventDate').value.trim())  missing.push('Event Date');
+  if (!document.getElementById('perfTime').value.trim())   missing.push('Performance Time');
+  if (!document.getElementById('occasion').value)          missing.push('Event Occasion');
+  if (!document.getElementById('venue').value.trim())      missing.push('Venue Address');
   const rateRadio = document.querySelector('input[name="rateType"]:checked');
   if (!rateRadio) {
     missing.push('Rate Type');
@@ -766,7 +674,7 @@ function getMissingFields() {
 }
 
 function updateSubmitHint() {
-  const btn = document.getElementById('submitBtn');
+  const btn  = document.getElementById('submitBtn');
   const hint = document.getElementById('submitHintEl');
   const valid = isFormValid();
   btn.disabled = !valid;
@@ -775,16 +683,13 @@ function updateSubmitHint() {
     hint.classList.remove('error');
   } else {
     const missing = getMissingFields();
-    if (missing.length > 0) {
-      hint.textContent = 'Still needed: ' + missing.join(', ') + '.';
-    } else {
-      hint.textContent = 'Fill in all required fields and upload your GCash screenshot to proceed.';
-    }
+    hint.textContent = missing.length
+      ? 'Still needed: ' + missing.join(', ') + '.'
+      : 'Fill in all required fields and upload your GCash screenshot to proceed.';
     hint.classList.remove('error');
   }
 }
 
-// Watch fields for changes to auto-update the hint
 document.addEventListener('DOMContentLoaded', function() {
   ['clientName','eventDate','perfTime','venue','notes'].forEach(id => {
     const el = document.getElementById(id);
@@ -796,6 +701,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// ══════ SUBMIT ══════
 async function submitForm() {
   if (!isFormValid()) {
     const hint = document.getElementById('submitHintEl');
@@ -803,49 +709,66 @@ async function submitForm() {
     hint.classList.add('error');
     return;
   }
-  const name = document.getElementById('clientName').value.trim();
-  const date = document.getElementById('eventDate').value.trim();
-  const perfTime = document.getElementById('perfTime').value.trim();
-  const occ = document.getElementById('occasion').value;
-  const venue = document.getElementById('venue').value.trim();
-  const notes = document.getElementById('notes').value.trim();
+
+  const name      = document.getElementById('clientName').value.trim();
+  const date      = document.getElementById('eventDate').value.trim();
+  const perfTime  = document.getElementById('perfTime').value.trim();
+  const occ       = document.getElementById('occasion').value;
+  const venue     = document.getElementById('venue').value.trim();
+  const notes     = document.getElementById('notes').value.trim();
   const rateRadio = document.querySelector('input[name="rateType"]:checked');
-  const rateType = rateRadio.value;
-  const pkgRaw = rateType==='song' ? document.getElementById('songPkg').value : document.getElementById('hourPkg').value;
-  const parts = pkgRaw.split('|'); const pkg = parts[0]+' — '+parts[1];
+  const rateType  = rateRadio.value;
+  const pkgRaw    = rateType==='song'
+    ? document.getElementById('songPkg').value
+    : document.getElementById('hourPkg').value;
+  const parts = pkgRaw.split('|');
+  const pkg   = parts[0] + ' — ' + parts[1];
+
   const booking = {
-    id: Date.now(), name, date, perfTime, occasion: occ, venue,
-    rateType: rateType==='song' ? '🎵 Per Song' : '⏱️ Per Hour',
-    package: pkg, notes: notes||'',
+    id:              Date.now(),
+    submittedAt:     new Date().toISOString(),
+    clientUsername,
+    clientDisplayName,
+    name,
+    date,
+    perfTime,
+    occasion:        occ,
+    venue,
+    rateType:        rateType==='song' ? '🎵 Per Song' : '⏱️ Per Hour',
+    package:         pkg,
+    notes:           notes || '',
     gcashScreenshot: pendingImageData,
+    status:          'pending'
   };
+
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Submitting…';
-  try {
-    const res = await fetch(API_BASE + '/client/bookings', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+clientToken},
-      body: JSON.stringify(booking)
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      const hint = document.getElementById('submitHintEl');
-      hint.textContent = 'Error: '+(err.error||'Could not submit booking. Please try again.');
-      hint.classList.add('error');
-      btn.disabled = false; btn.innerHTML = '🎀 Submit Booking'; return;
-    }
-  } catch(e) {
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…';
+
+  // ── Save to persistent storage (shared = accessible by admin) ──
+  const saved = await saveBooking(booking);
+
+  if (!saved) {
     const hint = document.getElementById('submitHintEl');
-    hint.textContent = 'Cannot connect to server. Please check your connection and try again.';
+    hint.textContent = 'Could not save booking. Please try again.';
     hint.classList.add('error');
-    btn.disabled = false; btn.innerHTML = '🎀 Submit Booking'; return;
+    btn.disabled = false;
+    btn.innerHTML = '🎀 Submit Booking';
+    return;
   }
-  currentBookingId = booking.id;
+
+  // ── Show thank-you ──
   const rows = [
-    ['Client Name',name],['Event Date',date],['Time',perfTime],
-    ['Occasion',occ],['Venue',venue],['Rate Type',booking.rateType],['Package',pkg],
+    ['Client',    name],
+    ['Date',      date],
+    ['Time',      perfTime],
+    ['Occasion',  occ],
+    ['Venue',     venue],
+    ['Rate',      booking.rateType],
+    ['Package',   pkg],
   ];
-  if (notes) rows.push(['Notes',notes]);
+  if (notes) rows.push(['Notes', notes]);
+
   document.getElementById('summaryRows').innerHTML = rows.map(r =>
     '<div class="cc-row"><span class="lbl">'+r[0]+'</span><span class="val">'+r[1]+'</span></div>'
   ).join('');
@@ -861,13 +784,13 @@ function compressImage(file, callback) {
     const img = new Image();
     img.onload = function() {
       const canvas = document.createElement('canvas');
-      const maxDim = 900; let w=img.width, h=img.height;
-      if (w>maxDim||h>maxDim) {
-        if (w>h) { h=Math.round(h*maxDim/w); w=maxDim; }
-        else { w=Math.round(w*maxDim/h); h=maxDim; }
+      const maxDim = 900; let w = img.width, h = img.height;
+      if (w>maxDim || h>maxDim) {
+        if (w>h) { h = Math.round(h*maxDim/w); w = maxDim; }
+        else     { w = Math.round(w*maxDim/h); h = maxDim; }
       }
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       callback(canvas.toDataURL('image/jpeg', 0.72));
     };
     img.src = e.target.result;
@@ -895,9 +818,7 @@ function reuploadScreenshot() {
   updateSubmitHint();
 }
 
-function closeSsModal() {
-  document.getElementById('ssModal').classList.remove('show');
-}
+function closeSsModal() { document.getElementById('ssModal').classList.remove('show'); }
 </script>
 </body>
 </html>
