@@ -18,36 +18,40 @@ const pool = new Pool({
 });
 
 async function initDB() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS client_accounts (
-      id SERIAL PRIMARY KEY,
-      username TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      display_name TEXT NOT NULL,
-      created_at TIMESTAMPTZ DEFAULT NOW()
-    )
-  `);
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS bookings (
-      id BIGINT PRIMARY KEY,
-      client_username TEXT,
-      name TEXT NOT NULL,
-      date TEXT,
-      perf_time TEXT,
-      occasion TEXT,
-      venue TEXT,
-      rate_type TEXT,
-      package TEXT,
-      notes TEXT,
-      gcash_screenshot TEXT,
-      screenshot_at TIMESTAMPTZ,
-      status TEXT DEFAULT 'pending',
-      admin_note TEXT DEFAULT '',
-      submitted_at TIMESTAMPTZ DEFAULT NOW(),
-      updated_at TIMESTAMPTZ
-    )
-  `);
-  console.log('✅ Database tables ready');
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS client_accounts (
+        id SERIAL PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        display_name TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS bookings (
+        id BIGINT PRIMARY KEY,
+        client_username TEXT,
+        name TEXT NOT NULL,
+        date TEXT,
+        perf_time TEXT,
+        occasion TEXT,
+        venue TEXT,
+        rate_type TEXT,
+        package TEXT,
+        notes TEXT,
+        gcash_screenshot TEXT,
+        screenshot_at TIMESTAMPTZ,
+        status TEXT DEFAULT 'pending',
+        admin_note TEXT DEFAULT '',
+        submitted_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ
+      )
+    `);
+    console.log('✅ Database tables ready');
+  } catch (err) {
+    console.error('❌ Database Init Error:', err.message);
+  }
 }
 
 // ─── Middleware ───────────────────────────────────────────────
@@ -58,8 +62,8 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 
-// ─── Serve static HTML files from /src ───────────────────────
-app.use(express.static(path.join(__dirname, 'src')));
+// FIX: Since index.js is INSIDE src, we serve the current directory as static
+app.use(express.static(__dirname));
 
 // ─── Auth Middleware ──────────────────────────────────────────
 function requireAdmin(req, res, next) {
@@ -87,9 +91,9 @@ function requireClient(req, res, next) {
 }
 
 // ─── ROOT ROUTE ───
-// This tells the server what to show when you click the main Railway link
+// FIX: Serves the index.html located in the same folder as this script
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // ─── ADMIN AUTH ───────────────────────────────────────────────
