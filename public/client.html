@@ -32,6 +32,24 @@
 
 <!-- BOOKING FORM PAGE -->
 <div id="formPage">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="menu-title">🎀 Menu</div>
+
+      <button class="menu-btn active" onclick="showSection('booking')">
+        📄 Booking Form
+      </button>
+
+      <button class="menu-btn" onclick="showSection('submitted')">
+        📂 Submitted / Rejected
+      </button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <div id="bookingSection">
   <div class="hero">
     <div class="petals" id="petals"></div>
     <div class="hero-logout-wrap">
@@ -186,7 +204,19 @@
     </div>
   </div>
 </div>
+</div> <!-- END bookingSection -->
 
+<!-- SUBMITTED / REJECTED SECTION -->
+<div id="submittedSection" style="display:none; padding:20px;">
+  <div class="section-head">📂 Submitted / Rejected</div>
+  <p style="font-size:13px; color:var(--mauve);">
+    This section will display submitted bookings from your database.
+  </p>
+</div>
+
+    </div> <!-- END main-content -->
+  </div> <!-- END layout -->
+</div>
 <!-- THANK YOU PAGE -->
 <div id="thankYouPage">
   <div class="sparkles" id="sparkles"></div>
@@ -255,38 +285,6 @@
     <button class="modal-btn-done" onclick="closeSsModal()">🎀 &nbsp; Done</button>
   </div>
   
-  <!-- SIDEBAR -->
-   
-  <div class="sidebar">
-      <div class="menu-title">🎀 Menu</div>
-      <button class="menu-btn active" onclick="showSection('booking')">📄 Booking Form</button>
-      <button class="menu-btn" onclick="showSection('submitted')">📂 Submitted / Rejected</button>
-    </div>
-<!-- MAIN CONTENT -->
-    <div class="main-content">
-
-      <!-- BOOKING SECTION -->
-      <div id="bookingSection">
-
-        <div class="hero" style="padding:20px; text-align:center;">
-          <h2>🎀 Booking Form</h2>
-        </div>
-
-        <div style="padding:20px;">
-          <input type="text" placeholder="Client Name"/><br><br>
-          <input type="text" placeholder="Event Date"/><br><br>
-          <input type="text" placeholder="Performance Time"/><br><br>
-
-          <button>Submit Booking</button>
-        </div>
-          </div>
-
-      <!-- SUBMITTED SECTION -->
-      <div id="submittedSection" style="display:none;">
-        <h2>📂 Submitted / Rejected Forms</h2>
-        <p>No data yet. (Connect this to database later)</p>
-      </div>
-
 </div>
 </body>
 </html>
