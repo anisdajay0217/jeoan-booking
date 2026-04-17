@@ -4,6 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -56,6 +57,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type','Authorization']
 }));
 app.use(express.json({ limit: '10mb' }));
+
+// ─── Serve static HTML files from /src ───────────────────────
+app.use(express.static(path.join(__dirname, 'src')));
 
 // ─── Auth Middleware ──────────────────────────────────────────
 function requireAdmin(req, res, next) {
@@ -231,9 +235,3 @@ initDB()
 app.listen(PORT, () => {
   console.log(`🎀 Jeoan API running on port ${PORT}`);
 });
-const express = require('express');
-const path = require('path');
-const app = express();
-
-// Add this line to serve your HTML files
-app.use(express.static(path.join(__dirname, 'src')));
