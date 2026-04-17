@@ -81,7 +81,6 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
 }
 .btn-logout:hover{background:var(--pink-deep);color:#fff;border-color:var(--pink-deep)}
 
-/* header logout (white version for colored bg) */
 .btn-logout-white{
   background:rgba(255,255,255,.2);
   border:1.5px solid rgba(255,255,255,.45);
@@ -156,9 +155,59 @@ textarea{resize:none}
 .custom-cb.checked svg{display:block}
 .agree-label{font-size:12px;color:var(--mauve);line-height:1.5;margin-top:1px}
 .agree-label strong{color:var(--pink-deep)}
-.btn-submit{width:100%;margin-top:12px;padding:14px;background:linear-gradient(135deg,var(--pink),var(--pink-deep));border:none;border-radius:12px;color:#fff;font-family:'Lato',sans-serif;font-size:13px;font-weight:400;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:opacity .2s,transform .1s;box-shadow:0 6px 18px rgba(201,79,106,.35)}
+
+/* ═══ GCASH SECTION (inside the form, before submit) ═══ */
+.gcash-form-box{background:var(--white);border:1.5px dashed var(--pink);border-radius:12px;overflow:hidden;margin-top:2px}
+.gcash-form-head{background:linear-gradient(135deg,var(--pink-pale),#fde8ef);padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.gcash-form-head span{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pink-deep);font-weight:400}
+.gcash-form-body{padding:12px 14px}
+.gcash-form-body p{font-size:12px;color:var(--mauve);margin-bottom:10px;line-height:1.5}
+.gc-inline{background:#f0fffe;border:1px solid #9dd4d0;border-radius:10px;overflow:hidden;margin-bottom:10px}
+.gc-inline-head{background:linear-gradient(135deg,#007b6e,#00a693);padding:5px 11px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#fff}
+.gc-inline-body{padding:8px 11px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.gc-inline-name{font-size:12px;font-weight:700;color:#007b6e}
+.gc-inline-num{font-size:17px;font-weight:700;color:#00a693;letter-spacing:2px}
+.gc-inline-badge{background:#007b6e;color:#fff;font-size:10px;border-radius:100px;padding:3px 10px;white-space:nowrap}
+.upload-area{border:1.5px dashed var(--border);border-radius:10px;padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--pink-light);position:relative}
+.upload-area:hover{border-color:var(--pink);background:var(--pink-pale)}
+.upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:28px;display:block;margin-bottom:6px}
+.upload-label{font-size:13px;color:var(--pink-deep);font-weight:400;display:block;margin-bottom:3px}
+.upload-sublabel{font-size:11px;color:var(--muted)}
+.gcash-preview{margin-top:10px;display:none;animation:fadeIn .3s ease}
+.gcash-preview.show{display:block}
+.gcash-preview img{width:100%;max-height:250px;object-fit:contain;border-radius:8px;border:1px solid var(--border)}
+.gcash-preview-actions{display:flex;align-items:center;gap:8px;margin-top:7px}
+.gcash-preview-label{font-size:12px;color:#27ae60;font-weight:400;flex:1}
+.btn-reupload{background:none;border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Lato',sans-serif;font-size:11px;padding:5px 12px;cursor:pointer;transition:all .15s}
+.btn-reupload:hover{border-color:var(--pink);color:var(--pink-deep)}
+
+/* ═══ ACTION BUTTONS ═══ */
+.action-bar{display:flex;gap:9px;margin-top:14px}
+.btn-submit{
+  flex:1;padding:14px;
+  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+  border:none;border-radius:12px;color:#fff;
+  font-family:'Lato',sans-serif;font-size:13px;font-weight:400;
+  letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;
+  transition:opacity .2s,transform .1s;
+  box-shadow:0 6px 18px rgba(201,79,106,.35);
+}
 .btn-submit:active{transform:scale(.98)}
 .btn-submit:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
+.btn-cancel{
+  padding:14px 20px;
+  background:rgba(201,79,106,.06);
+  border:1.5px solid var(--blush);
+  border-radius:12px;color:var(--mauve);
+  font-family:'Lato',sans-serif;font-size:13px;font-weight:400;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+}
+.btn-cancel:hover{background:var(--pink-pale);border-color:var(--pink);color:var(--pink-deep)}
+.btn-cancel:active{transform:scale(.98)}
+.submit-hint{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5}
+.submit-hint.error{color:#c0392b;background:#fdecea;border:1px solid #f5b8b0;border-radius:8px;padding:7px 10px}
 
 /* ═══════════════════════ THANK YOU PAGE ═══════════════════════ */
 #thankYouPage{position:fixed;inset:0;background:linear-gradient(160deg,#fce8ee 0%,#fdf0f5 50%,#fce8ee 100%);flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;z-index:10;padding-bottom:40px}
@@ -183,43 +232,14 @@ textarea{resize:none}
 .tc-row{display:flex;gap:5px;padding:3px 11px;border-bottom:1px solid var(--pink-pale);font-size:12px;color:#5a3040;line-height:1.3}
 .tc-row:last-child{border:none}
 .tc-n{color:var(--pink);font-weight:700;min-width:14px;flex-shrink:0}
-.gc{background:#f0fffe;border:1px solid #9dd4d0;border-radius:10px;overflow:hidden}
-.gc-head{background:linear-gradient(135deg,#007b6e,#00a693);padding:5px 11px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#fff}
-.gc-body{padding:6px 11px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.gc-name{font-size:12px;font-weight:700;color:#007b6e}
-.gc-num{font-size:17px;font-weight:700;color:#00a693;letter-spacing:2px}
-.gc-badge{background:#007b6e;color:#fff;font-size:10px;border-radius:100px;padding:3px 10px;white-space:nowrap}
-.gcash-upload-box{background:#fff;border:1.5px dashed var(--pink);border-radius:12px;overflow:hidden;margin-top:2px}
-.gcash-upload-head{background:linear-gradient(135deg,var(--pink-pale),#fde8ef);padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
-.gcash-upload-head span{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pink-deep);font-weight:400}
-.gcash-upload-body{padding:10px 14px}
-.gcash-upload-body p{font-size:12px;color:var(--mauve);margin-bottom:10px;line-height:1.5}
-.upload-area{border:1.5px dashed var(--border);border-radius:10px;padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--pink-light);position:relative}
-.upload-area:hover{border-color:var(--pink);background:var(--pink-pale)}
-.upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-icon{font-size:28px;display:block;margin-bottom:6px}
-.upload-label{font-size:13px;color:var(--pink-deep);font-weight:400;display:block;margin-bottom:3px}
-.upload-sublabel{font-size:11px;color:var(--muted)}
-.gcash-preview{margin-top:10px;display:none;animation:fadeIn .3s ease}
-.gcash-preview.show{display:block}
-.gcash-preview img{width:100%;max-height:250px;object-fit:contain;border-radius:8px;border:1px solid var(--border)}
-.btn-submit-ss{
-  width:100%;margin-top:10px;padding:13px;
-  background:linear-gradient(135deg,#27ae60,#1a9e50);
-  border:none;border-radius:11px;color:#fff;
-  font-family:'Lato',sans-serif;font-size:13px;font-weight:400;
-  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
-  box-shadow:0 4px 14px rgba(27,158,80,.3);transition:all .15s;
-  display:none;
-}
-.btn-submit-ss.show{display:block;animation:fadeIn .3s ease}
-.btn-submit-ss:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(27,158,80,.4)}
-.btn-submit-ss:active{transform:scale(.97)}
-.btn-submit-ss:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.ty-ss-box{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.ty-ss-head{background:var(--pink-pale);padding:5px 11px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--pink-deep)}
+.ty-ss-body{padding:8px 11px}
+.ty-ss-body img{width:100%;max-height:220px;object-fit:contain;border-radius:6px;border:1px solid var(--border)}
 .ty-footer{display:flex;justify-content:center;margin-top:6px;padding-bottom:4px}
 .ty-sig{text-align:center;font-family:'Pinyon Script',cursive;font-size:15px;color:var(--mauve);opacity:.45;margin-top:4px}
 
-/* ═══════════════════════ CONFIRM MODAL (logout / thank you) ═══════════════════════ */
+/* ═══════════════════════ MODALS ═══════════════════════ */
 .modal-overlay{
   position:fixed;inset:0;
   background:rgba(58,31,40,.5);
@@ -244,30 +264,15 @@ textarea{resize:none}
 .modal-msg{font-size:13px;color:var(--mauve);line-height:1.65;margin-bottom:22px}
 .modal-msg strong{color:var(--pink-deep)}
 .modal-actions{display:flex;gap:8px}
-.modal-btn-cancel{
-  flex:1;padding:11px;
-  background:var(--pink-light);border:1.5px solid var(--blush);
-  border-radius:11px;color:var(--mauve);
-  font-family:'Lato',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;
-  cursor:pointer;transition:all .15s;
-}
+.modal-btn-cancel{flex:1;padding:11px;background:var(--pink-light);border:1.5px solid var(--blush);border-radius:11px;color:var(--mauve);font-family:'Lato',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s}
 .modal-btn-cancel:hover{background:var(--blush)}
-.modal-btn-confirm{
-  flex:1;padding:11px;
-  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
-  border:none;border-radius:11px;color:#fff;
-  font-family:'Lato',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;
-  cursor:pointer;box-shadow:0 4px 14px rgba(201,79,106,.3);transition:all .15s;
-}
+.modal-btn-confirm{flex:1;padding:11px;background:linear-gradient(135deg,var(--pink),var(--pink-deep));border:none;border-radius:11px;color:#fff;font-family:'Lato',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 14px rgba(201,79,106,.3);transition:all .15s}
 .modal-btn-confirm:hover{box-shadow:0 6px 18px rgba(201,79,106,.4);transform:translateY(-1px)}
 .modal-btn-confirm:active{transform:scale(.97)}
-.modal-btn-done{
-  width:100%;padding:12px;
-  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
-  border:none;border-radius:12px;color:#fff;
-  font-family:'Lato',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;
-  cursor:pointer;box-shadow:0 4px 14px rgba(201,79,106,.3);transition:all .15s;
-}
+.modal-btn-confirm-danger{flex:1;padding:11px;background:linear-gradient(135deg,#e05a5a,#c03030);border:none;border-radius:11px;color:#fff;font-family:'Lato',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 14px rgba(192,48,48,.3);transition:all .15s}
+.modal-btn-confirm-danger:hover{box-shadow:0 6px 18px rgba(192,48,48,.4);transform:translateY(-1px)}
+.modal-btn-confirm-danger:active{transform:scale(.97)}
+.modal-btn-done{width:100%;padding:12px;background:linear-gradient(135deg,var(--pink),var(--pink-deep));border:none;border-radius:12px;color:#fff;font-family:'Lato',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 14px rgba(201,79,106,.3);transition:all .15s}
 .modal-btn-done:hover{box-shadow:0 6px 18px rgba(201,79,106,.4);transform:translateY(-1px)}
 
 /* Spinner */
@@ -408,7 +413,49 @@ textarea{resize:none}
         </div>
         <span class="agree-label">I have read and <strong>agree</strong> to all Terms &amp; Conditions above.</span>
       </label>
-      <button class="btn-submit" id="submitBtn" onclick="submitForm()" disabled>🎀 &nbsp; Submit Booking</button>
+
+      <!-- ═══ GCASH DOWNPAYMENT SECTION ═══ -->
+      <div class="section-head">💚 Downpayment via GCash</div>
+      <div class="gcash-form-box">
+        <div class="gcash-form-head">
+          <span>📸</span>
+          <span>Pay ₱200 &amp; Upload Screenshot</span>
+        </div>
+        <div class="gcash-form-body">
+          <div class="gc-inline">
+            <div class="gc-inline-head">💚 GCash Number</div>
+            <div class="gc-inline-body">
+              <div>
+                <div class="gc-inline-name">JEOAN GWYNETH G.</div>
+                <div class="gc-inline-num">0912 797 7245</div>
+              </div>
+              <div class="gc-inline-badge">₱200 DP</div>
+            </div>
+          </div>
+          <p>Send <strong>₱200</strong> to the number above, then upload your GCash confirmation screenshot here. <strong>Screenshot is required</strong> before your booking can be submitted. 💕</p>
+          <div class="upload-area" id="uploadArea">
+            <input type="file" id="gcashFile" accept="image/*" onchange="handleGcashUpload(this)"/>
+            <span class="upload-icon">📱</span>
+            <span class="upload-label">Tap to upload GCash screenshot</span>
+            <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
+          </div>
+          <div class="gcash-preview" id="gcashPreview">
+            <img id="gcashPreviewImg" src="" alt="GCash Screenshot Preview"/>
+            <div class="gcash-preview-actions">
+              <span class="gcash-preview-label">✅ Screenshot ready</span>
+              <button class="btn-reupload" onclick="reuploadScreenshot()">Change photo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ FINAL ACTION BUTTONS ═══ -->
+      <div class="section-head">✅ Confirm Booking</div>
+      <div id="submitHintEl" class="submit-hint">Fill in all required fields and upload your GCash screenshot to proceed.</div>
+      <div class="action-bar">
+        <button class="btn-cancel" onclick="confirmCancel()">✕ Cancel</button>
+        <button class="btn-submit" id="submitBtn" onclick="submitForm()" disabled>🎀 Submit Booking</button>
+      </div>
     </div>
   </div>
 </div>
@@ -419,8 +466,8 @@ textarea{resize:none}
   <div class="ty-compact">
     <div class="ty-top">
       <span class="emoji">🌸</span>
-      <h2>You're all set, darling! 🎀</h2>
-      <p>Pay ₱200 downpayment via GCash below,<br>then upload your screenshot and tap Submit.</p>
+      <h2>Booking submitted! 🎀</h2>
+      <p>Jeoan will review your booking and reach out to you shortly. 💕</p>
     </div>
     <div class="cc">
       <div class="cc-head">🌸 Booking Summary</div>
@@ -435,33 +482,10 @@ textarea{resize:none}
       <div class="tc-row"><span class="tc-n">5.</span><span>Client cancels = DP forfeited. Performer cancels = 100% refund.</span></div>
       <div class="tc-row"><span class="tc-n">6.</span><span>Outdoor venues must have covered area for performer.</span></div>
     </div>
-    <div class="gc">
-      <div class="gc-head">💚 Pay ₱200 Downpayment via GCash</div>
-      <div class="gc-body">
-        <div>
-          <div class="gc-name">JEOAN GWYNETH G.</div>
-          <div class="gc-num">0912 797 7245</div>
-        </div>
-        <div class="gc-badge">₱200 DP</div>
-      </div>
-    </div>
-    <div class="gcash-upload-box">
-      <div class="gcash-upload-head">
-        <span>📸</span>
-        <span>Upload GCash Screenshot</span>
-      </div>
-      <div class="gcash-upload-body">
-        <p>After paying ₱200 via GCash, upload your confirmation screenshot here, then tap <strong>Submit Screenshot</strong> to finalize your booking. 💕</p>
-        <div class="upload-area" id="uploadArea">
-          <input type="file" id="gcashFile" accept="image/*" onchange="handleGcashUpload(this)"/>
-          <span class="upload-icon">📱</span>
-          <span class="upload-label">Tap to upload GCash screenshot</span>
-          <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
-        </div>
-        <div class="gcash-preview" id="gcashPreview">
-          <img id="gcashPreviewImg" src="" alt="GCash Screenshot"/>
-        </div>
-        <button class="btn-submit-ss" id="submitSsBtn" onclick="submitGcashScreenshot()">✅ &nbsp; Submit Screenshot</button>
+    <div class="ty-ss-box">
+      <div class="ty-ss-head">📱 GCash Screenshot Submitted</div>
+      <div class="ty-ss-body">
+        <img id="tyScreenshot" src="" alt="GCash Payment Screenshot"/>
       </div>
     </div>
     <div class="ty-footer">
@@ -484,12 +508,25 @@ textarea{resize:none}
   </div>
 </div>
 
-<!-- ══════════════ SCREENSHOT SUBMITTED MODAL ══════════════ -->
+<!-- ══════════════ CANCEL BOOKING MODAL ══════════════ -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal-box">
+    <span class="modal-icon">🗑️</span>
+    <div class="modal-title">Cancel Booking?</div>
+    <div class="modal-msg">This will <strong>clear all the details</strong> you've entered. Are you sure you want to start over?</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeCancelModal()">Go Back</button>
+      <button class="modal-btn-confirm-danger" onclick="doCancelForm()">Yes, Clear Form</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SUBMIT SUCCESS MODAL ══════════════ -->
 <div class="modal-overlay" id="ssModal">
   <div class="modal-box">
     <span class="modal-icon">🌸</span>
     <div class="modal-title">All done, darling!</div>
-    <div class="modal-msg">Your GCash screenshot has been submitted! Jeoan will review your booking and reach out to you shortly. 🎀</div>
+    <div class="modal-msg">Your booking and GCash screenshot have been submitted! Jeoan will review and reach out to you shortly. 🎀</div>
     <button class="modal-btn-done" onclick="closeSsModal()">🎀 &nbsp; Done</button>
   </div>
 </div>
@@ -505,7 +542,6 @@ let pendingImageData = null;
 (function init() {
   spawnLoginPetals();
   spawnSparkles();
-  // If already logged in, go straight to the form
   if (clientToken) showForm();
 })();
 
@@ -537,7 +573,6 @@ async function doClientLogin() {
     sessionStorage.setItem('client_token', clientToken);
     sessionStorage.setItem('client_display_name', clientDisplayName);
     sessionStorage.setItem('client_username', clientUsername);
-    // Go directly to the form — no welcome page
     showForm();
   } catch(e) {
     errEl.textContent = 'Cannot connect to server. Please try again.';
@@ -546,7 +581,6 @@ async function doClientLogin() {
   }
 }
 
-// Show the booking form directly (replaces showWelcome + goToForm)
 function showForm() {
   const lp = document.getElementById('loginPage');
   lp.classList.add('hide');
@@ -556,12 +590,8 @@ function showForm() {
   }, 300);
 }
 
-function confirmLogout() {
-  document.getElementById('logoutModal').classList.add('show');
-}
-function closeLogoutModal() {
-  document.getElementById('logoutModal').classList.remove('show');
-}
+function confirmLogout() { document.getElementById('logoutModal').classList.add('show'); }
+function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
 function doLogout() {
   closeLogoutModal();
   clientToken = null; clientDisplayName = ''; clientUsername = '';
@@ -577,6 +607,42 @@ function doLogout() {
   document.getElementById('loginBtn').disabled = false;
   document.getElementById('loginBtn').innerHTML = '🔑 &nbsp; Sign In';
   document.getElementById('loginError').classList.remove('show');
+}
+
+// ══════ CANCEL FORM ══════
+function confirmCancel() { document.getElementById('cancelModal').classList.add('show'); }
+function closeCancelModal() { document.getElementById('cancelModal').classList.remove('show'); }
+function doCancelForm() {
+  closeCancelModal();
+  // Clear all fields
+  document.getElementById('clientName').value = '';
+  document.getElementById('eventDate').value = '';
+  document.getElementById('perfTime').value = '';
+  document.getElementById('occasion').value = '';
+  document.getElementById('venue').value = '';
+  document.getElementById('notes').value = '';
+  document.querySelectorAll('input[name="rateType"]').forEach(r => r.checked = false);
+  document.getElementById('songBox').classList.remove('show');
+  document.getElementById('hourBox').classList.remove('show');
+  document.getElementById('songPkg').value = '';
+  document.getElementById('hourPkg').value = '';
+  document.getElementById('songPrice').classList.remove('show');
+  document.getElementById('hourPrice').classList.remove('show');
+  document.getElementById('agreeCheck').checked = false;
+  document.getElementById('customCB').classList.remove('checked');
+  // Clear screenshot
+  pendingImageData = null;
+  document.getElementById('gcashPreview').classList.remove('show');
+  document.getElementById('gcashPreviewImg').src = '';
+  document.getElementById('uploadArea').style.opacity = '';
+  document.getElementById('uploadArea').style.pointerEvents = '';
+  document.getElementById('gcashFile').value = '';
+  // Reset submit
+  document.getElementById('submitBtn').disabled = true;
+  updateSubmitHint();
+  // Scroll to top
+  document.getElementById('formPage').scrollTop = 0;
+  window.scrollTo(0,0);
 }
 
 // ══════ PETALS ══════
@@ -630,6 +696,7 @@ function switchRate() {
   document.getElementById('hourPkg').value = '';
   document.getElementById('songPrice').classList.remove('show');
   document.getElementById('hourPrice').classList.remove('show');
+  updateSubmitHint();
 }
 const songNotes = {
   '1–6 Songs':'Up to 6 songs of live performance 🎵',
@@ -649,15 +716,93 @@ function showPrice(type) {
   const note = type==='song' ? songNotes[label] : hourNotes[label];
   tag.innerHTML = '<strong>'+label+' — '+price+'</strong><span>'+(note||'')+'</span>';
   tag.classList.add('show');
+  updateSubmitHint();
 }
 function toggleCB() {
   setTimeout(() => {
     const cb = document.getElementById('agreeCheck');
     document.getElementById('customCB').classList.toggle('checked', cb.checked);
-    document.getElementById('submitBtn').disabled = !cb.checked;
+    updateSubmitHint();
   }, 0);
 }
+
+function isFormValid() {
+  const name = document.getElementById('clientName').value.trim();
+  const date = document.getElementById('eventDate').value.trim();
+  const perf = document.getElementById('perfTime').value.trim();
+  const occ = document.getElementById('occasion').value;
+  const venue = document.getElementById('venue').value.trim();
+  const agreed = document.getElementById('agreeCheck').checked;
+  const rateRadio = document.querySelector('input[name="rateType"]:checked');
+  let pkgOk = false;
+  if (rateRadio) {
+    const pkgVal = rateRadio.value==='song'
+      ? document.getElementById('songPkg').value
+      : document.getElementById('hourPkg').value;
+    pkgOk = !!pkgVal;
+  }
+  return name && date && perf && occ && venue && agreed && rateRadio && pkgOk && !!pendingImageData;
+}
+
+function getMissingFields() {
+  const missing = [];
+  if (!document.getElementById('clientName').value.trim()) missing.push('Client Name');
+  if (!document.getElementById('eventDate').value.trim()) missing.push('Event Date');
+  if (!document.getElementById('perfTime').value.trim()) missing.push('Performance Time');
+  if (!document.getElementById('occasion').value) missing.push('Event Occasion');
+  if (!document.getElementById('venue').value.trim()) missing.push('Venue Address');
+  const rateRadio = document.querySelector('input[name="rateType"]:checked');
+  if (!rateRadio) {
+    missing.push('Rate Type');
+  } else {
+    const pkgVal = rateRadio.value==='song'
+      ? document.getElementById('songPkg').value
+      : document.getElementById('hourPkg').value;
+    if (!pkgVal) missing.push('Package');
+  }
+  if (!document.getElementById('agreeCheck').checked) missing.push('Terms Agreement');
+  if (!pendingImageData) missing.push('GCash Screenshot');
+  return missing;
+}
+
+function updateSubmitHint() {
+  const btn = document.getElementById('submitBtn');
+  const hint = document.getElementById('submitHintEl');
+  const valid = isFormValid();
+  btn.disabled = !valid;
+  if (valid) {
+    hint.textContent = 'Everything looks good! Tap Submit Booking to confirm. 🎀';
+    hint.classList.remove('error');
+  } else {
+    const missing = getMissingFields();
+    if (missing.length > 0) {
+      hint.textContent = 'Still needed: ' + missing.join(', ') + '.';
+    } else {
+      hint.textContent = 'Fill in all required fields and upload your GCash screenshot to proceed.';
+    }
+    hint.classList.remove('error');
+  }
+}
+
+// Watch fields for changes to auto-update the hint
+document.addEventListener('DOMContentLoaded', function() {
+  ['clientName','eventDate','perfTime','venue','notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateSubmitHint);
+  });
+  ['occasion','songPkg','hourPkg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', updateSubmitHint);
+  });
+});
+
 async function submitForm() {
+  if (!isFormValid()) {
+    const hint = document.getElementById('submitHintEl');
+    hint.textContent = 'Please complete all required fields and upload your GCash screenshot before submitting.';
+    hint.classList.add('error');
+    return;
+  }
   const name = document.getElementById('clientName').value.trim();
   const date = document.getElementById('eventDate').value.trim();
   const perfTime = document.getElementById('perfTime').value.trim();
@@ -665,18 +810,17 @@ async function submitForm() {
   const venue = document.getElementById('venue').value.trim();
   const notes = document.getElementById('notes').value.trim();
   const rateRadio = document.querySelector('input[name="rateType"]:checked');
-  if (!rateRadio) { alert('Please select a Rate Type.'); return; }
   const rateType = rateRadio.value;
   const pkgRaw = rateType==='song' ? document.getElementById('songPkg').value : document.getElementById('hourPkg').value;
-  if (!name||!date||!perfTime||!occ||!venue||!pkgRaw) { alert('Please fill in all required fields (*).'); return; }
   const parts = pkgRaw.split('|'); const pkg = parts[0]+' — '+parts[1];
   const booking = {
     id: Date.now(), name, date, perfTime, occasion: occ, venue,
     rateType: rateType==='song' ? '🎵 Per Song' : '⏱️ Per Hour',
     package: pkg, notes: notes||'',
+    gcashScreenshot: pendingImageData,
   };
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.textContent = 'Submitting…';
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Submitting…';
   try {
     const res = await fetch(API_BASE + '/client/bookings', {
       method:'POST',
@@ -685,12 +829,16 @@ async function submitForm() {
     });
     if (!res.ok) {
       const err = await res.json();
-      alert('Error: '+(err.error||'Could not submit booking.'));
-      btn.disabled = false; btn.textContent = '🎀  Submit Booking'; return;
+      const hint = document.getElementById('submitHintEl');
+      hint.textContent = 'Error: '+(err.error||'Could not submit booking. Please try again.');
+      hint.classList.add('error');
+      btn.disabled = false; btn.innerHTML = '🎀 Submit Booking'; return;
     }
   } catch(e) {
-    alert('Cannot connect to server. Please check your connection.');
-    btn.disabled = false; btn.textContent = '🎀  Submit Booking'; return;
+    const hint = document.getElementById('submitHintEl');
+    hint.textContent = 'Cannot connect to server. Please check your connection and try again.';
+    hint.classList.add('error');
+    btn.disabled = false; btn.innerHTML = '🎀 Submit Booking'; return;
   }
   currentBookingId = booking.id;
   const rows = [
@@ -701,6 +849,7 @@ async function submitForm() {
   document.getElementById('summaryRows').innerHTML = rows.map(r =>
     '<div class="cc-row"><span class="lbl">'+r[0]+'</span><span class="val">'+r[1]+'</span></div>'
   ).join('');
+  document.getElementById('tyScreenshot').src = pendingImageData;
   document.getElementById('formPage').style.display = 'none';
   document.getElementById('thankYouPage').classList.add('show');
 }
@@ -732,26 +881,18 @@ function handleGcashUpload(input) {
     pendingImageData = dataUrl;
     document.getElementById('gcashPreviewImg').src = dataUrl;
     document.getElementById('gcashPreview').classList.add('show');
-    document.getElementById('uploadArea').style.opacity = '0.5';
-    document.getElementById('uploadArea').style.pointerEvents = 'none';
-    const btn = document.getElementById('submitSsBtn');
-    btn.classList.add('show');
+    document.getElementById('uploadArea').style.display = 'none';
+    updateSubmitHint();
   });
 }
 
-async function submitGcashScreenshot() {
-  if (!pendingImageData || !currentBookingId) return;
-  const btn = document.getElementById('submitSsBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Submitting…';
-  try {
-    await fetch(API_BASE + '/client/bookings/' + currentBookingId + '/screenshot', {
-      method:'PATCH',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+clientToken},
-      body: JSON.stringify({ gcashScreenshot: pendingImageData })
-    });
-  } catch(e) { console.warn('Screenshot upload failed', e); }
-  document.getElementById('ssModal').classList.add('show');
+function reuploadScreenshot() {
+  pendingImageData = null;
+  document.getElementById('gcashPreview').classList.remove('show');
+  document.getElementById('gcashPreviewImg').src = '';
+  document.getElementById('uploadArea').style.display = '';
+  document.getElementById('gcashFile').value = '';
+  updateSubmitHint();
 }
 
 function closeSsModal() {
