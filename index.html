@@ -455,7 +455,7 @@ textarea{resize:none}
 <script>
 // ══════════════ CONFIG ══════════════
 // TODO: Replace with your Railway backend URL after deployment
-const API_BASE = 'https://jeoan-booking-production.up.railway.app/';
+const API_BASE = 'const API_BASE = window.location.origin;';
 
 // ══════════════ AUTH STATE ══════════════
 let clientToken = sessionStorage.getItem('client_token') || null;
