@@ -8,8 +8,8 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'jeoan_secret_change_me';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'jeoan2025';
+const JWT_SECRET = process.env.JWT_SECRET || 'JeoanChuchu';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'JeoanChuchu';
 
 // ─── Database ────────────────────────────────────────────────
 const pool = new Pool({
