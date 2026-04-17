@@ -416,3 +416,20 @@ function showSection(section) {
     buttons[1].classList.add("active");
   }
 }
+function showSection(section) {
+  const booking = document.getElementById("bookingSection");
+  const submitted = document.getElementById("submittedSection");
+  const buttons = document.querySelectorAll(".menu-btn");
+
+  buttons.forEach(btn => btn.classList.remove("active"));
+
+  if (section === "booking") {
+    booking.style.display = "block";
+    submitted.style.display = "none";
+    buttons[0].classList.add("active");
+  } else {
+    booking.style.display = "none";
+    submitted.style.display = "block";
+    buttons[1].classList.add("active");
+  }
+}
