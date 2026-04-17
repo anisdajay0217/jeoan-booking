@@ -1,0 +1,50 @@
+/* Paste inside your <style> tag */
+
+/* ═══════════════════════ LOGIN PAGE ═══════════════════════ */
+#loginPage{
+  position:fixed;inset:0;
+  background:linear-gradient(150deg,#f5c8d8 0%,#fce8ee 40%,#f0b8c8 80%,#fce8ee 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;z-index:30;transition:opacity .5s ease,transform .5s ease;
+}
+#loginPage.hide{opacity:0;transform:translateY(-30px);pointer-events:none;display:none!important}
+.login-petals{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.petal{position:absolute;top:-50px;opacity:0;font-size:var(--sz,16px);animation:floatDown var(--dur,6s) var(--del,0s) infinite ease-in-out}
+@keyframes floatDown{0%{opacity:0;transform:translateY(0) rotate(0deg)}8%{opacity:1}85%{opacity:.7}100%{opacity:0;transform:translateY(110vh) rotate(400deg)}}
+.login-card{
+  position:relative;z-index:1;width:90%;max-width:340px;
+  background:rgba(255,248,250,0.88);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1.5px solid rgba(255,255,255,.85);
+  border-radius:24px;padding:32px 28px 26px;text-align:center;
+  box-shadow:0 20px 60px rgba(201,79,106,.18);
+  animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes cardIn{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.login-icon{font-size:32px;display:block;margin-bottom:10px;animation:sway 3s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.login-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--pink-deep);margin-bottom:3px}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.login-field{margin-bottom:12px;text-align:left}
+.login-field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.login-field input{
+  width:100%;background:#fff;border:1.5px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'Lato',sans-serif;font-size:14px;
+  padding:10px 14px;outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.login-field input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(232,114,138,.12)}
+.btn-login{
+  width:100%;padding:12px;margin-top:4px;
+  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+  border:none;border-radius:12px;color:#fff;
+  font-family:'Lato',sans-serif;font-size:13px;font-weight:400;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;box-shadow:0 6px 18px rgba(201,79,106,.35);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(201,79,106,.45)}
+.btn-login:active{transform:scale(.98)}
+.btn-login:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.login-error{margin-top:10px;padding:8px 12px;background:#fdecea;border:1px solid #f5b8b0;border-radius:8px;font-size:12px;color:#c0392b;display:none}
+.login-error.show{display:block}
+.login-note{margin-top:14px;font-size:11px;color:var(--muted);line-height:1.6}
