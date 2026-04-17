@@ -1,4 +1,4 @@
-<script>
+<script src="client-scripts.js">
 const API_BASE = window.location.origin;
 let clientToken = sessionStorage.getItem('client_token') || null;
 let clientDisplayName = sessionStorage.getItem('client_display_name') || '';
