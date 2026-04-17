@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Book Jeoan Gwyneth 🎀</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400&family=Pinyon+Script&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   login.html — Client Login Page
+   ═══════════════════════════════════════════════════════════════ */
+
+#loginPage{
+  position:fixed;inset:0;
+  background:linear-gradient(150deg,#f5c8d8 0%,#fce8ee 40%,#f0b8c8 80%,#fce8ee 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;z-index:30;transition:opacity .5s ease,transform .5s ease;
+}
+#loginPage.hide{opacity:0;transform:translateY(-30px);pointer-events:none;display:none!important}
+
+.login-petals{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+
+.login-card{
+  position:relative;z-index:1;width:90%;max-width:340px;
+  background:rgba(255,248,250,0.88);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1.5px solid rgba(255,255,255,.85);
+  border-radius:24px;padding:32px 28px 26px;text-align:center;
+  box-shadow:0 20px 60px rgba(201,79,106,.18);
+  animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.login-icon{font-size:32px;display:block;margin-bottom:10px;animation:sway 3s ease-in-out infinite}
+.login-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--pink-deep);margin-bottom:3px}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+
+.login-field{margin-bottom:12px;text-align:left}
+.login-field label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.login-field input{
+  width:100%;background:#fff;border:1.5px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'Lato',sans-serif;font-size:14px;
+  padding:10px 14px;outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.login-field input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(232,114,138,.12)}
+
+.btn-login{
+  width:100%;padding:12px;margin-top:4px;
+  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+  border:none;border-radius:12px;color:#fff;
+  font-family:'Lato',sans-serif;font-size:13px;font-weight:400;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;box-shadow:0 6px 18px rgba(201,79,106,.35);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(201,79,106,.45)}
+.btn-login:active{transform:scale(.98)}
+.btn-login:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+.login-error{margin-top:10px;padding:8px 12px;background:#fdecea;border:1px solid #f5b8b0;border-radius:8px;font-size:12px;color:#c0392b;display:none}
+.login-error.show{display:block}
+
+.login-note{margin-top:14px;font-size:11px;color:var(--muted);line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN PAGE ══════════════ -->
+<div id="loginPage">
+  <div class="login-petals" id="loginPetals"></div>
+  <div class="login-card">
+    <span class="login-icon">🎀</span>
+    <div class="login-title">Welcome Back!</div>
+    <div class="login-sub">Sign in to book Jeoan Gwyneth<br>Use the account Jeoan made for you 💕</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="loginUsername" placeholder="Your username" autocomplete="username"/>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter') doClientLogin()"/>
+    </div>
+    <button class="btn-login" id="loginBtn" onclick="doClientLogin()">🔑 &nbsp; Sign In</button>
+    <div class="login-error" id="loginError">Incorrect username or password.</div>
+    <div class="login-note">Don't have an account? Contact Jeoan and she'll set one up for you! 🌸</div>
+  </div>
+</div>
+
+<!-- ══════════════ LOGOUT CONFIRM MODAL ══════════════ -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal-box">
+    <span class="modal-icon">🎀</span>
+    <div class="modal-title">Sign Out?</div>
+    <div class="modal-msg">Are you sure you want to sign out? You can always come back and book again! 💕</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeLogoutModal()">Stay</button>
+      <button class="modal-btn-confirm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   login.js (inline) — Auth logic for login page
+   ═══════════════════════════════════════════════════════════════ */
+
+const API_BASE = window.location.origin;
+let clientToken = sessionStorage.getItem('client_token') || null;
+let clientDisplayName = sessionStorage.getItem('client_display_name') || '';
+let clientUsername = sessionStorage.getItem('client_username') || '';
+
+// Auto-redirect if already logged in
+(function init() {
+  spawnLoginPetals();
+  if (clientToken) {
+    window.location.href = 'welcome.html';
+  }
+})();
+
+// ── Login ──
+async function doClientLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl   = document.getElementById('loginError');
+  const btn     = document.getElementById('loginBtn');
+  errEl.classList.remove('show');
+
+  if (!username || !password) {
+    errEl.textContent = 'Please enter your username and password.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Signing in…';
+
+  try {
+    const res  = await fetch(API_BASE + '/client/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      errEl.textContent = data.error || 'Login failed. Please try again.';
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.innerHTML = '🔑 &nbsp; Sign In';
+      return;
+    }
+
+    // Save session
+    sessionStorage.setItem('client_token', data.token);
+    sessionStorage.setItem('client_display_name', data.displayName);
+    sessionStorage.setItem('client_username', data.username);
+
+    window.location.href = 'welcome.html';
+  } catch(e) {
+    errEl.textContent = 'Cannot connect to server. Please try again.';
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = '🔑 &nbsp; Sign In';
+  }
+}
+
+// ── Logout modal (used if navigated back) ──
+function confirmLogout() { document.getElementById('logoutModal').classList.add('show'); }
+function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
+function doLogout() {
+  sessionStorage.clear();
+  window.location.href = 'login.html';
+}
+
+// ── Falling petals ──
+function spawnLoginPetals() {
+  const pc = document.getElementById('loginPetals');
+  ['🌸','🌸','🌷','🌸','🌺','🌸','🌷'].forEach(p => {
+    const count = p === '🌸' ? 5 : 3;
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'petal';
+      el.textContent = p;
+      el.style.left = Math.random() * 100 + '%';
+      el.style.setProperty('--sz', (13 + Math.random() * 12) + 'px');
+      el.style.setProperty('--dur', (5  + Math.random() * 6)  + 's');
+      el.style.setProperty('--del', (Math.random() * 8)       + 's');
+      pc.appendChild(el);
+    }
+  });
+}
+</script>
+</body>
+</html>
