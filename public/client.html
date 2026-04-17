@@ -78,9 +78,7 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
   background:rgba(255,248,250,0.72);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border:1.5px solid rgba(255,255,255,.85);
-  border-radius:28px;
-  padding:36px 32px 30px;
-  text-align:center;
+  border-radius:28px;padding:36px 32px 30px;text-align:center;
   max-width:340px;width:90%;
   box-shadow:0 20px 60px rgba(201,79,106,.18),0 4px 16px rgba(201,79,106,.1);
   animation:cardIn .6s cubic-bezier(.34,1.56,.64,1) both;
@@ -104,23 +102,55 @@ body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;fon
 .btn-book:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(201,79,106,.5)}
 .btn-book:active{transform:scale(.98)}
 .welcome-note{margin-top:14px;font-size:11px;color:var(--muted);line-height:1.5}
-.welcome-logout{margin-top:10px;background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline;font-family:'Lato',sans-serif}
-.welcome-logout:hover{color:var(--pink-deep)}
+
+/* ─── Shared pretty logout button ─── */
+.btn-logout{
+  background:rgba(201,79,106,.08);
+  border:1.5px solid rgba(201,79,106,.25);
+  border-radius:100px;
+  color:var(--pink-deep);
+  font-family:'Lato',sans-serif;
+  font-size:11px;
+  padding:6px 16px;
+  cursor:pointer;
+  transition:all .18s;
+  letter-spacing:.5px;
+  margin-top:12px;
+  display:inline-block;
+}
+.btn-logout:hover{background:var(--pink-deep);color:#fff;border-color:var(--pink-deep)}
+
+/* header logout (white version for colored bg) */
+.btn-logout-white{
+  background:rgba(255,255,255,.2);
+  border:1.5px solid rgba(255,255,255,.45);
+  border-radius:100px;
+  color:#fff;
+  font-family:'Lato',sans-serif;
+  font-size:11px;
+  padding:6px 16px;
+  cursor:pointer;
+  transition:all .18s;
+  letter-spacing:.5px;
+}
+.btn-logout-white:hover{background:rgba(255,255,255,.35)}
 
 /* ═══════════════════════ FORM PAGE ═══════════════════════ */
 #formPage{display:none}
 #thankYouPage{display:none}
 
 /* HERO */
-.hero{background:linear-gradient(150deg,#f9d6e4 0%,#fce8ee 50%,#f5c8d8 100%);padding:32px 20px 28px;text-align:center;position:relative;overflow:hidden}
+.hero{background:linear-gradient(150deg,#f9d6e4 0%,#fce8ee 50%,#f5c8d8 100%);padding:28px 20px 22px;text-align:center;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 80% at 50% 0%,rgba(232,114,138,.2) 0%,transparent 70%);pointer-events:none;z-index:0}
 .petals{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.hero-content{position:relative;z-index:1;display:inline-block;padding:18px 24px 16px;border-radius:20px;background:rgba(253,240,244,0.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.hero-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;max-width:480px;margin:0 auto}
+.hero-content{display:inline-block;padding:18px 24px 16px;border-radius:20px;background:rgba(253,240,244,0.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);flex:1;text-align:center}
 .hero-bow{font-size:28px;margin-bottom:6px;display:block;animation:sway 3s ease-in-out infinite}
 .hero-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--pink-deep);line-height:1.15}
 .hero-script{font-family:'Pinyon Script',cursive;font-size:20px;color:var(--mauve);margin:3px 0 4px}
 .hero-tagline{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--mauve);margin-bottom:12px}
 .loc-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.75);border:1px solid var(--border);border-radius:100px;padding:4px 14px;font-size:12px;color:var(--pink-deep)}
+.hero-logout-wrap{position:absolute;top:12px;right:14px;z-index:2}
 
 /* FORM */
 .form-bg{background:var(--cream)}
@@ -198,9 +228,6 @@ textarea{resize:none}
 .gc-name{font-size:12px;font-weight:700;color:#007b6e}
 .gc-num{font-size:17px;font-weight:700;color:#00a693;letter-spacing:2px}
 .gc-badge{background:#007b6e;color:#fff;font-size:10px;border-radius:100px;padding:3px 10px;white-space:nowrap}
-.ss-note{background:var(--pink-pale);border:1px solid var(--blush);border-radius:9px;padding:7px 11px;font-size:12px;color:var(--mauve);text-align:center;line-height:1.45}
-.ss-note strong{color:var(--pink-deep)}
-.ty-sig{text-align:center;font-family:'Pinyon Script',cursive;font-size:15px;color:var(--mauve);opacity:.45;margin-top:4px}
 .gcash-upload-box{background:#fff;border:1.5px dashed var(--pink);border-radius:12px;overflow:hidden;margin-top:2px}
 .gcash-upload-head{background:linear-gradient(135deg,var(--pink-pale),#fde8ef);padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
 .gcash-upload-head span{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--pink-deep);font-weight:400}
@@ -215,26 +242,76 @@ textarea{resize:none}
 .gcash-preview{margin-top:10px;display:none;animation:fadeIn .3s ease}
 .gcash-preview.show{display:block}
 .gcash-preview img{width:100%;max-height:250px;object-fit:contain;border-radius:8px;border:1px solid var(--border)}
-.gcash-success{margin-top:8px;padding:9px 12px;background:linear-gradient(135deg,#e8f8f0,#d0f0e4);border:1px solid #9dd4c0;border-radius:8px;display:flex;align-items:center;gap:8px;display:none}
-.gcash-success.show{display:flex;animation:fadeIn .3s ease}
-.gcash-success span{font-size:12px;color:#2a7a5a;line-height:1.45}
-.gcash-success strong{color:#1a6040}
+.btn-submit-ss{
+  width:100%;margin-top:10px;padding:13px;
+  background:linear-gradient(135deg,#27ae60,#1a9e50);
+  border:none;border-radius:11px;color:#fff;
+  font-family:'Lato',sans-serif;font-size:13px;font-weight:400;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  box-shadow:0 4px 14px rgba(27,158,80,.3);transition:all .15s;
+  display:none;
+}
+.btn-submit-ss.show{display:block;animation:fadeIn .3s ease}
+.btn-submit-ss:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(27,158,80,.4)}
+.btn-submit-ss:active{transform:scale(.97)}
+.btn-submit-ss:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.ty-footer{display:flex;justify-content:center;margin-top:6px;padding-bottom:4px}
+.ty-sig{text-align:center;font-family:'Pinyon Script',cursive;font-size:15px;color:var(--mauve);opacity:.45;margin-top:4px}
+
+/* ═══════════════════════ CONFIRM MODAL (logout / thank you) ═══════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(58,31,40,.5);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  z-index:500;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-box{
+  background:#fff;
+  border-radius:24px;padding:32px 28px 26px;
+  max-width:300px;width:100%;text-align:center;
+  box-shadow:0 24px 60px rgba(201,79,106,.28);
+  transform:scale(.9) translateY(12px);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  border:1.5px solid var(--blush);
+}
+.modal-overlay.show .modal-box{transform:scale(1) translateY(0)}
+.modal-icon{font-size:42px;display:block;margin-bottom:12px;animation:sway 3s ease-in-out infinite}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--pink-deep);margin-bottom:8px}
+.modal-msg{font-size:13px;color:var(--mauve);line-height:1.65;margin-bottom:22px}
+.modal-msg strong{color:var(--pink-deep)}
+.modal-actions{display:flex;gap:8px}
+.modal-btn-cancel{
+  flex:1;padding:11px;
+  background:var(--pink-light);border:1.5px solid var(--blush);
+  border-radius:11px;color:var(--mauve);
+  font-family:'Lato',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;transition:all .15s;
+}
+.modal-btn-cancel:hover{background:var(--blush)}
+.modal-btn-confirm{
+  flex:1;padding:11px;
+  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+  border:none;border-radius:11px;color:#fff;
+  font-family:'Lato',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;box-shadow:0 4px 14px rgba(201,79,106,.3);transition:all .15s;
+}
+.modal-btn-confirm:hover{box-shadow:0 6px 18px rgba(201,79,106,.4);transform:translateY(-1px)}
+.modal-btn-confirm:active{transform:scale(.97)}
+.modal-btn-done{
+  width:100%;padding:12px;
+  background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+  border:none;border-radius:12px;color:#fff;
+  font-family:'Lato',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;box-shadow:0 4px 14px rgba(201,79,106,.3);transition:all .15s;
+}
+.modal-btn-done:hover{box-shadow:0 6px 18px rgba(201,79,106,.4);transform:translateY(-1px)}
 
 /* Spinner */
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-  /* ═══ SUBMIT MODAL ═══ */
-.modal-overlay{position:fixed;inset:0;background:rgba(58,31,40,.55);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
-.modal-overlay.show{opacity:1;pointer-events:all}
-.modal-box{background:#fff;border-radius:22px;padding:32px 28px;max-width:320px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(201,79,106,.25);animation:cardIn .4s cubic-bezier(.34,1.56,.64,1) both}
-.modal-emoji{font-size:44px;display:block;margin-bottom:10px}
-.modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--pink-deep);margin-bottom:6px}
-.modal-msg{font-size:13px;color:var(--mauve);line-height:1.6;margin-bottom:20px}
-.modal-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--pink),var(--pink-deep));border:none;border-radius:12px;color:#fff;font-family:'Lato',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 6px 18px rgba(201,79,106,.35)}
-.btn-submit-ss{width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,#27ae60,#1a9e50);border:none;border-radius:10px;color:#fff;font-family:'Lato',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 12px rgba(27,158,80,.3);display:none}
-.btn-submit-ss.show{display:block;animation:fadeIn .3s ease}
-.btn-submit-ss:disabled{opacity:.4;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -273,22 +350,25 @@ textarea{resize:none}
     <div class="welcome-loc">📍 South Cotabato Based</div>
     <button class="btn-book" onclick="goToForm()">🎀 &nbsp; Book Me Now</button>
     <div class="welcome-note">Fill out the form below and I'll reach out to confirm your booking 💕</div>
-    <button class="welcome-logout" onclick="doLogout()">Sign out</button>
+    <button class="btn-logout" onclick="confirmLogout()">Sign Out</button>
   </div>
 </div>
 
 <!-- ══════════════ PAGE 1: BOOKING FORM ══════════════ -->
 <div id="formPage">
-<div class="hero-content">
-  <span class="hero-bow">🎀</span>
-  <div class="hero-name">Jeoan Gwyneth<br>Dajay Gran</div>
-  <div class="hero-script">Singer for Hire</div>
-  <div class="hero-tagline">Making your event unforgettable</div>
-  <div class="loc-chip">📍 South Cotabato Based</div>
-  <div style="margin-top:10px">
-    <button onclick="doLogout()" style="background:rgba(255,255,255,.55);border:1px solid var(--blush);border-radius:100px;padding:5px 16px;font-size:11px;color:var(--pink-deep);cursor:pointer;font-family:'Lato',sans-serif;letter-spacing:1px">Sign Out</button>
+  <div class="hero">
+    <div class="petals" id="petals"></div>
+    <div class="hero-logout-wrap">
+      <button class="btn-logout-white" onclick="confirmLogout()">Sign Out</button>
+    </div>
+    <div class="hero-content">
+      <span class="hero-bow">🎀</span>
+      <div class="hero-name">Jeoan Gwyneth<br>Dajay Gran</div>
+      <div class="hero-script">Singer for Hire</div>
+      <div class="hero-tagline">Making your event unforgettable</div>
+      <div class="loc-chip">📍 South Cotabato Based</div>
+    </div>
   </div>
-</div>
 
   <div class="form-bg">
     <div class="body">
@@ -396,7 +476,7 @@ textarea{resize:none}
     <div class="ty-top">
       <span class="emoji">🌸</span>
       <h2>You're all set, darling! 🎀</h2>
-      <p>Booking submitted! Pay ₱200 downpayment via GCash below,<br>then upload your screenshot to finalize.</p>
+      <p>Pay ₱200 downpayment via GCash below,<br>then upload your screenshot and tap Submit.</p>
     </div>
     <div class="cc">
       <div class="cc-head">🌸 Booking Summary</div>
@@ -421,119 +501,124 @@ textarea{resize:none}
         <div class="gc-badge">₱200 DP</div>
       </div>
     </div>
-<div class="gcash-upload-box">
-  <div class="gcash-upload-head">
-    <span>📸</span>
-    <span>Upload GCash Screenshot</span>
-  </div>
-  <div class="gcash-upload-body">
-    <p>After paying ₱200 via GCash, upload your confirmation screenshot below, then tap <strong>Submit</strong> to finalize your booking. 💕</p>
-    <div class="upload-area" id="uploadArea">
-      <input type="file" id="gcashFile" accept="image/*" onchange="handleGcashUpload(this)"/>
-      <span class="upload-icon">📱</span>
-      <span class="upload-label">Tap to upload GCash screenshot</span>
-      <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
+    <div class="gcash-upload-box">
+      <div class="gcash-upload-head">
+        <span>📸</span>
+        <span>Upload GCash Screenshot</span>
+      </div>
+      <div class="gcash-upload-body">
+        <p>After paying ₱200 via GCash, upload your confirmation screenshot here, then tap <strong>Submit Screenshot</strong> to finalize your booking. 💕</p>
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="gcashFile" accept="image/*" onchange="handleGcashUpload(this)"/>
+          <span class="upload-icon">📱</span>
+          <span class="upload-label">Tap to upload GCash screenshot</span>
+          <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
+        </div>
+        <div class="gcash-preview" id="gcashPreview">
+          <img id="gcashPreviewImg" src="" alt="GCash Screenshot"/>
+        </div>
+        <button class="btn-submit-ss" id="submitSsBtn" onclick="submitGcashScreenshot()">✅ &nbsp; Submit Screenshot</button>
+      </div>
     </div>
-    <div class="gcash-preview" id="gcashPreview">
-      <img id="gcashPreviewImg" src="" alt="GCash Screenshot"/>
-    </div>
-    <button class="btn-submit-ss" id="submitSsBtn" onclick="submitGcashScreenshot()">✅ &nbsp; Submit Screenshot</button>
-  </div>
-</div>
-<div style="text-align:center;margin-top:8px">
-  <button onclick="doLogout()" style="background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline;font-family:'Lato',sans-serif">Sign out</button>
-</div>
-    </div>
-    <div class="ss-note">
-      📸 You may also <strong>screenshot this page</strong> + your GCash confirmation<br>
-      and send both to <strong>Jeoan via Messenger</strong> to finalize! 🎀
+    <div class="ty-footer">
+      <button class="btn-logout" onclick="confirmLogout()">Sign Out</button>
     </div>
     <div class="ty-sig">Jeoan Gwyneth Dajay Gran ✦ Singer for Hire</div>
   </div>
 </div>
 
-<script>
-// ══════════════ CONFIG ══════════════
-// Auto-detects the host — works on Railway and localhost
-const API_BASE = window.location.origin;
+<!-- ══════════════ LOGOUT CONFIRM MODAL ══════════════ -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal-box">
+    <span class="modal-icon">🎀</span>
+    <div class="modal-title">Sign Out?</div>
+    <div class="modal-msg">Are you sure you want to sign out? You can always come back and book again! 💕</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeLogoutModal()">Stay</button>
+      <button class="modal-btn-confirm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+</div>
 
-// ══════════════ AUTH STATE ══════════════
+<!-- ══════════════ SCREENSHOT SUBMITTED MODAL ══════════════ -->
+<div class="modal-overlay" id="ssModal">
+  <div class="modal-box">
+    <span class="modal-icon">🌸</span>
+    <div class="modal-title">All done, darling!</div>
+    <div class="modal-msg">Your GCash screenshot has been submitted! Jeoan will review your booking and reach out to you shortly. 🎀</div>
+    <button class="modal-btn-done" onclick="closeSsModal()">🎀 &nbsp; Done</button>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
 let clientToken = sessionStorage.getItem('client_token') || null;
 let clientDisplayName = sessionStorage.getItem('client_display_name') || '';
 let clientUsername = sessionStorage.getItem('client_username') || '';
 let currentBookingId = null;
+let pendingImageData = null;
 
-// ══════════════ INIT ══════════════
 (function init() {
   spawnLoginPetals();
   spawnSparkles();
-  if (clientToken) {
-    showWelcome();
-  }
+  if (clientToken) showWelcome();
 })();
 
-// ══════════════ LOGIN ══════════════
+// ══════ LOGIN ══════
 async function doClientLogin() {
   const username = document.getElementById('loginUsername').value.trim();
   const password = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('loginError');
   const btn = document.getElementById('loginBtn');
   errEl.classList.remove('show');
-
   if (!username || !password) {
     errEl.textContent = 'Please enter your username and password.';
-    errEl.classList.add('show');
-    return;
+    errEl.classList.add('show'); return;
   }
-
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Signing in…';
-
   try {
     const res = await fetch(API_BASE + '/client/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ username, password })
     });
     const data = await res.json();
     if (!res.ok) {
       errEl.textContent = data.error || 'Login failed. Please try again.';
       errEl.classList.add('show');
-      btn.disabled = false;
-      btn.innerHTML = '🔑 &nbsp; Sign In';
-      return;
+      btn.disabled = false; btn.innerHTML = '🔑 &nbsp; Sign In'; return;
     }
-    clientToken = data.token;
-    clientDisplayName = data.displayName;
-    clientUsername = data.username;
+    clientToken = data.token; clientDisplayName = data.displayName; clientUsername = data.username;
     sessionStorage.setItem('client_token', clientToken);
     sessionStorage.setItem('client_display_name', clientDisplayName);
     sessionStorage.setItem('client_username', clientUsername);
     showWelcome();
-  } catch (e) {
+  } catch(e) {
     errEl.textContent = 'Cannot connect to server. Please try again.';
     errEl.classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML = '🔑 &nbsp; Sign In';
+    btn.disabled = false; btn.innerHTML = '🔑 &nbsp; Sign In';
   }
 }
 
 function showWelcome() {
   document.getElementById('loginPage').classList.add('hide');
   const wp = document.getElementById('welcomePage');
-  wp.style.display = 'flex';
-  wp.style.opacity = '0';
+  wp.style.display = 'flex'; wp.style.opacity = '0';
   wp.style.transition = 'opacity .4s ease';
   setTimeout(() => { wp.style.opacity = '1'; }, 10);
   document.getElementById('welcomeGreeting').textContent = 'Hello, ' + (clientDisplayName || clientUsername) + '! 💕';
   spawnWelcomePetals();
 }
 
+function confirmLogout() {
+  document.getElementById('logoutModal').classList.add('show');
+}
+function closeLogoutModal() {
+  document.getElementById('logoutModal').classList.remove('show');
+}
 function doLogout() {
-  if (!confirm('Are you sure you want to sign out?')) return;
-  clientToken = null;
-  clientDisplayName = '';
-  clientUsername = '';
+  closeLogoutModal();
+  clientToken = null; clientDisplayName = ''; clientUsername = '';
   sessionStorage.removeItem('client_token');
   sessionStorage.removeItem('client_display_name');
   sessionStorage.removeItem('client_username');
@@ -549,13 +634,12 @@ function doLogout() {
   document.getElementById('loginError').classList.remove('show');
 }
 
-// ══════════════ PETALS ══════════════
+// ══════ PETALS ══════
 function spawnLoginPetals() {
   const pc = document.getElementById('loginPetals');
   ['🌸','🌸','🌷','🌸','🌺','🌸','🌷'].forEach(p => {
     for (let i = 0; i < (p==='🌸'?5:3); i++) {
-      const el = document.createElement('div');
-      el.className='petal'; el.textContent=p;
+      const el = document.createElement('div'); el.className='petal'; el.textContent=p;
       el.style.left = Math.random()*100+'%';
       el.style.setProperty('--sz',(13+Math.random()*12)+'px');
       el.style.setProperty('--dur',(5+Math.random()*6)+'s');
@@ -564,14 +648,12 @@ function spawnLoginPetals() {
     }
   });
 }
-
 function spawnWelcomePetals() {
   const pc = document.getElementById('welcomePetals');
   if (pc.childElementCount > 0) return;
   ['🌸','🌸','🌷','🌸','🌺','🌸','🌷','🌸','🌸','🌷'].forEach(p => {
     for (let i = 0; i < (p==='🌸'?7:4); i++) {
-      const el = document.createElement('div');
-      el.className='petal'; el.textContent=p;
+      const el = document.createElement('div'); el.className='petal'; el.textContent=p;
       el.style.left = Math.random()*100+'%';
       el.style.setProperty('--sz',(13+Math.random()*13)+'px');
       el.style.setProperty('--dur',(5+Math.random()*6)+'s');
@@ -580,14 +662,12 @@ function spawnWelcomePetals() {
     }
   });
 }
-
 function initFormPetals() {
   const pc = document.getElementById('petals');
   if (pc.childElementCount > 0) return;
   ['🌸','🌸','🌷','🌸','🌺','🌸','🌷','🌸','🌸','🌷'].forEach(p => {
     for (let i = 0; i < (p==='🌸'?7:4); i++) {
-      const el = document.createElement('div');
-      el.className='petal'; el.textContent=p;
+      const el = document.createElement('div'); el.className='petal'; el.textContent=p;
       el.style.left = Math.random()*100+'%';
       el.style.setProperty('--sz',(13+Math.random()*13)+'px');
       el.style.setProperty('--dur',(5+Math.random()*6)+'s');
@@ -596,16 +676,12 @@ function initFormPetals() {
     }
   });
 }
-
 function spawnSparkles() {
   const sc = document.getElementById('sparkles');
-  const sizes = [8,9,10,11,12];
-  const colors = ['#e8728a','#c94f6a','#d4a853','#e8728a','#b07080'];
-  for (let i = 0; i < 28; i++) {
-    const s = document.createElement('div');
-    s.className='sparkle';
-    s.style.left=Math.random()*100+'%';
-    s.style.top=Math.random()*100+'%';
+  const sizes=[8,9,10,11,12]; const colors=['#e8728a','#c94f6a','#d4a853','#e8728a','#b07080'];
+  for (let i=0;i<28;i++) {
+    const s=document.createElement('div'); s.className='sparkle';
+    s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*100+'%';
     s.style.setProperty('--ts',sizes[Math.floor(Math.random()*sizes.length)]+'px');
     s.style.setProperty('--td',(1.5+Math.random()*2.5)+'s');
     s.style.setProperty('--tl',(Math.random()*3)+'s');
@@ -614,7 +690,7 @@ function spawnSparkles() {
   }
 }
 
-// ══════════════ NAVIGATION ══════════════
+// ══════ NAVIGATION ══════
 function goToForm() {
   const wp = document.getElementById('welcomePage');
   wp.classList.add('hide');
@@ -625,7 +701,7 @@ function goToForm() {
   }, 500);
 }
 
-// ══════════════ FORM LOGIC ══════════════
+// ══════ FORM LOGIC ══════
 function switchRate() {
   const type = document.querySelector('input[name="rateType"]:checked').value;
   document.getElementById('songBox').classList.toggle('show', type==='song');
@@ -635,29 +711,25 @@ function switchRate() {
   document.getElementById('songPrice').classList.remove('show');
   document.getElementById('hourPrice').classList.remove('show');
 }
-
 const songNotes = {
-  '1–6 Songs':  'Up to 6 songs of live performance 🎵',
-  '1–10 Songs': 'Up to 10 songs of live performance 🎵',
-  '1–15 Songs': 'Up to 15 songs of live performance 🎵',
-  'Band Sub':   'Rate is negotiable — please discuss with Jeoan',
+  '1–6 Songs':'Up to 6 songs of live performance 🎵',
+  '1–10 Songs':'Up to 10 songs of live performance 🎵',
+  '1–15 Songs':'Up to 15 songs of live performance 🎵',
+  'Band Sub':'Rate is negotiable — please discuss with Jeoan',
 };
 const hourNotes = {
-  '1 Hour':       '1 hour of live performance 🎤',
-  '1 Hr 30 Mins': '1 hour and 30 minutes of live performance 🎤',
-  '2 Hours':      '2 hours of live performance 🎤',
+  '1 Hour':'1 hour of live performance 🎤',
+  '1 Hr 30 Mins':'1 hour and 30 minutes of live performance 🎤',
+  '2 Hours':'2 hours of live performance 🎤',
 };
-
 function showPrice(type) {
-  const sel  = document.getElementById(type==='song' ? 'songPkg' : 'hourPkg');
-  const tag  = document.getElementById(type==='song' ? 'songPrice' : 'hourPrice');
-  const parts = sel.value.split('|');
-  const label = parts[0], price = parts[1];
-  const note  = type==='song' ? songNotes[label] : hourNotes[label];
+  const sel = document.getElementById(type==='song'?'songPkg':'hourPkg');
+  const tag = document.getElementById(type==='song'?'songPrice':'hourPrice');
+  const parts = sel.value.split('|'); const label=parts[0], price=parts[1];
+  const note = type==='song' ? songNotes[label] : hourNotes[label];
   tag.innerHTML = '<strong>'+label+' — '+price+'</strong><span>'+(note||'')+'</span>';
   tag.classList.add('show');
 }
-
 function toggleCB() {
   setTimeout(() => {
     const cb = document.getElementById('agreeCheck');
@@ -665,87 +737,68 @@ function toggleCB() {
     document.getElementById('submitBtn').disabled = !cb.checked;
   }, 0);
 }
-
 async function submitForm() {
-  const name     = document.getElementById('clientName').value.trim();
-  const date     = document.getElementById('eventDate').value.trim();
+  const name = document.getElementById('clientName').value.trim();
+  const date = document.getElementById('eventDate').value.trim();
   const perfTime = document.getElementById('perfTime').value.trim();
-  const occ      = document.getElementById('occasion').value;
-  const venue    = document.getElementById('venue').value.trim();
-  const notes    = document.getElementById('notes').value.trim();
+  const occ = document.getElementById('occasion').value;
+  const venue = document.getElementById('venue').value.trim();
+  const notes = document.getElementById('notes').value.trim();
   const rateRadio = document.querySelector('input[name="rateType"]:checked');
   if (!rateRadio) { alert('Please select a Rate Type.'); return; }
   const rateType = rateRadio.value;
-  const pkgRaw   = rateType==='song' ? document.getElementById('songPkg').value : document.getElementById('hourPkg').value;
+  const pkgRaw = rateType==='song' ? document.getElementById('songPkg').value : document.getElementById('hourPkg').value;
   if (!name||!date||!perfTime||!occ||!venue||!pkgRaw) { alert('Please fill in all required fields (*).'); return; }
-  const parts = pkgRaw.split('|');
-  const pkg   = parts[0]+' — '+parts[1];
-
+  const parts = pkgRaw.split('|'); const pkg = parts[0]+' — '+parts[1];
   const booking = {
-    id: Date.now(),
-    name, date, perfTime, occasion: occ, venue,
+    id: Date.now(), name, date, perfTime, occasion: occ, venue,
     rateType: rateType==='song' ? '🎵 Per Song' : '⏱️ Per Hour',
-    package: pkg,
-    notes: notes || '',
+    package: pkg, notes: notes||'',
   };
-
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Submitting…';
-
+  btn.disabled = true; btn.textContent = 'Submitting…';
   try {
     const res = await fetch(API_BASE + '/client/bookings', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + clientToken
-      },
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+clientToken},
       body: JSON.stringify(booking)
     });
     if (!res.ok) {
       const err = await res.json();
-      alert('Error: ' + (err.error || 'Could not submit booking.'));
-      btn.disabled = false;
-      btn.textContent = '🎀  Submit Booking';
-      return;
+      alert('Error: '+(err.error||'Could not submit booking.'));
+      btn.disabled = false; btn.textContent = '🎀  Submit Booking'; return;
     }
-  } catch (e) {
+  } catch(e) {
     alert('Cannot connect to server. Please check your connection.');
-    btn.disabled = false;
-    btn.textContent = '🎀  Submit Booking';
-    return;
+    btn.disabled = false; btn.textContent = '🎀  Submit Booking'; return;
   }
-
   currentBookingId = booking.id;
-
   const rows = [
-    ['Client Name', name],['Event Date', date],['Time', perfTime],
-    ['Occasion', occ],['Venue', venue],['Rate Type', booking.rateType],['Package', pkg],
+    ['Client Name',name],['Event Date',date],['Time',perfTime],
+    ['Occasion',occ],['Venue',venue],['Rate Type',booking.rateType],['Package',pkg],
   ];
-  if (notes) rows.push(['Notes', notes]);
+  if (notes) rows.push(['Notes',notes]);
   document.getElementById('summaryRows').innerHTML = rows.map(r =>
     '<div class="cc-row"><span class="lbl">'+r[0]+'</span><span class="val">'+r[1]+'</span></div>'
   ).join('');
-
   document.getElementById('formPage').style.display = 'none';
   document.getElementById('thankYouPage').classList.add('show');
 }
 
-// ══════════════ GCASH UPLOAD ══════════════
+// ══════ GCASH UPLOAD ══════
 function compressImage(file, callback) {
   const reader = new FileReader();
   reader.onload = function(e) {
     const img = new Image();
     img.onload = function() {
       const canvas = document.createElement('canvas');
-      const maxDim = 900;
-      let w = img.width, h = img.height;
-      if (w > maxDim || h > maxDim) {
-        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-        else       { w = Math.round(w * maxDim / h); h = maxDim; }
+      const maxDim = 900; let w=img.width, h=img.height;
+      if (w>maxDim||h>maxDim) {
+        if (w>h) { h=Math.round(h*maxDim/w); w=maxDim; }
+        else { w=Math.round(w*maxDim/h); h=maxDim; }
       }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
       callback(canvas.toDataURL('image/jpeg', 0.72));
     };
     img.src = e.target.result;
@@ -756,36 +809,33 @@ function compressImage(file, callback) {
 function handleGcashUpload(input) {
   if (!input.files || !input.files[0]) return;
   compressImage(input.files[0], function(dataUrl) {
+    pendingImageData = dataUrl;
     document.getElementById('gcashPreviewImg').src = dataUrl;
     document.getElementById('gcashPreview').classList.add('show');
     document.getElementById('uploadArea').style.opacity = '0.5';
     document.getElementById('uploadArea').style.pointerEvents = 'none';
     const btn = document.getElementById('submitSsBtn');
     btn.classList.add('show');
-    btn._imageData = dataUrl;
   });
 }
-  async function submitGcashScreenshot() {
+
+async function submitGcashScreenshot() {
+  if (!pendingImageData || !currentBookingId) return;
   const btn = document.getElementById('submitSsBtn');
-  const dataUrl = btn._imageData;
-  if (!dataUrl || !currentBookingId) return;
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Submitting…';
   try {
     await fetch(API_BASE + '/client/bookings/' + currentBookingId + '/screenshot', {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + clientToken
-      },
-      body: JSON.stringify({ gcashScreenshot: dataUrl })
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+clientToken},
+      body: JSON.stringify({ gcashScreenshot: pendingImageData })
     });
   } catch(e) { console.warn('Screenshot upload failed', e); }
-  document.getElementById('thankYouModal').classList.add('show');
+  document.getElementById('ssModal').classList.add('show');
 }
 
-function closeThankYouModal() {
-  document.getElementById('thankYouModal').classList.remove('show');
+function closeSsModal() {
+  document.getElementById('ssModal').classList.remove('show');
 }
 </script>
 </body>
