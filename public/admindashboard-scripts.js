@@ -90,11 +90,12 @@ async function updateStats() {
 
 async function renderBookings() {
   let all = await fetchBookings();
+  console.log('Bookings fetched:', all.length, all); 
   all.sort((a, b) => {
     const order = sc => sc==='no-ss'?0 : sc==='pending'?1 : sc==='confirmed'?2 : 3;
     const oa = order(getStatusClass(a)), ob = order(getStatusClass(b));
     if (oa !== ob) return oa - ob;
-    return b.id - a.id;
+return String(b.id) > String(a.id) ? -1 : 1;
   });
   if (currentFilter !== 'all') {
     all = all.filter(b => {
