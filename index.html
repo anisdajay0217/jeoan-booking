@@ -14,7 +14,20 @@
   --muted:#b08090;--border:#f0c8d4;--white:#ffffff;
 }
 body{background:var(--cream);color:var(--text);font-family:'Lato',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;font-size:12px}
+const path = require('path');
 
+// Tell Express to serve files from the 'public' folder
+app.use(express.static(path.join(__dirname, '../public')));
+
+// If someone goes to your link, show them the client page (index.html)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+// If someone goes to yourlink.com/admin, show them the admin page
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/admin.html'));
+});
 /* ═══════════════════════ LOGIN PAGE ═══════════════════════ */
 #loginPage{
   position:fixed;inset:0;
