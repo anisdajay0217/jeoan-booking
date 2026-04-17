@@ -58,15 +58,15 @@ async function initDB() {
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// IMPORTANT: Since index.js is inside the 'src' folder, we serve this folder directly.
+// FIX: Since index.js is ALREADY in src, we serve the current directory (.)
+// This prevents the "src/src/" error.
 app.use(express.static(__dirname));
 
 // ─── Health & Root ───────────────────────────────────────────
-// Railway uses /health to verify the app is running
 app.get('/health', (req, res) => res.status(200).send('OK'));
 
 app.get('/', (req, res) => {
-  // Serves index.html from the same folder as this script
+  // FIX: index.html is in the same folder as this index.js
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
@@ -103,7 +103,8 @@ app.post('/client/login', async (req, res) => {
   }
 });
 
-// ─── (Rest of your Booking/Client DB Endpoints here...) ───
+// ─── ADMIN & CLIENT BOOKING ENDPOINTS ────────────────────────
+// (Add your existing booking GET/POST/PATCH routes here)
 
 // ─── Start ────────────────────────────────────────────────────
 initDB().then(() => {
