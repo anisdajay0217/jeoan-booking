@@ -17,22 +17,60 @@ const pool = new Pool({
   ssl: process.env.DATABASE_PUBLIC_URL ? { rejectUnauthorized: false } : false
 });
 
+async function initDB() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS client_accounts (
+        id SERIAL PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        display_name TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS bookings (
+        id BIGINT PRIMARY KEY,
+        client_username TEXT,
+        name TEXT NOT NULL,
+        date TEXT,
+        perf_time TEXT,
+        occasion TEXT,
+        venue TEXT,
+        rate_type TEXT,
+        package TEXT,
+        notes TEXT,
+        gcash_screenshot TEXT,
+        screenshot_at TIMESTAMPTZ,
+        status TEXT DEFAULT 'pending',
+        admin_note TEXT DEFAULT '',
+        submitted_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ
+      )
+    `);
+    console.log('✅ Database tables ready');
+  } catch (err) {
+    console.error('⚠️ DB Init Error:', err.message);
+  }
+}
+
 // ─── Middleware ───────────────────────────────────────────────
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// Serve static files from the current folder (src)
+// IMPORTANT: Since index.js is inside the 'src' folder, we serve this folder directly.
 app.use(express.static(__dirname));
 
-// ─── Health Check (For Railway) ───────────────────────────────
+// ─── Health & Root ───────────────────────────────────────────
+// Railway uses /health to verify the app is running
 app.get('/health', (req, res) => res.status(200).send('OK'));
 
-// ─── Root Route ───
 app.get('/', (req, res) => {
+  // Serves index.html from the same folder as this script
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// ─── Auth Routes ──────────────────────────────────────────────
+// ─── ADMIN AUTH ───────────────────────────────────────────────
 app.post('/admin/login', (req, res) => {
   const { password } = req.body;
   if (password !== ADMIN_PASSWORD) {
@@ -42,6 +80,7 @@ app.post('/admin/login', (req, res) => {
   res.json({ token });
 });
 
+// ─── CLIENT AUTH ──────────────────────────────────────────────
 app.post('/client/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
@@ -64,7 +103,11 @@ app.post('/client/login', async (req, res) => {
   }
 });
 
-// ─── Start Server ─────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`🎀 Server running on port ${PORT}`);
+// ─── (Rest of your Booking/Client DB Endpoints here...) ───
+
+// ─── Start ────────────────────────────────────────────────────
+initDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🎀 Jeoan API running on port ${PORT}`);
+  });
 });
