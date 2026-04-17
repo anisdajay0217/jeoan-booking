@@ -468,34 +468,39 @@ async function saveBooking(booking) {
 })();
 
 // ══════ LOGIN ══════
-function doClientLogin() {
-  const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+async function doClientLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
   const password = document.getElementById('loginPassword').value;
-  const errEl    = document.getElementById('loginError');
-  const btn      = document.getElementById('loginBtn');
+  const errEl = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
   errEl.classList.remove('show');
-
   if (!username || !password) {
     errEl.textContent = 'Please enter your username and password.';
     errEl.classList.add('show'); return;
   }
-
-  const account = ACCOUNTS[username];
-  if (!account || account.password !== password) {
-    errEl.textContent = 'Incorrect username or password.';
-    errEl.classList.add('show'); return;
-  }
-
-  clientDisplayName = account.displayName;
-  clientUsername    = username;
-  isLoggedIn        = true;
-  sessionStorage.setItem('logged_in',           'yes');
-  sessionStorage.setItem('client_display_name', clientDisplayName);
-  sessionStorage.setItem('client_username',     clientUsername);
-
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Signing in…';
-  setTimeout(showForm, 400);
+  try {
+    const res = await fetch(API_BASE + '/client/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent = data.error || 'Login failed. Please try again.';
+      errEl.classList.add('show');
+      btn.disabled = false; btn.innerHTML = '🔑 &nbsp; Sign In'; return;
+    }
+    clientToken = data.token; clientDisplayName = data.displayName; clientUsername = data.username;
+    sessionStorage.setItem('client_token', clientToken);
+    sessionStorage.setItem('client_display_name', clientDisplayName);
+    sessionStorage.setItem('client_username', clientUsername);
+    showForm();
+  } catch(e) {
+    errEl.textContent = 'Cannot connect to server. Please try again.';
+    errEl.classList.add('show');
+    btn.disabled = false; btn.innerHTML = '🔑 &nbsp; Sign In';
+  }
 }
 
 function showForm() {
@@ -506,7 +511,6 @@ function showForm() {
     initFormPetals();
   }, 300);
 }
-
 function confirmLogout()  { document.getElementById('logoutModal').classList.add('show'); }
 function closeLogoutModal(){ document.getElementById('logoutModal').classList.remove('show'); }
 
