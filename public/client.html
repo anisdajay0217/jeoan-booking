@@ -452,7 +452,7 @@ async function saveBooking(booking) {
   // store under shared key so the admin panel can read it
   const key = 'booking:' + booking.id;
   try {
-    await window.storage.set(key, JSON.stringify(booking), true); // shared=true → visible to admin
+    await fetch('/client/bookings');
     return true;
   } catch(e) {
     console.error('Storage save error:', e);
