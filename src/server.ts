@@ -253,7 +253,14 @@ app.patch('/client/bookings/:id/resubmit', requireClient, async (req: AuthReques
 });
 
 // ─── CATCH-ALL ────────────────────────────────────────────────────────────────
-app.get('*', (_req: Request, res: Response) => {
+// If the request path starts with /admin or /client it's an API call —
+// return JSON 404 instead of the HTML shell so the browser never receives
+// "<!DOCTYPE" when it expects JSON.
+app.use((req: Request, res: Response) => {
+  if (req.path.startsWith('/admin') || req.path.startsWith('/client')) {
+    res.status(404).json({ error: 'Not found' });
+    return;
+  }
   res.sendFile(path.join(__dirname, '../public/client.html'));
 });
 
