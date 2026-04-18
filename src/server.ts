@@ -206,19 +206,12 @@ app.patch('/client/bookings/:id/screenshot', requireClient, async (req: Request,
   res.json({ ok: true });
 });
 
-// ── Get client's own bookings (non-declined) ────────────────────────────────
+// ── Get ALL of client's bookings (all statuses, including declined) ───────────
+// NOTE: clientsubmittedforms-scripts.js filters out 'declined' on the client side.
+//       clientrejectedforms-scripts.js filters for 'declined' on the client side.
 app.get('/client/bookings', requireClient, async (req: AuthRequest, res: Response) => {
   const result = await pool.query(
-    `SELECT * FROM bookings WHERE client_username = $1 AND status != 'declined' ORDER BY submitted_at DESC`,
-    [req.user?.username]
-  );
-  res.json(result.rows.map(mapBooking));
-});
-
-// ── Get client's rejected/declined bookings ─────────────────────────────────
-app.get('/client/bookings/rejected', requireClient, async (req: AuthRequest, res: Response) => {
-  const result = await pool.query(
-    `SELECT * FROM bookings WHERE client_username = $1 AND status = 'declined' ORDER BY submitted_at DESC`,
+    `SELECT * FROM bookings WHERE client_username = $1 ORDER BY submitted_at DESC`,
     [req.user?.username]
   );
   res.json(result.rows.map(mapBooking));
@@ -260,8 +253,6 @@ app.patch('/client/bookings/:id/resubmit', requireClient, async (req: AuthReques
 });
 
 // ─── CATCH-ALL ────────────────────────────────────────────────────────────────
-// IMPORTANT: serve client.html (login) as the default for unknown routes.
-// clientdashboard.html is only loaded explicitly after login via JS redirect.
 app.get('*', (_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '../public/client.html'));
 });
