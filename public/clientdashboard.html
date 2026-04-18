@@ -65,6 +65,11 @@
     .cd-spinner-wrap{display:flex;align-items:center;justify-content:center;padding:60px 20px;}
     .cd-spinner{width:28px;height:28px;border:3px solid var(--rose-pale);border-top-color:var(--rose);border-radius:50%;animation:cdSpin .7s linear infinite;}
     @keyframes cdSpin{to{transform:rotate(360deg);}}
+    /* STATUS BADGE */
+    .status-badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+    .status-pending{background:#fff3cd;color:#856404;}
+    .status-approved{background:#d1fae5;color:#065f46;}
+    .status-declined{background:#fee2e2;color:#991b1b;}
     /* TOAST */
     .cd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;border-radius:100px;padding:11px 24px;font-size:13px;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(58,31,40,.3);}
     .cd-toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
@@ -372,38 +377,34 @@ function closeSidebar(){
 function showTab(tab){
   ['tabBooking','tabSubmitted','tabRejected'].forEach(function(id){document.getElementById(id).style.display='none';});
   ['navBooking','navSubmitted','navRejected'].forEach(function(id){document.getElementById(id).classList.remove('active');});
-  if(tab==='booking'){document.getElementById('tabBooking').style.display='';document.getElementById('navBooking').classList.add('active');}
-  else if(tab==='submitted'){document.getElementById('tabSubmitted').style.display='';document.getElementById('navSubmitted').classList.add('active');loadSubmissions();}
-  else if(tab==='rejected'){document.getElementById('tabRejected').style.display='';document.getElementById('navRejected').classList.add('active');loadRejected();}
+  if(tab==='booking'){
+    document.getElementById('tabBooking').style.display='';
+    document.getElementById('navBooking').classList.add('active');
+  } else if(tab==='submitted'){
+    document.getElementById('tabSubmitted').style.display='';
+    document.getElementById('navSubmitted').classList.add('active');
+    loadSubmissions();
+  } else if(tab==='rejected'){
+    document.getElementById('tabRejected').style.display='';
+    document.getElementById('navRejected').classList.add('active');
+    loadRejected();
+  }
 }
 
-async function loadSubmissions(){
-  var el=document.getElementById('submittedList');
-  el.innerHTML='<div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>';
-  try{
-    var res=await fetch(window.location.origin+'/client/bookings',{headers:{'Authorization':'Bearer '+sessionStorage.getItem('client_token')}});
-    var data=await res.json();
-    var list=Array.isArray(data)?data:(data.bookings||[]);
-    el.innerHTML=list.length?list.map(function(b){return bookingCard(b,false);}).join(''):'<div class="cd-empty"><span class="cd-ei">📂</span><p>No submissions yet.<br>Fill out the Booking Form to get started! 🌸</p></div>';
-  }catch(e){el.innerHTML='<div class="cd-empty"><span class="cd-ei">⚠️</span><p>Could not load submissions.</p></div>';}
+function statusBadge(status){
+  var map={
+    'pending':'<span class="status-badge status-pending">⏳ Pending</span>',
+    'approved':'<span class="status-badge status-approved">✅ Approved</span>',
+    'declined':'<span class="status-badge status-declined">✖ Declined</span>'
+  };
+  return map[status]||'<span class="status-badge status-pending">'+escHtml(status)+'</span>';
 }
 
-async function loadRejected(){
-  var el=document.getElementById('rejectedList');
-  el.innerHTML='<div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>';
-  try{
-    var res=await fetch(window.location.origin+'/client/bookings/rejected',{headers:{'Authorization':'Bearer '+sessionStorage.getItem('client_token')}});
-    var data=await res.json();
-    var list=Array.isArray(data)?data:(data.bookings||[]);
-    el.innerHTML=list.length?list.map(function(b){return bookingCard(b,true);}).join(''):'<div class="cd-empty"><span class="cd-ei">✖</span><p>No rejected bookings. 🎉</p></div>';
-  }catch(e){el.innerHTML='<div class="cd-empty"><span class="cd-ei">⚠️</span><p>Could not load rejections.</p></div>';}
-}
-
-function bookingCard(b,rejected){
+function bookingCard(b, rejected){
   return '<div style="background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 2px 10px rgba(201,79,106,.09);border:1.5px solid var(--border);margin-bottom:10px;">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'
     +'<div style="font-family:\'Playfair Display\',serif;font-size:15px;color:var(--rose);font-weight:700;">'+escHtml(b.name||'—')+'</div>'
-    +'<div style="font-size:11px;font-weight:700;color:'+(rejected?'var(--red)':'var(--green)')+';">'+(rejected?'✖ Rejected':'📋 Submitted')+'</div>'
+    +statusBadge(b.status||'pending')
     +'</div>'
     +'<div style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mauve);">'
     +'<div>📅 '+escHtml(b.date||'—')+' · ⏰ '+escHtml(b.perfTime||'—')+'</div>'
@@ -411,8 +412,46 @@ function bookingCard(b,rejected){
     +'<div>📍 '+escHtml(b.venue||'—')+'</div>'
     +'<div>💳 '+escHtml(b.package||'—')+'</div>'
     +(b.notes?'<div>📝 '+escHtml(b.notes)+'</div>':'')
-    +(rejected&&b.rejectReason?'<div style="margin-top:6px;color:var(--red);font-weight:700;">Reason: '+escHtml(b.rejectReason)+'</div>':'')
+    +(rejected && b.adminNote
+      ? '<div style="margin-top:8px;padding:8px 10px;background:#fee2e2;border-radius:8px;color:#991b1b;font-size:11px;font-weight:700;">📋 Reason: '+escHtml(b.adminNote)+'</div>'
+      : '')
     +'</div></div>';
+}
+
+async function loadSubmissions(){
+  var el=document.getElementById('submittedList');
+  el.innerHTML='<div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>';
+  try{
+    var res=await fetch(window.location.origin+'/client/bookings',{
+      headers:{'Authorization':'Bearer '+sessionStorage.getItem('client_token')}
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    var data=await res.json();
+    var list=Array.isArray(data)?data:(data.bookings||[]);
+    el.innerHTML=list.length
+      ? list.map(function(b){return bookingCard(b,false);}).join('')
+      : '<div class="cd-empty"><span class="cd-ei">📂</span><p>No submissions yet.<br>Fill out the Booking Form to get started! 🌸</p></div>';
+  } catch(e){
+    el.innerHTML='<div class="cd-empty"><span class="cd-ei">⚠️</span><p>Could not load submissions.<br><small>'+escHtml(e.message)+'</small></p></div>';
+  }
+}
+
+async function loadRejected(){
+  var el=document.getElementById('rejectedList');
+  el.innerHTML='<div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>';
+  try{
+    var res=await fetch(window.location.origin+'/client/bookings/rejected',{
+      headers:{'Authorization':'Bearer '+sessionStorage.getItem('client_token')}
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    var data=await res.json();
+    var list=Array.isArray(data)?data:(data.bookings||[]);
+    el.innerHTML=list.length
+      ? list.map(function(b){return bookingCard(b,true);}).join('')
+      : '<div class="cd-empty"><span class="cd-ei">🎉</span><p>No rejected bookings. You\'re all good! 🌸</p></div>';
+  } catch(e){
+    el.innerHTML='<div class="cd-empty"><span class="cd-ei">⚠️</span><p>Could not load rejections.<br><small>'+escHtml(e.message)+'</small></p></div>';
+  }
 }
 
 function confirmLogout(){document.getElementById('logoutModal').classList.add('show');}
