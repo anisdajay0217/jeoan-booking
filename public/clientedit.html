@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Edit Booking — Jeoan Booking 🎀</title>
+  <link rel="stylesheet" href="client-styles.css"/>
+  <link rel="stylesheet" href="clientdashboard-styles.css"/>
+  <link rel="stylesheet" href="clientedit-styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400&family=Pinyon+Script&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="cd-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="cd-sidebar">
+    <div class="cd-brand">
+      <span class="cd-brand-icon">🎀</span>
+      <div class="cd-brand-name">Jeoan Gwyneth</div>
+      <div class="cd-brand-sub">Client Portal</div>
+    </div>
+    <nav class="cd-nav">
+      <div class="cd-nav-label">Menu</div>
+      <a class="cd-nav-item" href="clientdashboard.html">
+        <span class="ni">📋</span> Booking Form
+      </a>
+      <a class="cd-nav-item" href="clientsubmittedforms.html">
+        <span class="ni">📂</span> My Submissions
+      </a>
+      <a class="cd-nav-item" href="clientrejectedforms.html">
+        <span class="ni">❌</span> Rejected
+      </a>
+    </nav>
+    <div class="cd-sidebar-footer">
+      <div class="cd-welcome" id="ceWelcome"></div>
+      <button class="cd-signout" onclick="ceConfirmLogout()">↩ Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="cd-main">
+    <div class="cd-page-header">
+      <a class="ce-back-btn" href="clientrejectedforms.html">← Back to Rejected</a>
+      <div class="cd-page-title">✏️ Edit &amp; Resubmit</div>
+      <div class="cd-page-subtitle">Update your booking details and resubmit for review</div>
+    </div>
+
+    <!-- Loading / Error state -->
+    <div class="cd-scroll" id="ceLoadArea">
+      <div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>
+    </div>
+
+    <!-- Edit Form (hidden until booking loads) -->
+    <div class="cd-scroll ce-form-wrap" id="ceFormArea" style="display:none">
+
+      <!-- Rejection reason banner -->
+      <div class="ce-rejection-banner" id="ceRejectionBanner" style="display:none">
+        <div class="ce-rb-head">❌ Reason for Rejection</div>
+        <div class="ce-rb-body" id="ceRejectionText"></div>
+      </div>
+
+      <div class="ce-card">
+        <div class="ce-error" id="ceError"></div>
+
+        <div class="ce-row">
+          <div class="ce-field">
+            <label>Event Date *</label>
+            <input type="text" id="ceDate" placeholder="e.g. June 15, 2025"/>
+          </div>
+          <div class="ce-field">
+            <label>Performance Time *</label>
+            <input type="text" id="cePerfTime" placeholder="e.g. 6:00 PM"/>
+          </div>
+        </div>
+
+        <div class="ce-field">
+          <label>Event Occasion *</label>
+          <select id="ceOccasion">
+            <option value="" disabled>— Choose occasion —</option>
+            <option>Birthday Party</option>
+            <option>Session Vocalist / Band Sub</option>
+            <option>Party</option>
+            <option>Resto Bar</option>
+            <option>Wedding</option>
+            <option>Reception</option>
+          </select>
+        </div>
+
+        <div class="ce-field">
+          <label>Venue Address *</label>
+          <textarea id="ceVenue" rows="2" placeholder="Full venue address…"></textarea>
+        </div>
+
+        <div class="ce-field">
+          <label>Rate Type *</label>
+          <p class="ce-field-hint">Change your package if needed</p>
+          <div class="ce-rate-toggle">
+            <div class="ce-rate-btn">
+              <input type="radio" name="ceRateType" id="ceRateSong" value="song" onchange="ceSwitchRate()"/>
+              <label class="ce-rate-label" for="ceRateSong"><span class="rb"></span> 🎵 Per Song</label>
+            </div>
+            <div class="ce-rate-btn">
+              <input type="radio" name="ceRateType" id="ceRateHour" value="hour" onchange="ceSwitchRate()"/>
+              <label class="ce-rate-label" for="ceRateHour"><span class="rb"></span> ⏱️ Per Hour</label>
+            </div>
+          </div>
+          <div class="ce-pkg-box" id="ceSongBox">
+            <select id="ceSongPkg" onchange="ceShowPrice('song')">
+              <option value="" disabled selected>— Choose song package —</option>
+              <option value="1–6 Songs|₱400">1–6 Songs — ₱400</option>
+              <option value="1–10 Songs|₱450">1–10 Songs — ₱450</option>
+              <option value="1–15 Songs|₱500">1–15 Songs — ₱500</option>
+              <option value="Band Sub|Negotiable">Band Sub — Negotiable</option>
+            </select>
+            <div class="ce-price-tag" id="ceSongPrice"></div>
+          </div>
+          <div class="ce-pkg-box" id="ceHourBox">
+            <select id="ceHourPkg" onchange="ceShowPrice('hour')">
+              <option value="" disabled selected>— Choose hour package —</option>
+              <option value="1 Hour|₱500">1 Hour — ₱500</option>
+              <option value="1 Hr 30 Mins|₱600">1 Hour 30 Mins — ₱600</option>
+              <option value="2 Hours|₱650">2 Hours — ₱650</option>
+            </select>
+            <div class="ce-price-tag" id="ceHourPrice"></div>
+          </div>
+        </div>
+
+        <div class="ce-field">
+          <label>Notes / Song Requests</label>
+          <textarea id="ceNotes" rows="2" placeholder="Special requests, changes…"></textarea>
+        </div>
+
+        <div class="ce-field">
+          <label>GCash Screenshot *</label>
+          <p class="ce-field-hint">Upload a new screenshot or keep the existing one</p>
+          <div class="ce-upload-area" id="ceUploadArea">
+            <input type="file" id="ceGcashFile" accept="image/*" onchange="ceHandleUpload(this)"/>
+            <span class="ce-upload-icon">📱</span>
+            <span class="ce-upload-label">Tap to upload new screenshot</span>
+            <span class="ce-upload-sub">JPG, PNG — your GCash confirmation receipt</span>
+          </div>
+          <div class="ce-preview" id="cePreview">
+            <img id="cePreviewImg" src="" alt="Screenshot Preview"/>
+            <div class="ce-preview-actions">
+              <span class="ce-preview-label">✅ Screenshot ready</span>
+              <button class="ce-reupload-btn" onclick="ceClearUpload()">Change photo</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ce-actions">
+          <a class="ce-btn-cancel" href="clientrejectedforms.html">Cancel</a>
+          <button class="ce-btn-submit" id="ceSubmitBtn" onclick="ceSubmit()">🎀 &nbsp; Resubmit Booking</button>
+        </div>
+      </div>
+
+    </div><!-- end ceFormArea -->
+  </div><!-- end cd-main -->
+
+</div><!-- end cd-layout -->
+
+<!-- LOGOUT MODAL -->
+<div class="cd-modal-overlay" id="ceLogoutModal">
+  <div class="cd-modal-box">
+    <span class="cd-modal-icon">🎀</span>
+    <div class="cd-modal-title">Sign Out?</div>
+    <div class="cd-modal-msg">Are you sure you want to sign out? 💕</div>
+    <div class="cd-modal-actions">
+      <button class="cd-modal-btn-cancel"  onclick="ceCloseLogout()">Stay</button>
+      <button class="cd-modal-btn-confirm" onclick="ceDoLogout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="cd-toast" id="ceToast"></div>
+
+<script src="clientedit-scripts.js"></script>
+</body>
+</html>
