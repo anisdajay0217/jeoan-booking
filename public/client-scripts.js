@@ -8,8 +8,7 @@ let clientUsername    = sessionStorage.getItem('client_username') || '';
 let pendingImageData  = null;
 
 // ════════════════════════════════════════════
-// INIT — only runs login-page code if those
-// elements actually exist on this page
+// INIT
 // ════════════════════════════════════════════
 (function init() {
   if (document.getElementById('loginPetals')) {
@@ -255,7 +254,8 @@ async function submitForm() {
     document.getElementById('submitHintEl').classList.add('error');
     btn.disabled = false; btn.innerHTML = '🎀 Submit Booking'; return;
   }
-  // Show thank-you
+
+  // ── Build summary rows ───────────────────────────────────────────────────
   const rows = [
     ['Client', name], ['Date', date], ['Time', perfTime],
     ['Occasion', occ], ['Venue', venue], ['Rate', rateLabel], ['Package', pkg],
@@ -265,8 +265,18 @@ async function submitForm() {
     '<div class="cc-row"><span class="lbl">' + r[0] + '</span><span class="val">' + r[1] + '</span></div>'
   ).join('');
   document.getElementById('tyScreenshot').src = pendingImageData;
+
+  // ── Show thank-you page ──────────────────────────────────────────────────
   document.getElementById('dashPage').style.display = 'none';
   document.getElementById('thankYouPage').classList.add('show');
+
+  // ── Sync welcome name in thank-you sidebar ───────────────────────────────
+  var tyW = document.getElementById('tyWelcome');
+  if (tyW) {
+    var dn = sessionStorage.getItem('client_display_name') || '';
+    var un = sessionStorage.getItem('client_username') || '';
+    tyW.innerHTML = '<strong>' + escHtml(dn || un) + '</strong>@' + escHtml(un);
+  }
 }
 
 // ════════════════════════════════════════════
