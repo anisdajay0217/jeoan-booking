@@ -2,68 +2,22 @@
 // STATE
 // ════════════════════════════════════════════
 const API_BASE = window.location.origin;
-let clientToken       = sessionStorage.getItem('client_token') || null;
-let clientDisplayName = sessionStorage.getItem('client_display_name') || '';
-let clientUsername    = sessionStorage.getItem('client_username') || '';
-let pendingImageData  = null;
+let pendingImageData = null;
 
 // ════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════
 (function init() {
-  if (document.getElementById('loginPetals')) {
-    spawnLoginPetals();
-  }
   if (document.getElementById('sparkles')) {
     spawnSparkles();
   }
 })();
 
 // ════════════════════════════════════════════
-// AUTH — LOGIN / LOGOUT
-// ════════════════════════════════════════════
-async function doClientLogin() {
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const errEl = document.getElementById('loginError');
-  const btn   = document.getElementById('loginBtn');
-  errEl.classList.remove('show');
-  if (!username || !password) {
-    errEl.textContent = 'Please enter your username and password.';
-    errEl.classList.add('show'); return;
-  }
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Signing in…';
-  try {
-    const res  = await fetch(API_BASE + '/client/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      errEl.textContent = data.error || 'Login failed. Please try again.';
-      errEl.classList.add('show');
-      btn.disabled = false; btn.innerHTML = '🔑 &nbsp; Sign In'; return;
-    }
-    clientToken       = data.token;
-    clientDisplayName = data.displayName;
-    clientUsername    = data.username;
-    sessionStorage.setItem('client_token',        clientToken);
-    sessionStorage.setItem('client_display_name', clientDisplayName);
-    sessionStorage.setItem('client_username',     clientUsername);
-    window.location.href = 'clientdashboard.html';
-  } catch (e) {
-    errEl.textContent = 'Cannot connect to server. Please try again.';
-    errEl.classList.add('show');
-    btn.disabled = false; btn.innerHTML = '🔑 &nbsp; Sign In';
-  }
-}
-
-// ════════════════════════════════════════════
 // CANCEL FORM
 // ════════════════════════════════════════════
-function confirmCancel()   { document.getElementById('cancelModal').classList.add('show'); }
-function closeCancelModal(){ document.getElementById('cancelModal').classList.remove('show'); }
+function confirmCancel()    { document.getElementById('cancelModal').classList.add('show'); }
+function closeCancelModal() { document.getElementById('cancelModal').classList.remove('show'); }
 
 function doCancelForm() {
   closeCancelModal();
@@ -177,8 +131,8 @@ function getMissingFields() {
 }
 
 function updateSubmitHint() {
-  const btn   = document.getElementById('submitBtn');
-  const hint  = document.getElementById('submitHintEl');
+  const btn  = document.getElementById('submitBtn');
+  const hint = document.getElementById('submitHintEl');
   if (!btn || !hint) return;
   const valid = isFormValid();
   btn.disabled = !valid;
@@ -235,7 +189,7 @@ async function submitForm() {
   try {
     const res = await fetch(API_BASE + '/client/bookings', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + clientToken },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: bookingId, name, date, perfTime, occasion: occ, venue, rateType: rateLabel, package: pkg, notes })
     });
     if (!res.ok) {
@@ -246,7 +200,7 @@ async function submitForm() {
     }
     await fetch(API_BASE + '/client/bookings/' + bookingId + '/screenshot', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + clientToken },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ gcashScreenshot: pendingImageData })
     });
   } catch (e) {
@@ -269,14 +223,6 @@ async function submitForm() {
   // ── Show thank-you page ──────────────────────────────────────────────────
   document.getElementById('dashPage').style.display = 'none';
   document.getElementById('thankYouPage').classList.add('show');
-
-  // ── Sync welcome name in thank-you sidebar ───────────────────────────────
-  var tyW = document.getElementById('tyWelcome');
-  if (tyW) {
-    var dn = sessionStorage.getItem('client_display_name') || '';
-    var un = sessionStorage.getItem('client_username') || '';
-    tyW.innerHTML = '<strong>' + escHtml(dn || un) + '</strong>@' + escHtml(un);
-  }
 }
 
 // ════════════════════════════════════════════
@@ -324,23 +270,8 @@ function reuploadScreenshot() {
 }
 
 // ════════════════════════════════════════════
-// PETALS & SPARKLES
+// SPARKLES
 // ════════════════════════════════════════════
-function spawnLoginPetals() {
-  const pc = document.getElementById('loginPetals');
-  if (!pc) return;
-  ['🌸','🌸','🌷','🌸','🌺','🌸','🌷'].forEach(p => {
-    for (let i = 0; i < (p === '🌸' ? 5 : 3); i++) {
-      const el = document.createElement('div'); el.className = 'petal'; el.textContent = p;
-      el.style.left = Math.random() * 100 + '%';
-      el.style.setProperty('--sz',  (13 + Math.random() * 12) + 'px');
-      el.style.setProperty('--dur', (5  + Math.random() * 6)  + 's');
-      el.style.setProperty('--del', (Math.random() * 8)       + 's');
-      pc.appendChild(el);
-    }
-  });
-}
-
 function initFormPetals() {
   const pc = document.getElementById('petals');
   if (!pc || pc.childElementCount > 0) return;
