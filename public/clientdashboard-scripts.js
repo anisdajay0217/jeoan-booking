@@ -2,6 +2,5 @@
    clientdashboard-scripts.js
    ============================================================ */
 
-(function init() {
-  if (typeof initFormPetals === 'function') initFormPetals();
-})();
+// Nothing needed here — welcome page and booking form are
+// fully handled by clientdashboard.html + client-scripts.js
