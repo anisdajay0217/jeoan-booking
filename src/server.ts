@@ -30,6 +30,7 @@ async function initDB() {
       id BIGINT PRIMARY KEY,
       client_username TEXT,
       name TEXT NOT NULL,
+      phone TEXT DEFAULT '',
       date TEXT NOT NULL,
       perf_time TEXT NOT NULL,
       occasion TEXT NOT NULL,
@@ -44,6 +45,12 @@ async function initDB() {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
   `);
+
+  // Migration: add phone column if it doesn't exist yet (for existing deployments)
+  await pool.query(`
+    ALTER TABLE bookings ADD COLUMN IF NOT EXISTS phone TEXT DEFAULT '';
+  `);
+
   console.log('✅ Database tables ready');
 }
 
@@ -91,6 +98,7 @@ function mapBooking(row: Record<string, unknown>) {
     id: row.id,
     clientUsername: row.client_username,
     name: row.name,
+    phone: row.phone,
     date: row.date,
     perfTime: row.perf_time,
     occasion: row.occasion,
@@ -105,6 +113,46 @@ function mapBooking(row: Record<string, unknown>) {
     updatedAt: row.updated_at,
   };
 }
+
+// ─── PUBLIC ROUTES (no login required) ───────────────────────────────────────
+
+// Public booking submission — used by the client booking form (no account needed)
+app.post('/public/bookings', async (req: Request, res: Response) => {
+  const {
+    id, name, phone, date, perfTime, occasion, venue,
+    rateType, package: pkg, notes, gcashScreenshot
+  } = req.body as {
+    id?: number; name: string; phone?: string; date: string; perfTime: string;
+    occasion: string; venue: string; rateType: string; package: string;
+    notes?: string; gcashScreenshot?: string;
+  };
+
+  if (!name || !date || !perfTime || !occasion || !venue || !pkg) {
+    res.status(400).json({ error: 'Missing required fields' }); return;
+  }
+
+  await pool.query(
+    `INSERT INTO bookings
+      (id, client_username, name, phone, date, perf_time, occasion, venue, rate_type, package, notes, gcash_screenshot)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+    [
+      id ?? Date.now(),
+      null,
+      name,
+      phone ?? '',
+      date,
+      perfTime,
+      occasion,
+      venue,
+      rateType,
+      pkg,
+      notes ?? '',
+      gcashScreenshot ?? null
+    ]
+  );
+
+  res.status(201).json({ ok: true });
+});
 
 // ─── ADMIN ROUTES ─────────────────────────────────────────────────────────────
 
@@ -181,17 +229,17 @@ app.post('/client/login', async (req: Request, res: Response) => {
 });
 
 app.post('/client/bookings', requireClient, async (req: AuthRequest, res: Response) => {
-  const { id, name, date, perfTime, occasion, venue, rateType, package: pkg, notes } = req.body as {
-    id: number; name: string; date: string; perfTime: string; occasion: string;
+  const { id, name, phone, date, perfTime, occasion, venue, rateType, package: pkg, notes } = req.body as {
+    id: number; name: string; phone?: string; date: string; perfTime: string; occasion: string;
     venue: string; rateType: string; package: string; notes?: string;
   };
   if (!name || !date || !perfTime || !occasion || !venue || !pkg) {
     res.status(400).json({ error: 'Missing required fields' }); return;
   }
   await pool.query(
-    `INSERT INTO bookings (id, client_username, name, date, perf_time, occasion, venue, rate_type, package, notes)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-    [id ?? Date.now(), req.user?.username ?? null, name, date, perfTime, occasion, venue, rateType, pkg, notes ?? '']
+    `INSERT INTO bookings (id, client_username, name, phone, date, perf_time, occasion, venue, rate_type, package, notes)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+    [id ?? Date.now(), req.user?.username ?? null, name, phone ?? '', date, perfTime, occasion, venue, rateType, pkg, notes ?? '']
   );
   res.status(201).json({ ok: true });
 });
@@ -206,11 +254,7 @@ app.patch('/client/bookings/:id/screenshot', requireClient, async (req: Request,
   res.json({ ok: true });
 });
 
-// ── Get ALL of client's bookings (all statuses, including declined) ───────────
-// NOTE: clientsubmittedforms-scripts.js filters out 'declined' on the client side.
-//       clientrejectedforms-scripts.js filters for 'declined' on the client side.
 // IMPORTANT: /client/bookings/rejected must be defined BEFORE /client/bookings
-// so Express matches the more specific path first.
 app.get('/client/bookings/rejected', requireClient, async (req: AuthRequest, res: Response) => {
   const result = await pool.query(
     `SELECT * FROM bookings WHERE client_username = $1 AND status = 'declined' ORDER BY submitted_at DESC`,
@@ -227,7 +271,6 @@ app.get('/client/bookings', requireClient, async (req: AuthRequest, res: Respons
   res.json(result.rows.map(mapBooking));
 });
 
-// ── Resubmit a declined booking ─────────────────────────────────────────────
 app.patch('/client/bookings/:id/resubmit', requireClient, async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const { name, date, perfTime, occasion, venue, rateType, package: pkg, notes, gcashScreenshot } = req.body as {
@@ -263,11 +306,8 @@ app.patch('/client/bookings/:id/resubmit', requireClient, async (req: AuthReques
 });
 
 // ─── CATCH-ALL ────────────────────────────────────────────────────────────────
-// If the request path starts with /admin or /client it's an API call —
-// return JSON 404 instead of the HTML shell so the browser never receives
-// "<!DOCTYPE" when it expects JSON.
 app.use((req: Request, res: Response) => {
-  if (req.path.startsWith('/admin') || req.path.startsWith('/client')) {
+  if (req.path.startsWith('/admin') || req.path.startsWith('/client') || req.path.startsWith('/public')) {
     res.status(404).json({ error: 'Not found' });
     return;
   }
