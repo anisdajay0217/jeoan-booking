@@ -37,6 +37,17 @@ if (!clientToken) {
 function rfInitPage() {
   const w = document.getElementById('rfWelcome');
   if (w) w.innerHTML = '<strong>' + escHtml(clientDisplayName || clientUsername) + '</strong>@' + escHtml(clientUsername);
+
+  // Show toast if redirected back after a successful resubmit (from clientedit.html)
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('resubmitted') === '1') {
+    setTimeout(function () {
+      showToast('🎀 Booking resubmitted! Jeoan will review it shortly.');
+    }, 400);
+    // Clean the URL so refreshing doesn't re-show the toast
+    window.history.replaceState({}, '', 'clientrejectedforms.html');
+  }
+
   rfLoadRejected();
 }
 
@@ -52,9 +63,10 @@ async function rfLoadRejected() {
     });
     if (!res.ok) throw new Error('fetch failed');
     const all  = await res.json();
+    // Filter for declined only — server now returns all statuses
     const data = all.filter(function(b) { return b.status === 'declined'; });
 
-    // Save all bookings into the map
+    // Save all declined bookings into the map
     rfBookingsMap = {};
     data.forEach(function(b) { rfBookingsMap[b.id] = b; });
 
