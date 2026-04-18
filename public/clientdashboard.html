@@ -51,6 +51,7 @@
     .wlc-play-label { font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: #b07080; }
     .wlc-divider { width: 40px; height: 1px; background: linear-gradient(90deg, transparent, #f0c8d4, transparent); margin: 22px auto; }
     .wlc-note { font-size: 11px; color: #b07080; line-height: 1.6; }
+
     .category-toggle { display: flex; gap: 8px; margin-bottom: 8px; }
     .category-btn { flex: 1; position: relative; }
     .category-btn input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -66,8 +67,8 @@
     .category-btn input[type="radio"]:checked + .category-label {
       border-color: #c94f6a; background: #fce8ee; color: #c94f6a;
     }
-    .category-box { display: none; animation: fadeIn .25s ease; }
-    .category-box.show { display: block; }
+    .category-box { display: none; }
+    .category-box.show { display: block; animation: fadeIn .25s ease both; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
@@ -97,20 +98,23 @@
 
 <!-- BOOKING FORM PAGE -->
 <div id="dashPage" style="display:none;">
+
+  <!-- FALLING PETALS (fixed, full page) -->
+  <div class="petals" id="petals"></div>
+
   <div class="hero">
-    <div class="petals" id="petals"></div>
     <div class="hero-content">
       <span class="hero-bow">🎀</span>
       <div class="hero-name">Jeoan Gwyneth<br>Dajay Gran</div>
-      <div class="hero-script">Singer &amp; Host for Hire</div>
-      <div class="hero-tagline">Making your event unforgettable</div>
+      <div class="hero-script">Your Fave Singer &amp; Host for Hire 💅</div>
+      <div class="hero-tagline">Your Event. Her Stage. Let's Goooo! ✨</div>
       <div class="loc-chip">📍 South Cotabato Based</div>
     </div>
   </div>
 
   <div class="form-bg">
     <div class="form-body">
-      <div class="section-head">🎀 Let's Make It Official, Bestie</div>
+      <div class="section-head">🎀 Let's Lock It In, Queen!</div>
 
       <div class="field">
         <label>Your Name, Queen/King *</label>
@@ -196,7 +200,7 @@
               <div class="price-tag" id="songPrice"></div>
             </div>
             <div class="pkg-box" id="hourBox">
-              <p class="field-hint">How many hours? ⏱️</p>
+              <p class="field-hint">How many hours of pure slay? ⏱️</p>
               <select id="hourPkg" onchange="showPrice('hour')">
                 <option value="" disabled selected>— Pick your hours —</option>
                 <option value="1 Hour|₱400">1 Hour — ₱400</option>
@@ -239,7 +243,9 @@
         </div>
       </div>
 
-      <label class="agree-row" for="agreeCheck" onclick="toggleCB()">
+      <!-- ✅ FIX: removed for="agreeCheck" from label — input is already inside it,
+           having both caused a double-toggle that kept the checkbox permanently unchecked -->
+      <label class="agree-row" onclick="toggleCB()">
         <input type="checkbox" id="agreeCheck"/>
         <div class="custom-cb" id="customCB">
           <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
