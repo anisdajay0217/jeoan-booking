@@ -32,6 +32,14 @@ async function sfLoadSubmissions() {
     const res = await fetch(API_BASE + '/client/bookings', {
       headers: { 'Authorization': 'Bearer ' + clientToken }
     });
+    // Session expired or invalid token — send back to login
+    if (res.status === 401 || res.status === 403) {
+      sessionStorage.removeItem('client_token');
+      sessionStorage.removeItem('client_display_name');
+      sessionStorage.removeItem('client_username');
+      window.location.href = 'clientdashboard.html';
+      return;
+    }
     if (!res.ok) throw new Error('fetch failed');
     const all = await res.json();
 
