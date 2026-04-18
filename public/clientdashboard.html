@@ -6,11 +6,179 @@
   <title>Book Jeoan Gwyneth 🎀</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400;700&family=Pinyon+Script&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="client-styles.css"/>
+  <style>
+    #welcomePage {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(150deg, #f5c8d8 0%, #fce8ee 40%, #f0b8c8 80%, #fce8ee 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      z-index: 30;
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    #welcomePage.hide {
+      opacity: 0;
+      transform: translateY(-30px);
+      pointer-events: none;
+    }
+
+    .wlc-petals { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+
+    .wlc-card {
+      position: relative;
+      z-index: 1;
+      width: 90%;
+      max-width: 340px;
+      background: rgba(255,248,250,0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1.5px solid rgba(255,255,255,.85);
+      border-radius: 28px;
+      padding: 40px 28px 36px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(201,79,106,.18);
+      animation: cardIn .5s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: scale(.88) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .wlc-bow {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 12px;
+      animation: sway 3s ease-in-out infinite;
+    }
+    @keyframes sway {
+      0%,100% { transform: rotate(-6deg); }
+      50%      { transform: rotate(6deg); }
+    }
+
+    .wlc-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #c94f6a;
+      line-height: 1.15;
+      margin-bottom: 4px;
+    }
+    .wlc-script {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 20px;
+      color: #b07080;
+      margin-bottom: 6px;
+    }
+    .wlc-tagline {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #b07080;
+      margin-bottom: 6px;
+    }
+    .wlc-loc {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255,255,255,.75);
+      border: 1px solid #f0c8d4;
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 12px;
+      color: #c94f6a;
+      margin-bottom: 28px;
+    }
+
+    /* Play button */
+    .wlc-play-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .wlc-play-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e8728a, #c94f6a);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 28px rgba(201,79,106,.4), 0 0 0 0 rgba(201,79,106,.3);
+      transition: transform .15s, box-shadow .15s;
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+    .wlc-play-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 12px 36px rgba(201,79,106,.5), 0 0 0 0 rgba(201,79,106,.3);
+      animation: none;
+    }
+    .wlc-play-btn:active { transform: scale(.96); }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 8px 28px rgba(201,79,106,.4), 0 0 0 0 rgba(201,79,106,.3); }
+      50%      { box-shadow: 0 8px 28px rgba(201,79,106,.4), 0 0 0 14px rgba(201,79,106,.0); }
+    }
+
+    /* Triangle play icon */
+    .wlc-play-btn svg {
+      width: 28px;
+      height: 28px;
+      margin-left: 4px; /* optical center */
+    }
+
+    .wlc-play-label {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #b07080;
+    }
+
+    .wlc-divider {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #f0c8d4, transparent);
+      margin: 22px auto;
+    }
+    .wlc-note {
+      font-size: 11px;
+      color: #b07080;
+      line-height: 1.6;
+    }
+  </style>
 </head>
 <body>
 
+<!-- WELCOME / LANDING PAGE -->
+<div id="welcomePage">
+  <div class="wlc-petals" id="wlcPetals"></div>
+  <div class="wlc-card">
+    <span class="wlc-bow">🎀</span>
+    <div class="wlc-name">Jeoan Gwyneth<br>Dajay Gran</div>
+    <div class="wlc-script">Singer for Hire</div>
+    <div class="wlc-tagline">Making your event unforgettable</div>
+    <div class="wlc-loc">📍 South Cotabato Based</div>
+
+    <div class="wlc-play-wrap">
+      <button class="wlc-play-btn" onclick="goToBooking()" aria-label="Book now">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 4.5L19.5 12L6 19.5V4.5Z" fill="white"/>
+        </svg>
+      </button>
+      <div class="wlc-play-label">Book Now</div>
+    </div>
+
+    <div class="wlc-divider"></div>
+    <div class="wlc-note">Tap the button above to fill out<br>your booking form 🌸</div>
+  </div>
+</div>
+
 <!-- BOOKING FORM PAGE -->
-<div id="dashPage">
+<div id="dashPage" style="display:none;">
   <div class="hero">
     <div class="petals" id="petals"></div>
     <div class="hero-content">
@@ -182,6 +350,38 @@
 
 <div class="cd-toast" id="cdToast"></div>
 
+<script>
+  function spawnWelcomePetals() {
+    const pc = document.getElementById('wlcPetals');
+    if (!pc) return;
+    ['🌸','🌸','🌷','🌸','🌺','🌸','🌷'].forEach(p => {
+      for (let i = 0; i < (p === '🌸' ? 5 : 3); i++) {
+        const el = document.createElement('div');
+        el.className = 'petal';
+        el.textContent = p;
+        el.style.left = Math.random() * 100 + '%';
+        el.style.setProperty('--sz',  (13 + Math.random() * 12) + 'px');
+        el.style.setProperty('--dur', (5  + Math.random() * 6)  + 's');
+        el.style.setProperty('--del', (Math.random() * 8)       + 's');
+        pc.appendChild(el);
+      }
+    });
+  }
+
+  function goToBooking() {
+    const wp = document.getElementById('welcomePage');
+    wp.classList.add('hide');
+    setTimeout(function() {
+      wp.style.display = 'none';
+      const dp = document.getElementById('dashPage');
+      dp.style.display = '';
+      if (typeof initFormPetals === 'function') initFormPetals();
+      window.scrollTo(0, 0);
+    }, 550);
+  }
+
+  spawnWelcomePetals();
+</script>
 <script src="client-scripts.js"></script>
 <script src="clientdashboard-scripts.js"></script>
 </body>
