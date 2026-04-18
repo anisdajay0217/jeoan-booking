@@ -209,6 +209,16 @@ app.patch('/client/bookings/:id/screenshot', requireClient, async (req: Request,
 // ── Get ALL of client's bookings (all statuses, including declined) ───────────
 // NOTE: clientsubmittedforms-scripts.js filters out 'declined' on the client side.
 //       clientrejectedforms-scripts.js filters for 'declined' on the client side.
+// IMPORTANT: /client/bookings/rejected must be defined BEFORE /client/bookings
+// so Express matches the more specific path first.
+app.get('/client/bookings/rejected', requireClient, async (req: AuthRequest, res: Response) => {
+  const result = await pool.query(
+    `SELECT * FROM bookings WHERE client_username = $1 AND status = 'declined' ORDER BY submitted_at DESC`,
+    [req.user?.username]
+  );
+  res.json(result.rows.map(mapBooking));
+});
+
 app.get('/client/bookings', requireClient, async (req: AuthRequest, res: Response) => {
   const result = await pool.query(
     `SELECT * FROM bookings WHERE client_username = $1 ORDER BY submitted_at DESC`,
