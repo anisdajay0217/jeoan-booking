@@ -2,6 +2,8 @@
    clientdashboard-scripts.js  —  CORE LOGIC
    ============================================================ */
 
+const API_BASE = window.location.origin;
+
 /* ── PETALS (form page) ───────────────────────────────────── */
 function initFormPetals() {
   var pc = document.getElementById('petals');
@@ -135,30 +137,15 @@ function checkSubmit() {
      This stub exists so calls before steps.js loads don't crash. */
 }
 
-/* ── SUBMIT FORM ──────────────────────────────────────────── */
-function submitForm() {
-  var btn = document.getElementById('submitBtn');
-  if (btn.disabled) return;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Submitting…';
+/* ── BUILD PACKAGE STRING ─────────────────────────────────── */
+function buildPackageInfo() {
+  var catVal   = document.querySelector('input[name="categoryType"]:checked');
+  var pkg      = '—';
+  var rateType = 'host';
 
-  setTimeout(function() {
-    buildSummary();
-    document.getElementById('tyScreenshot').src = document.getElementById('gcashPreviewImg').src;
-    document.getElementById('dashPage').style.display = 'none';
-    var ty = document.getElementById('thankYouPage');
-    ty.classList.add('show');
-    spawnSparkles();
-    window.scrollTo(0, 0);
-  }, 1400);
-}
-
-/* ── BUILD THANK YOU SUMMARY ──────────────────────────────── */
-function buildSummary() {
-  var catVal = document.querySelector('input[name="categoryType"]:checked');
-  var pkg    = '—';
   if (catVal) {
     if (catVal.value === 'singer') {
+      rateType = 'singer';
       var rt = document.querySelector('input[name="rateType"]:checked');
       if (rt && rt.value === 'song' && document.getElementById('songPkg').value) {
         var sp = document.getElementById('songPkg').value.split('|');
@@ -168,10 +155,71 @@ function buildSummary() {
         pkg = hp[0] + ' — ' + hp[1];
       }
     } else if (catVal.value === 'host' && document.getElementById('hostPkg').value) {
+      rateType = 'host';
       var hpkg = document.getElementById('hostPkg').value.split('|');
       pkg = hpkg[0] + ' — ' + hpkg[1];
     }
   }
+
+  return { pkg: pkg, rateType: rateType };
+}
+
+/* ── SUBMIT FORM ──────────────────────────────────────────── */
+function submitForm() {
+  var btn = document.getElementById('submitBtn');
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…';
+
+  var pkgInfo  = buildPackageInfo();
+  var gcashSrc = document.getElementById('gcashPreviewImg').src || null;
+
+  var payload = {
+    id:             Date.now(),
+    name:           document.getElementById('clientName').value.trim(),
+    phone:          document.getElementById('clientPhone').value.trim(),
+    date:           document.getElementById('eventDate').value.trim(),
+    perfTime:       document.getElementById('perfTime').value.trim(),
+    occasion:       document.getElementById('occasion').value,
+    venue:          document.getElementById('venue').value.trim(),
+    rateType:       pkgInfo.rateType,
+    package:        pkgInfo.pkg,
+    notes:          document.getElementById('notes').value.trim(),
+    gcashScreenshot: gcashSrc
+  };
+
+  fetch(API_BASE + '/public/bookings', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  })
+  .then(function(res) {
+    if (!res.ok) {
+      return res.json().then(function(data) {
+        throw new Error(data.error || 'Server error');
+      });
+    }
+    return res.json();
+  })
+  .then(function() {
+    buildSummary();
+    document.getElementById('tyScreenshot').src = gcashSrc || '';
+    document.getElementById('dashPage').style.display = 'none';
+    var ty = document.getElementById('thankYouPage');
+    ty.classList.add('show');
+    spawnSparkles();
+    window.scrollTo(0, 0);
+  })
+  .catch(function(err) {
+    btn.disabled = false;
+    btn.innerHTML = '🎀 Submit Booking';
+    showToast('❌ Submission failed: ' + err.message);
+  });
+}
+
+/* ── BUILD THANK YOU SUMMARY ──────────────────────────────── */
+function buildSummary() {
+  var pkgInfo = buildPackageInfo();
 
   var rows = [
     ['Client',   document.getElementById('clientName').value],
@@ -180,7 +228,7 @@ function buildSummary() {
     ['Time',     document.getElementById('perfTime').value],
     ['Occasion', document.getElementById('occasion').value],
     ['Venue',    document.getElementById('venue').value],
-    ['Package',  pkg],
+    ['Package',  pkgInfo.pkg],
     ['Notes',    document.getElementById('notes').value || '—'],
   ];
 
