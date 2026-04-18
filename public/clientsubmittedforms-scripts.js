@@ -10,146 +10,102 @@ const clientUsername    = sessionStorage.getItem('client_username') || '';
 if (!clientToken) {
   window.location.href = 'clientdashboard.html';
 } else {
-  initPage();
+  sfInitPage();
 }
 
 // ════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════
-function initPage() {
+function sfInitPage() {
   const w = document.getElementById('sfWelcome');
-  if (w) w.innerHTML = `<strong>${escHtml(clientDisplayName || clientUsername)}</strong>@${escHtml(clientUsername)}`;
-  loadSubmissions();
+  if (w) w.innerHTML = '<strong>' + escHtml(clientDisplayName || clientUsername) + '</strong>@' + escHtml(clientUsername);
+  sfLoadSubmissions();
 }
 
 // ════════════════════════════════════════════
 // FETCH & RENDER
 // ════════════════════════════════════════════
-async function loadSubmissions() {
-  const area = document.getElementById('submittedArea');
+async function sfLoadSubmissions() {
+  const area = document.getElementById('submissionsArea');
   area.innerHTML = '<div class="cd-spinner-wrap"><div class="cd-spinner"></div></div>';
   try {
-    const res  = await fetch(API_BASE + '/client/bookings', {
+    const res = await fetch(API_BASE + '/client/bookings', {
       headers: { 'Authorization': 'Bearer ' + clientToken }
     });
     if (!res.ok) throw new Error('fetch failed');
-    const all  = await res.json();
-    const data = all.filter(b => b.status === 'pending' || b.status === 'confirmed');
+    const all = await res.json();
 
-    // Badge
-    const badge = document.getElementById('sfBadge');
-    if (badge) badge.textContent = data.length || '';
+    // IMPORTANT: exclude declined — those belong in clientrejectedforms.html
+    const data = all.filter(function(b) { return b.status !== 'declined'; });
 
     if (data.length === 0) {
-      area.innerHTML = `
-        <div class="cd-empty">
-          <span class="cd-ei">📂</span>
-          <p>No submissions yet.<br>Fill out the booking form to get started! 🌸</p>
-        </div>`;
+      area.innerHTML =
+        '<div class="cd-empty">' +
+          '<span class="cd-ei">📂</span>' +
+          '<p>No submissions yet!<br>Submit a booking form to get started. 🌸</p>' +
+        '</div>';
       return;
     }
 
-    // Cards always start collapsed — no sfOpenCardId logic
-    area.innerHTML = data.map(b => buildSfCard(b)).join('');
-
+    area.innerHTML = data.map(function(b) { return buildSfCard(b); }).join('');
   } catch (e) {
-    area.innerHTML = `
-      <div class="cd-empty">
-        <span class="cd-ei">⚠️</span>
-        <p>Could not load your submissions.<br>Please try refreshing the page.</p>
-      </div>`;
+    area.innerHTML =
+      '<div class="cd-empty">' +
+        '<span class="cd-ei">⚠️</span>' +
+        '<p>Could not load submissions.<br>Please try refreshing the page.</p>' +
+      '</div>';
   }
 }
 
 // ════════════════════════════════════════════
-// BUILD CARD HTML  —  cards start COLLAPSED
+// BUILD CARD
 // ════════════════════════════════════════════
 function buildSfCard(b) {
-  const isPending   = b.status === 'pending';
-  const isConfirmed = b.status === 'confirmed';
-  const sc  = isPending ? 'pending' : 'confirmed';
-  const lbl = isPending ? '⏳ Pending' : '✅ Confirmed';
+  const statusClass = b.status === 'confirmed' ? 'confirmed'
+                    : b.status === 'pending'   ? 'pending'
+                    : 'no-ss';
+  const statusLabel = b.status === 'confirmed' ? '✅ Confirmed'
+                    : b.status === 'pending'   ? '⏳ Pending'
+                    : '⚠️ Awaiting Screenshot';
 
-  // Banner
-  let bannerHTML = '';
-  if (isConfirmed) {
-    bannerHTML = `
-      <div class="sf-confirmed-banner">
-        <span class="sf-banner-icon">✅</span>
-        <span>Confirmed on ${formatDate(b.updatedAt)}</span>
-      </div>`;
-    if (b.adminNote) {
-      bannerHTML += `<div class="sf-admin-note"><strong>Note from Jeoan:</strong> ${escHtml(b.adminNote)}</div>`;
-    }
-  } else {
-    bannerHTML = `
-      <div class="sf-pending-banner">
-        <span class="sf-banner-icon">⏳</span>
-        <span>Awaiting review — Jeoan will reach out to you soon! 💕</span>
-      </div>`;
-  }
-
-  // Screenshot
   const ssHTML = b.gcashScreenshot
-    ? `<div class="sf-ss-section">
-         <div class="sf-ss-head">📸 GCash Screenshot</div>
-         <img class="sf-ss-img" src="${b.gcashScreenshot}" alt="GCash Screenshot"/>
-       </div>`
+    ? '<div class="sf-ss-section"><div class="sf-ss-head">📸 GCash Screenshot</div><img class="sf-ss-img" src="' + b.gcashScreenshot + '" alt="GCash Screenshot"/></div>'
+    : '<div class="sf-ss-section"><div class="sf-no-ss">⚠️ No GCash screenshot uploaded yet.</div></div>';
+
+  const adminNoteHTML = b.adminNote
+    ? '<div class="sf-admin-note"><div class="sf-an-head">📝 Admin Note</div><div class="sf-an-body">' + escHtml(b.adminNote) + '</div></div>'
     : '';
 
-  return `
-    <div class="sf-card">
-      <div class="sf-card-header" onclick="sfToggleCard(${b.id})">
-        <span class="sf-status-dot ${sc}"></span>
-        <div class="sf-card-info">
-          <div class="sf-card-name">${escHtml(b.name)}</div>
-          <div class="sf-card-meta">📅 ${escHtml(b.date)} · ${escHtml(b.occasion)} · ${escHtml(b.package)}</div>
-        </div>
-        <div class="sf-card-right">
-          <span class="sf-badge ${sc}">${lbl}</span>
-          <span class="sf-submitted-date">Submitted ${formatDateShort(b.submittedAt)}</span>
-        </div>
-        <span class="sf-chevron" id="sfchev-${b.id}">▼</span>
-      </div>
+  const notesRow = b.notes
+    ? '<div class="sf-detail-item full"><div class="sf-dl">Notes</div><div class="sf-dv">' + escHtml(b.notes) + '</div></div>'
+    : '';
 
-      <!-- Body starts CLOSED (no .open class) -->
-      <div class="sf-card-body" id="sfbody-${b.id}">
-        <div class="sf-detail-grid">
-          <div class="sf-detail-item">
-            <div class="sf-dl">Client Name</div>
-            <div class="sf-dv">${escHtml(b.name)}</div>
-          </div>
-          <div class="sf-detail-item">
-            <div class="sf-dl">Event Date</div>
-            <div class="sf-dv">${escHtml(b.date)}</div>
-          </div>
-          <div class="sf-detail-item">
-            <div class="sf-dl">Performance Time</div>
-            <div class="sf-dv">${escHtml(b.perfTime)}</div>
-          </div>
-          <div class="sf-detail-item">
-            <div class="sf-dl">Occasion</div>
-            <div class="sf-dv">${escHtml(b.occasion)}</div>
-          </div>
-          <div class="sf-detail-item full">
-            <div class="sf-dl">Venue</div>
-            <div class="sf-dv">${escHtml(b.venue)}</div>
-          </div>
-          <div class="sf-detail-item">
-            <div class="sf-dl">Rate Type</div>
-            <div class="sf-dv">${escHtml(b.rateType)}</div>
-          </div>
-          <div class="sf-detail-item">
-            <div class="sf-dl">Package</div>
-            <div class="sf-dv"><span class="sf-pkg-badge">${escHtml(b.package)}</span></div>
-          </div>
-          ${b.notes ? `<div class="sf-detail-item full"><div class="sf-dl">Notes</div><div class="sf-dv">${escHtml(b.notes)}</div></div>` : ''}
-        </div>
-        ${ssHTML}
-        ${bannerHTML}
-        <div class="sf-submitted-time">Submitted: ${formatDate(b.submittedAt)}</div>
-      </div>
-    </div>`;
+  return '<div class="sf-card">' +
+    '<div class="sf-card-header" onclick="sfToggleCard(\'' + b.id + '\')">' +
+      '<span class="sf-status-dot ' + statusClass + '"></span>' +
+      '<div class="sf-card-info">' +
+        '<div class="sf-card-name">' + escHtml(b.name) + '</div>' +
+        '<div class="sf-card-meta">📅 ' + escHtml(b.date) + ' · ' + escHtml(b.occasion) + ' · ' + escHtml(b.package) + '</div>' +
+      '</div>' +
+      '<span class="sf-badge ' + statusClass + '">' + statusLabel + '</span>' +
+      '<span class="sf-chevron" id="sfchev-' + b.id + '">▼</span>' +
+    '</div>' +
+    '<div class="sf-card-body" id="sfbody-' + b.id + '">' +
+      '<div class="sf-detail-grid">' +
+        '<div class="sf-detail-item"><div class="sf-dl">Client Name</div><div class="sf-dv">' + escHtml(b.name) + '</div></div>' +
+        '<div class="sf-detail-item"><div class="sf-dl">Event Date</div><div class="sf-dv">' + escHtml(b.date) + '</div></div>' +
+        '<div class="sf-detail-item"><div class="sf-dl">Performance Time</div><div class="sf-dv">' + escHtml(b.perfTime) + '</div></div>' +
+        '<div class="sf-detail-item"><div class="sf-dl">Occasion</div><div class="sf-dv">' + escHtml(b.occasion) + '</div></div>' +
+        '<div class="sf-detail-item full"><div class="sf-dl">Venue</div><div class="sf-dv">' + escHtml(b.venue) + '</div></div>' +
+        '<div class="sf-detail-item"><div class="sf-dl">Rate Type</div><div class="sf-dv">' + escHtml(b.rateType) + '</div></div>' +
+        '<div class="sf-detail-item"><div class="sf-dl">Package</div><div class="sf-dv"><span class="sf-pkg-badge">' + escHtml(b.package) + '</span></div></div>' +
+        notesRow +
+      '</div>' +
+      ssHTML +
+      adminNoteHTML +
+      '<div class="sf-submitted-time">Submitted: ' + formatDate(b.submittedAt) + '</div>' +
+    '</div>' +
+  '</div>';
 }
 
 // ════════════════════════════════════════════
@@ -159,9 +115,8 @@ function sfToggleCard(id) {
   const body = document.getElementById('sfbody-' + id);
   const chev = document.getElementById('sfchev-' + id);
   if (!body || !chev) return;
-  const isOpen = body.classList.contains('open');
-  body.classList.toggle('open', !isOpen);
-  chev.classList.toggle('open', !isOpen);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
 }
 
 // ════════════════════════════════════════════
@@ -187,10 +142,6 @@ function formatDate(iso) {
        + ' · '
        + d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
 }
-function formatDateShort(iso) {
-  if (!iso) return '';
-  return new Date(iso).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
-}
 function escHtml(s) {
   if (!s) return '';
   return String(s)
@@ -201,5 +152,5 @@ function showToast(msg) {
   const t = document.getElementById('sfToast');
   if (!t) return;
   t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  setTimeout(function() { t.classList.remove('show'); }, 3500);
 }
