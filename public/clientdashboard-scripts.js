@@ -4,7 +4,7 @@
 
 /* ── PETALS (form page) ───────────────────────────────────── */
 function initFormPetals() {
-  const pc = document.getElementById('petals');
+  var pc = document.getElementById('petals');
   if (!pc || pc.children.length > 0) return;
   ['🌸','🌸','🌷','🌸','🌺','🌸','🌷','🌸'].forEach(function(p) {
     var count = p === '🌸' ? 6 : 3;
@@ -72,15 +72,15 @@ function switchRate() {
 /* ── SHOW PRICE ───────────────────────────────────────────── */
 function showPrice(type) {
   if (type === 'song') {
-    var sel = document.getElementById('songPkg');
-    var box = document.getElementById('songPrice');
+    var sel  = document.getElementById('songPkg');
+    var box  = document.getElementById('songPrice');
     if (!sel.value) { box.classList.remove('show'); return; }
     var parts = sel.value.split('|');
     box.innerHTML = '<strong>' + parts[1] + '</strong><span>' + parts[0] + '</span>';
     box.classList.add('show');
   } else {
-    var sel2 = document.getElementById('hourPkg');
-    var box2 = document.getElementById('hourPrice');
+    var sel2  = document.getElementById('hourPkg');
+    var box2  = document.getElementById('hourPrice');
     if (!sel2.value) { box2.classList.remove('show'); return; }
     var parts2 = sel2.value.split('|');
     box2.innerHTML = '<strong>' + parts2[1] + '</strong><span>' + parts2[0] + '</span>';
@@ -111,7 +111,6 @@ function toggleCB() {
 /* ── GCASH UPLOAD ─────────────────────────────────────────── */
 function handleGcashUpload(input) {
   if (!input.files || !input.files[0]) return;
-  var file = input.files[0];
   var reader = new FileReader();
   reader.onload = function(e) {
     document.getElementById('gcashPreviewImg').src = e.target.result;
@@ -119,7 +118,7 @@ function handleGcashUpload(input) {
     document.getElementById('uploadArea').style.display = 'none';
     checkSubmit();
   };
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(input.files[0]);
 }
 
 function reuploadScreenshot() {
@@ -130,41 +129,10 @@ function reuploadScreenshot() {
   checkSubmit();
 }
 
-/* ── VALIDATE & SUBMIT CHECK ──────────────────────────────── */
+/* ── checkSubmit — base version (steps.js will override) ─── */
 function checkSubmit() {
-  var name    = (document.getElementById('clientName').value || '').trim();
-  var phone   = (document.getElementById('clientPhone').value || '').trim();
-  var date    = (document.getElementById('eventDate').value || '').trim();
-  var time    = (document.getElementById('perfTime').value || '').trim();
-  var occ     = (document.getElementById('occasion').value || '').trim();
-  var venue   = (document.getElementById('venue').value || '').trim();
-  var agreed  = document.getElementById('agreeCheck').checked;
-  var hasShot = document.getElementById('gcashPreview').classList.contains('show');
-
-  var catVal  = document.querySelector('input[name="categoryType"]:checked');
-  var pkgOk   = false;
-  if (catVal) {
-    if (catVal.value === 'singer') {
-      var rt = document.querySelector('input[name="rateType"]:checked');
-      if (rt && rt.value === 'song' && document.getElementById('songPkg').value) pkgOk = true;
-      if (rt && rt.value === 'hour' && document.getElementById('hourPkg').value) pkgOk = true;
-    } else if (catVal.value === 'host') {
-      if (document.getElementById('hostPkg').value) pkgOk = true;
-    }
-  }
-
-  var ok = name && phone && date && time && occ && venue && agreed && hasShot && pkgOk;
-  var btn = document.getElementById('submitBtn');
-  btn.disabled = !ok;
-
-  var hint = document.getElementById('submitHintEl');
-  if (ok) {
-    hint.textContent = 'All set! Tap the button below to lock in your booking. 🎀';
-    hint.classList.remove('error');
-  } else {
-    hint.textContent = 'Fill in all required fields and upload your GCash screenshot to proceed.';
-    hint.classList.remove('error');
-  }
+  /* Overridden by clientdashboard-steps.js after load.
+     This stub exists so calls before steps.js loads don't crash. */
 }
 
 /* ── SUBMIT FORM ──────────────────────────────────────────── */
@@ -185,35 +153,35 @@ function submitForm() {
   }, 1400);
 }
 
-/* ── BUILD SUMMARY ────────────────────────────────────────── */
+/* ── BUILD THANK YOU SUMMARY ──────────────────────────────── */
 function buildSummary() {
   var catVal = document.querySelector('input[name="categoryType"]:checked');
   var pkg    = '—';
   if (catVal) {
     if (catVal.value === 'singer') {
       var rt = document.querySelector('input[name="rateType"]:checked');
-      if (rt && rt.value === 'song') {
+      if (rt && rt.value === 'song' && document.getElementById('songPkg').value) {
         var sp = document.getElementById('songPkg').value.split('|');
         pkg = sp[0] + ' — ' + sp[1];
-      } else if (rt && rt.value === 'hour') {
+      } else if (rt && rt.value === 'hour' && document.getElementById('hourPkg').value) {
         var hp = document.getElementById('hourPkg').value.split('|');
         pkg = hp[0] + ' — ' + hp[1];
       }
-    } else {
+    } else if (catVal.value === 'host' && document.getElementById('hostPkg').value) {
       var hpkg = document.getElementById('hostPkg').value.split('|');
       pkg = hpkg[0] + ' — ' + hpkg[1];
     }
   }
 
   var rows = [
-    ['Client',    document.getElementById('clientName').value],
-    ['Contact',   document.getElementById('clientPhone').value],
-    ['Date',      document.getElementById('eventDate').value],
-    ['Time',      document.getElementById('perfTime').value],
-    ['Occasion',  document.getElementById('occasion').value],
-    ['Venue',     document.getElementById('venue').value],
-    ['Package',   pkg],
-    ['Notes',     document.getElementById('notes').value || '—'],
+    ['Client',   document.getElementById('clientName').value],
+    ['Contact',  document.getElementById('clientPhone').value],
+    ['Date',     document.getElementById('eventDate').value],
+    ['Time',     document.getElementById('perfTime').value],
+    ['Occasion', document.getElementById('occasion').value],
+    ['Venue',    document.getElementById('venue').value],
+    ['Package',  pkg],
+    ['Notes',    document.getElementById('notes').value || '—'],
   ];
 
   var html = rows.map(function(r) {
@@ -249,10 +217,19 @@ function closeCancelModal() {
 }
 function doCancelForm() {
   closeCancelModal();
+  // Reset to step 1
+  if (typeof goToStep === 'function') {
+    document.getElementById('step' + currentStep).classList.remove('active');
+    currentStep = 1;
+    document.getElementById('step1').classList.add('active');
+    if (typeof updateProgress === 'function') updateProgress();
+  }
+  // Go back to welcome
   document.getElementById('dashPage').style.display = 'none';
-  document.getElementById('welcomePage').style.display = '';
-  document.getElementById('welcomePage').classList.remove('hide');
-  // reset form
+  var wp = document.getElementById('welcomePage');
+  wp.style.display = '';
+  wp.classList.remove('hide');
+  // Reset all fields
   ['clientName','clientPhone','eventDate','perfTime','venue','notes'].forEach(function(id) {
     document.getElementById(id).value = '';
   });
@@ -272,7 +249,6 @@ function doCancelForm() {
   document.getElementById('agreeCheck').checked = false;
   document.getElementById('customCB').classList.remove('checked');
   reuploadScreenshot();
-  document.getElementById('submitBtn').disabled = true;
   showToast('Form cleared! 🌸');
 }
 
@@ -284,7 +260,7 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 2800);
 }
 
-/* ── LIVE VALIDATION LISTENERS ────────────────────────────── */
+/* ── INIT ─────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   spawnWelcomePetals();
   ['clientName','clientPhone','eventDate','perfTime','venue','notes'].forEach(function(id) {
