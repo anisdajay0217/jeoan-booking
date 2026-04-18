@@ -65,6 +65,26 @@ function closeSidebar() {
   document.getElementById('cdHamburger').textContent = '☰';
 }
 
+// ── THANK YOU PAGE SIDEBAR ────────────────────────────────────────────────────
+function toggleTySidebar() {
+  var s = document.getElementById('tySidebar');
+  var o = document.getElementById('tySidebarOverlay');
+  var b = document.getElementById('tyHamburger');
+  var open = s.classList.toggle('open');
+  o.classList.toggle('show', open);
+  b.textContent = open ? '✕' : '☰';
+}
+function closeTySidebar() {
+  document.getElementById('tySidebar').classList.remove('open');
+  document.getElementById('tySidebarOverlay').classList.remove('show');
+  document.getElementById('tyHamburger').textContent = '☰';
+}
+function goToDashboard(tab) {
+  document.getElementById('thankYouPage').classList.remove('show');
+  document.getElementById('dashPage').style.display = '';
+  showTab(tab);
+}
+
 // ── TABS ─────────────────────────────────────────────────────────────────────
 function showTab(tab) {
   ['tabBooking', 'tabSubmitted', 'tabRejected'].forEach(function (id) {
