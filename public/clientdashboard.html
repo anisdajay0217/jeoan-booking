@@ -21,7 +21,7 @@
     <aside class="cd-sidebar" id="cdSidebar">
       <div class="cd-brand">
         <span class="cd-brand-icon">🎀</span>
-        <div class="cd-brand-name">Jeoan Gwyneth</div>
+        <div class="cd-brand-name">Book Jeoan</div>
         <div class="cd-brand-sub">Client Portal</div>
       </div>
       <nav class="cd-nav">
@@ -38,7 +38,6 @@
       </nav>
       <div class="cd-sidebar-footer">
         <div class="cd-welcome" id="cdWelcome"><strong>Welcome!</strong></div>
-        <button class="cd-signout" onclick="confirmLogout()">⇥ Sign Out</button>
       </div>
     </aside>
 
@@ -93,9 +92,9 @@
                 <p class="field-hint">Pick the number of songs you need 🎵</p>
                 <select id="songPkg" onchange="showPrice('song')">
                   <option value="" disabled selected>— Choose song package —</option>
-                  <option value="1–6 Songs|₱400">1–6 Songs — ₱400</option>
-                  <option value="1–10 Songs|₱450">1–10 Songs — ₱450</option>
-                  <option value="1–15 Songs|₱500">1–15 Songs — ₱500</option>
+                  <option value="1–6 Songs|₱300">1–6 Songs — ₱300</option>
+                  <option value="1–10 Songs|₱350">1–10 Songs — ₱350</option>
+                  <option value="1–15 Songs|₱400">1–15 Songs — ₱400</option>
                   <option value="Band Sub|Negotiable">Band Sub — Negotiable</option>
                 </select>
                 <div class="price-tag" id="songPrice"></div>
@@ -104,9 +103,9 @@
                 <p class="field-hint">Pick how many hours you need her ⏱️</p>
                 <select id="hourPkg" onchange="showPrice('hour')">
                   <option value="" disabled selected>— Choose hour package —</option>
-                  <option value="1 Hour|₱500">1 Hour — ₱500</option>
-                  <option value="1 Hr 30 Mins|₱600">1 Hour 30 Mins — ₱600</option>
-                  <option value="2 Hours|₱650">2 Hours — ₱650</option>
+                  <option value="1 Hour|400">1 Hour — ₱400</option>
+                  <option value="1 Hr 30 Mins|₱450">1 Hour 30 Mins — ₱450</option>
+                  <option value="2 Hours|₱500">2 Hours — ₱500</option>
                 </select>
                 <div class="price-tag" id="hourPrice"></div>
               </div>
@@ -296,19 +295,6 @@
     <div class="cd-edit-actions">
       <button class="cd-edit-btn-cancel" onclick="closeEditModal()">Cancel</button>
       <button class="cd-edit-btn-submit" id="editSubmitBtn" onclick="doResubmit()">🎀 Resubmit Booking</button>
-    </div>
-  </div>
-</div>
-
-<!-- LOGOUT MODAL -->
-<div class="cd-modal-overlay" id="logoutModal">
-  <div class="cd-modal-box">
-    <span class="cd-modal-icon">🎀</span>
-    <div class="cd-modal-title">Sign Out?</div>
-    <div class="cd-modal-msg">Are you sure you want to sign out? You can always come back and book again! 💕</div>
-    <div class="cd-modal-actions">
-      <button class="cd-modal-btn-cancel" onclick="closeLogoutModal()">Stay</button>
-      <button class="cd-modal-btn-confirm" onclick="doLogout()">Sign Out</button>
     </div>
   </div>
 </div>
