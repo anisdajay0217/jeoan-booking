@@ -6,137 +6,13 @@
   <title>Book Jeoan Gwyneth 🎀</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400;700&family=Pinyon+Script&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="clientdashboard-styles.css"/>
-  <style>
-    /* ── WELCOME PAGE ─────────────────────────────────────── */
-    #welcomePage {
-      position: fixed; inset: 0;
-      background: linear-gradient(150deg, #f5c8d8 0%, #fce8ee 40%, #f0b8c8 80%, #fce8ee 100%);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      overflow: hidden; z-index: 30;
-      transition: opacity .55s ease, transform .55s ease;
-    }
-    #welcomePage.hide { opacity: 0; transform: translateY(-30px); pointer-events: none; }
-    .wlc-petals { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
-    .wlc-card {
-      position: relative; z-index: 1; width: 90%; max-width: 340px;
-      background: rgba(255,248,250,0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      border: 1.5px solid rgba(255,255,255,.85); border-radius: 28px; padding: 40px 28px 36px;
-      text-align: center; box-shadow: 0 20px 60px rgba(201,79,106,.18);
-      animation: cardIn .5s cubic-bezier(.34,1.56,.64,1) both;
-    }
-    @keyframes cardIn {
-      from { opacity: 0; transform: scale(.88) translateY(20px); }
-      to   { opacity: 1; transform: scale(1) translateY(0); }
-    }
-    .wlc-bow { font-size: 36px; display: block; margin-bottom: 12px; animation: sway 3s ease-in-out infinite; }
-    @keyframes sway { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
-    .wlc-name { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #c94f6a; line-height: 1.15; margin-bottom: 4px; }
-    .wlc-script { font-family: 'Pinyon Script', cursive; font-size: 20px; color: #b07080; margin-bottom: 6px; }
-    .wlc-tagline { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #b07080; margin-bottom: 6px; }
-    .wlc-loc { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,.75); border: 1px solid #f0c8d4; border-radius: 100px; padding: 4px 14px; font-size: 12px; color: #c94f6a; margin-bottom: 28px; }
-    .wlc-play-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-    .wlc-play-btn {
-      width: 70px; height: 70px; border-radius: 50%;
-      background: linear-gradient(135deg, #e8728a, #c94f6a); border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 8px 28px rgba(201,79,106,.4); transition: transform .15s, box-shadow .15s;
-      animation: pulse 2.2s ease-in-out infinite;
-    }
-    .wlc-play-btn:hover { transform: scale(1.08); animation: none; }
-    .wlc-play-btn:active { transform: scale(.96); }
-    @keyframes pulse {
-      0%,100% { box-shadow: 0 8px 28px rgba(201,79,106,.4), 0 0 0 0 rgba(201,79,106,.3); }
-      50%      { box-shadow: 0 8px 28px rgba(201,79,106,.4), 0 0 0 14px rgba(201,79,106,.0); }
-    }
-    .wlc-play-btn svg { width: 28px; height: 28px; margin-left: 4px; }
-    .wlc-play-label { font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: #b07080; }
-    .wlc-divider { width: 40px; height: 1px; background: linear-gradient(90deg, transparent, #f0c8d4, transparent); margin: 22px auto; }
-    .wlc-note { font-size: 11px; color: #b07080; line-height: 1.6; }
-
-    /* ── CATEGORY TOGGLE (form page) ──────────────────────── */
-    .category-toggle { display: flex; gap: 8px; margin-bottom: 8px; }
-    .category-btn { flex: 1; position: relative; }
-    .category-btn input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
-    .category-label {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 4px; padding: 12px 8px; background: #fff; border: 1.5px solid #f0c8d4; border-radius: 12px;
-      font-size: 12px; color: #b08090; cursor: pointer; transition: all .2s;
-      font-family: 'Lato', sans-serif; text-align: center; line-height: 1.3;
-    }
-    .category-label .cat-icon { font-size: 22px; }
-    .category-label .cat-name { font-size: 12px; font-weight: 700; }
-    .category-label .cat-sub  { font-size: 10px; color: #b08090; }
-    .category-btn input[type="radio"]:checked + .category-label {
-      border-color: #c94f6a; background: #fce8ee; color: #c94f6a;
-    }
-    .category-box { display: none; }
-    .category-box.show { display: block; animation: fadeIn .25s ease both; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* ── CATEGORY MODAL ───────────────────────────────────── */
-    .cm-overlay {
-      position: fixed; inset: 0; background: rgba(58,31,40,.55);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      z-index: 600; display: flex; align-items: center; justify-content: center; padding: 20px;
-      opacity: 0; pointer-events: none; transition: opacity .25s ease;
-    }
-    .cm-overlay.show { opacity: 1; pointer-events: all; }
-    .cm-box {
-      background: #fff8fa; border-radius: 24px; padding: 28px 24px 22px;
-      max-width: 340px; width: 100%; text-align: center;
-      box-shadow: 0 24px 60px rgba(201,79,106,.28);
-      border: 1.5px solid #f0c8d4;
-      transform: scale(.9) translateY(14px);
-      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-      max-height: 90vh; overflow-y: auto;
-    }
-    .cm-overlay.show .cm-box { transform: scale(1) translateY(0); }
-    .cm-icon   { font-size: 36px; display: block; margin-bottom: 8px; animation: sway 3s ease-in-out infinite; }
-    .cm-title  { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #c94f6a; margin-bottom: 4px; }
-    .cm-sub    { font-size: 12px; color: #b08090; margin-bottom: 2px; }
-    .cm-divider { width: 40px; height: 1px; background: linear-gradient(90deg, transparent, #f0c8d4, transparent); margin: 14px auto; }
-    .cm-section-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #b08090; margin-bottom: 10px; }
-    .cm-rate-toggle { display: flex; gap: 8px; margin-bottom: 4px; }
-    .cm-rate-btn {
-      flex: 1; padding: 14px 8px; background: #fff; border: 1.5px solid #f0c8d4; border-radius: 12px;
-      cursor: pointer; transition: all .2s;
-    }
-    .cm-rate-btn:hover { border-color: #c94f6a; background: #fff0f4; }
-    .cm-rate-btn.active { border-color: #c94f6a; background: #fce8ee; }
-    .cm-rate-icon { font-size: 22px; margin-bottom: 4px; }
-    .cm-rate-name { font-size: 12px; font-weight: 700; color: #3a1f28; }
-    .cm-pkg-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-    .cm-pkg-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; background: #fff; border: 1.5px solid #f0c8d4; border-radius: 12px;
-      cursor: pointer; transition: all .2s; text-align: left;
-    }
-    .cm-pkg-item:hover { border-color: #c94f6a; background: #fff0f4; }
-    .cm-pkg-item.active { border-color: #c94f6a; background: #fce8ee; }
-    .cm-pkg-name  { font-size: 13px; font-weight: 700; color: #3a1f28; }
-    .cm-pkg-price { font-size: 14px; font-weight: 700; color: #c94f6a; }
-    .cm-actions { display: flex; gap: 8px; margin-top: 18px; }
-    .cm-btn-cancel {
-      flex: 1; padding: 12px; background: #fff0f4; border: 1.5px solid #f0c8d4; border-radius: 12px;
-      color: #b08090; font-family: 'Lato', sans-serif; font-size: 12px; letter-spacing: 1px;
-      text-transform: uppercase; cursor: pointer; transition: all .15s;
-    }
-    .cm-btn-cancel:hover { background: #f7d6e0; }
-    .cm-btn-confirm {
-      flex: 1; padding: 12px; background: linear-gradient(135deg, #e8728a, #c94f6a);
-      border: none; border-radius: 12px; color: #fff;
-      font-family: 'Lato', sans-serif; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
-      cursor: pointer; box-shadow: 0 4px 14px rgba(201,79,106,.3); transition: all .15s;
-    }
-    .cm-btn-confirm:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(201,79,106,.4); }
-    .cm-btn-confirm:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
-  </style>
+  <link rel="stylesheet" href="clientdashboard-steps.css"/>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════════════════════
      WELCOME PAGE
-════════════════════════════════════════════════════════════ -->
+════════════════════════════════════════════════════════ -->
 <div id="welcomePage">
   <div class="wlc-petals" id="wlcPetals"></div>
   <div class="wlc-card">
@@ -147,9 +23,7 @@
     <div class="wlc-loc">📍 South Cotabato Based</div>
     <div class="wlc-play-wrap">
       <button class="wlc-play-btn" onclick="goToBooking()" aria-label="Book now">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 4.5L19.5 12L6 19.5V4.5Z" fill="white"/>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 4.5L19.5 12L6 19.5V4.5Z" fill="white"/></svg>
       </button>
       <div class="wlc-play-label">Book Now</div>
     </div>
@@ -158,9 +32,9 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════════════════════
      BOOKING FORM PAGE
-════════════════════════════════════════════════════════════ -->
+════════════════════════════════════════════════════════ -->
 <div id="dashPage" style="display:none;">
 
   <div class="petals" id="petals"></div>
@@ -175,189 +49,252 @@
     </div>
   </div>
 
-  <div class="form-bg">
-    <div class="form-body">
-      <div class="section-head">🎀 Let's Lock It In, Queen!</div>
-
-      <div class="field">
-        <label>Your Name, Queen/King *</label>
-        <input type="text" id="clientName" placeholder="What do we call you?"/>
+  <!-- STEP PROGRESS BAR -->
+  <div class="step-progress-wrap">
+    <div class="step-progress-track">
+      <div class="step-progress-fill" id="stepFill"></div>
+    </div>
+    <div class="step-dots">
+      <div class="step-dot active" id="dot1">
+        <div class="dot-circle">1</div>
+        <div class="dot-label">Details</div>
       </div>
-      <div class="field">
-        <label>Contact Number *</label>
-        <input type="text" id="clientPhone" placeholder="e.g. 09XX XXX XXXX" inputmode="tel"/>
+      <div class="step-dot" id="dot2">
+        <div class="dot-circle">2</div>
+        <div class="dot-label">Payment</div>
       </div>
-      <div class="field">
-        <label>Event Date *</label>
-        <input type="text" id="eventDate" placeholder="e.g. June 15, 2025"/>
-      </div>
-      <div class="field">
-        <label>Performance Time *</label>
-        <input type="text" id="perfTime" placeholder="e.g. 6:00 PM — don't be late! 😉"/>
-      </div>
-      <div class="field">
-        <label>Event Occasion *</label>
-        <p class="field-hint">Spill — what are we celebrating? 🎉</p>
-        <select id="occasion">
-          <option value="" disabled selected>— Pick your vibe —</option>
-          <option>Birthday Party</option>
-          <option>Session Vocalist / Band Sub</option>
-          <option>Party</option>
-          <option>Resto Bar</option>
-          <option>Wedding</option>
-          <option>Reception</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Venue Address *</label>
-        <textarea id="venue" rows="2" placeholder="Drop the location, sis…"></textarea>
-      </div>
-
-      <!-- CATEGORY -->
-      <div class="field">
-        <label>What Do You Need? *</label>
-        <p class="field-hint">Choose your slay package 💅 — a pop-up will show the rates!</p>
-        <div class="category-toggle">
-          <div class="category-btn">
-            <input type="radio" name="categoryType" id="catSinger" value="singer" onchange="switchCategory()"/>
-            <label class="category-label" for="catSinger">
-              <span class="cat-icon">🎤</span>
-              <span class="cat-name">Singer Only</span>
-              <span class="cat-sub">Pure vocals, full feels</span>
-            </label>
-          </div>
-          <div class="category-btn">
-            <input type="radio" name="categoryType" id="catHost" value="host" onchange="switchCategory()"/>
-            <label class="category-label" for="catHost">
-              <span class="cat-icon">🎤🎙️</span>
-              <span class="cat-name">Singer + Host</span>
-              <span class="cat-sub">Vocals AND the whole show</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- SINGER RATES (shown after modal confirm) -->
-        <div class="category-box" id="singerBox">
-          <div class="field" style="margin-bottom:0;">
-            <label>Rate Type</label>
-            <div class="rate-toggle">
-              <div class="rate-btn">
-                <input type="radio" name="rateType" id="rateSong" value="song" onchange="switchRate()"/>
-                <label class="rate-label" for="rateSong"><span class="rb"></span> 🎵 Per Song</label>
-              </div>
-              <div class="rate-btn">
-                <input type="radio" name="rateType" id="rateHour" value="hour" onchange="switchRate()"/>
-                <label class="rate-label" for="rateHour"><span class="rb"></span> ⏱️ Per Hour</label>
-              </div>
-            </div>
-            <div class="pkg-box" id="songBox">
-              <p class="field-hint">Pick your song count 🎶</p>
-              <select id="songPkg" onchange="showPrice('song')">
-                <option value="" disabled selected>— Choose your bop package —</option>
-                <option value="1–6 Songs|₱300">1–6 Songs — ₱300</option>
-                <option value="1–10 Songs|₱350">1–10 Songs — ₱350</option>
-                <option value="1–15 Songs|₱400">1–15 Songs — ₱400</option>
-                <option value="Band Sub|Negotiable">Band Sub — Negotiable 💬</option>
-              </select>
-              <div class="price-tag" id="songPrice"></div>
-            </div>
-            <div class="pkg-box" id="hourBox">
-              <p class="field-hint">How many hours of pure slay? ⏱️</p>
-              <select id="hourPkg" onchange="showPrice('hour')">
-                <option value="" disabled selected>— Pick your hours —</option>
-                <option value="1 Hour|₱400">1 Hour — ₱400</option>
-                <option value="1 Hr 30 Mins|₱450">1 Hour 30 Mins — ₱450</option>
-                <option value="2 Hours|₱500">2 Hours — ₱500</option>
-              </select>
-              <div class="price-tag" id="hourPrice"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SINGER + HOST RATES (shown after modal confirm) -->
-        <div class="category-box" id="hostBox">
-          <p class="field-hint">She'll sing AND host — full package energy! 🎙️✨</p>
-          <select id="hostPkg" onchange="showHostPrice()">
-            <option value="" disabled selected>— Choose your full-glam package —</option>
-            <option value="1 Hour|₱800">1 Hour — ₱800</option>
-            <option value="2 Hours|₱900">2 Hours — ₱900</option>
-            <option value="3 Hours|₱1,000">3 Hours — ₱1,000</option>
-          </select>
-          <div class="price-tag" id="hostPrice"></div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Song Requests / Special Notes</label>
-        <textarea id="notes" rows="2" placeholder="Tell her what you want, what you really really want 🎤"></textarea>
-      </div>
-
-      <div class="section-head">📜 The Fine Print (Please Read!)</div>
-      <div class="terms-card">
-        <div class="terms-card-head"><span>🎀 House Rules Before We Slay Together</span></div>
-        <div class="terms-list">
-          <div class="term"><div class="term-dot">1</div><div><strong>Downpayment:</strong> ₱200 non-refundable to lock in your date. Deducted from total!</div></div>
-          <div class="term"><div class="term-dot">2</div><div><strong>Payment:</strong> Remaining balance via Cash or GCash right after the performance. No ghosting! 👻</div></div>
-          <div class="term"><div class="term-dot">3</div><div><strong>Tech Check:</strong> Venue must provide a working sound system and microphone. She brings the voice, you bring the gear! 🎛️</div></div>
-          <div class="term"><div class="term-dot">4</div><div><strong>Early Bird:</strong> She arrives 30 minutes early for soundcheck. ⏰</div></div>
-          <div class="term"><div class="term-dot">5</div><div><strong>Cancellations:</strong> Client cancels = DP forfeited. She cancels due to emergency = 100% full refund. 🤝</div></div>
-          <div class="term"><div class="term-dot">6</div><div><strong>Safety First:</strong> Outdoor venues MUST have a covered area for the performer. ☔</div></div>
-        </div>
-      </div>
-
-      <!-- ✅ CHECKBOX FIX: no onclick on label, no nested label conflict -->
-      <div class="agree-row" id="agreeRow" onclick="toggleCB()" style="cursor:pointer;">
-        <input type="checkbox" id="agreeCheck" style="display:none;"/>
-        <div class="custom-cb" id="customCB">
-          <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <span class="agree-label">Yes, I've read the fine print and I <strong>agree</strong> to all Terms &amp; Conditions. Let's gooo! 🎉</span>
-      </div>
-
-      <div class="section-head">💚 Secure Your Slot via GCash</div>
-      <div class="gcash-form-box">
-        <div class="gcash-form-head"><span>📸</span><span>Send ₱200 &amp; Upload Your Proof</span></div>
-        <div class="gcash-form-body">
-          <div class="gc-inline">
-            <div class="gc-inline-head">💚 GCash Number</div>
-            <div class="gc-inline-body">
-              <div><div class="gc-inline-name">JEOAN GWYNETH G.</div><div class="gc-inline-num">0912 797 7245</div></div>
-              <div class="gc-inline-badge">₱200 DP</div>
-            </div>
-          </div>
-          <p>Send <strong>₱200</strong> to the number above, then upload your GCash confirmation screenshot here. <strong>Screenshot is required</strong> before your booking can be submitted. 💕</p>
-
-          <!-- ✅ UPLOAD FIX: file input outside upload-area to avoid stacking conflicts -->
-          <div class="upload-area" id="uploadArea" onclick="document.getElementById('gcashFile').click()">
-            <span class="upload-icon">📱</span>
-            <span class="upload-label">Tap to upload GCash screenshot</span>
-            <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
-          </div>
-          <input type="file" id="gcashFile" accept="image/*" style="display:none;" onchange="handleGcashUpload(this)"/>
-
-          <div class="gcash-preview" id="gcashPreview">
-            <img id="gcashPreviewImg" src="" alt="GCash Screenshot Preview"/>
-            <div class="gcash-preview-actions">
-              <span class="gcash-preview-label">✅ Screenshot ready</span>
-              <button class="btn-reupload" onclick="reuploadScreenshot()">Change photo</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-head">✅ Lock It In!</div>
-      <div id="submitHintEl" class="submit-hint">Fill in all required fields and upload your GCash screenshot to proceed.</div>
-      <div class="action-bar">
-        <button class="btn-cancel" onclick="confirmCancel()">✕ Cancel</button>
-        <button class="btn-submit" id="submitBtn" onclick="submitForm()" disabled>🎀 Submit Booking</button>
+      <div class="step-dot" id="dot3">
+        <div class="dot-circle">3</div>
+        <div class="dot-label">Confirm</div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- ═══════════════════════════════════════════════════════════
+  <!-- STEP PANELS WRAPPER -->
+  <div class="steps-container">
+
+    <!-- ══════════════════════════════
+         STEP 1 — Booking Details
+    ══════════════════════════════ -->
+    <div class="step-panel active" id="step1">
+      <div class="form-body">
+        <div class="section-head">🎀 Let's Lock It In, Queen!</div>
+
+        <div class="field">
+          <label>Your Name, Queen/King *</label>
+          <input type="text" id="clientName" placeholder="What do we call you?"/>
+        </div>
+        <div class="field">
+          <label>Contact Number *</label>
+          <input type="text" id="clientPhone" placeholder="e.g. 09XX XXX XXXX" inputmode="tel"/>
+        </div>
+        <div class="field">
+          <label>Event Date *</label>
+          <input type="text" id="eventDate" placeholder="e.g. June 15, 2025"/>
+        </div>
+        <div class="field">
+          <label>Performance Time *</label>
+          <input type="text" id="perfTime" placeholder="e.g. 6:00 PM — don't be late! 😉"/>
+        </div>
+        <div class="field">
+          <label>Event Occasion *</label>
+          <p class="field-hint">Spill — what are we celebrating? 🎉</p>
+          <select id="occasion">
+            <option value="" disabled selected>— Pick your vibe —</option>
+            <option>Birthday Party</option>
+            <option>Session Vocalist / Band Sub</option>
+            <option>Party</option>
+            <option>Resto Bar</option>
+            <option>Wedding</option>
+            <option>Reception</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Venue Address *</label>
+          <textarea id="venue" rows="2" placeholder="Drop the location, sis…"></textarea>
+        </div>
+
+        <!-- CATEGORY -->
+        <div class="field">
+          <label>What Do You Need? *</label>
+          <p class="field-hint">Choose your slay package 💅 — rates pop-up will appear!</p>
+          <div class="category-toggle">
+            <div class="category-btn">
+              <input type="radio" name="categoryType" id="catSinger" value="singer" onchange="switchCategory()"/>
+              <label class="category-label" for="catSinger">
+                <span class="cat-icon">🎤</span>
+                <span class="cat-name">Singer Only</span>
+                <span class="cat-sub">Pure vocals, full feels</span>
+              </label>
+            </div>
+            <div class="category-btn">
+              <input type="radio" name="categoryType" id="catHost" value="host" onchange="switchCategory()"/>
+              <label class="category-label" for="catHost">
+                <span class="cat-icon">🎤🎙️</span>
+                <span class="cat-name">Singer + Host</span>
+                <span class="cat-sub">Vocals AND the whole show</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="category-box" id="singerBox">
+            <div class="field" style="margin-bottom:0;">
+              <label>Rate Type</label>
+              <div class="rate-toggle">
+                <div class="rate-btn">
+                  <input type="radio" name="rateType" id="rateSong" value="song" onchange="switchRate()"/>
+                  <label class="rate-label" for="rateSong"><span class="rb"></span> 🎵 Per Song</label>
+                </div>
+                <div class="rate-btn">
+                  <input type="radio" name="rateType" id="rateHour" value="hour" onchange="switchRate()"/>
+                  <label class="rate-label" for="rateHour"><span class="rb"></span> ⏱️ Per Hour</label>
+                </div>
+              </div>
+              <div class="pkg-box" id="songBox">
+                <p class="field-hint">Pick your song count 🎶</p>
+                <select id="songPkg" onchange="showPrice('song')">
+                  <option value="" disabled selected>— Choose your bop package —</option>
+                  <option value="1–6 Songs|₱300">1–6 Songs — ₱300</option>
+                  <option value="1–10 Songs|₱350">1–10 Songs — ₱350</option>
+                  <option value="1–15 Songs|₱400">1–15 Songs — ₱400</option>
+                  <option value="Band Sub|Negotiable">Band Sub — Negotiable 💬</option>
+                </select>
+                <div class="price-tag" id="songPrice"></div>
+              </div>
+              <div class="pkg-box" id="hourBox">
+                <p class="field-hint">How many hours of pure slay? ⏱️</p>
+                <select id="hourPkg" onchange="showPrice('hour')">
+                  <option value="" disabled selected>— Pick your hours —</option>
+                  <option value="1 Hour|₱400">1 Hour — ₱400</option>
+                  <option value="1 Hr 30 Mins|₱450">1 Hour 30 Mins — ₱450</option>
+                  <option value="2 Hours|₱500">2 Hours — ₱500</option>
+                </select>
+                <div class="price-tag" id="hourPrice"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="category-box" id="hostBox">
+            <p class="field-hint">She'll sing AND host — full package energy! 🎙️✨</p>
+            <select id="hostPkg" onchange="showHostPrice()">
+              <option value="" disabled selected>— Choose your full-glam package —</option>
+              <option value="1 Hour|₱800">1 Hour — ₱800</option>
+              <option value="2 Hours|₱900">2 Hours — ₱900</option>
+              <option value="3 Hours|₱1,000">3 Hours — ₱1,000</option>
+            </select>
+            <div class="price-tag" id="hostPrice"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Song Requests / Special Notes</label>
+          <textarea id="notes" rows="2" placeholder="Tell her what you want, what you really really want 🎤"></textarea>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn-cancel" onclick="confirmCancel()">✕ Cancel</button>
+          <button class="btn-next" id="nextTo2" onclick="goToStep(2)">Next →</button>
+        </div>
+        <div class="step-hint" id="step1Hint">Fill in all required fields above to continue.</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         STEP 2 — GCash Payment
+    ══════════════════════════════ -->
+    <div class="step-panel" id="step2">
+      <div class="form-body">
+        <div class="section-head">💚 Secure Your Slot via GCash</div>
+
+        <div class="gcash-form-box">
+          <div class="gcash-form-head"><span>📸</span><span>Send ₱200 &amp; Upload Your Proof</span></div>
+          <div class="gcash-form-body">
+            <div class="gc-inline">
+              <div class="gc-inline-head">💚 GCash Number</div>
+              <div class="gc-inline-body">
+                <div>
+                  <div class="gc-inline-name">JEOAN GWYNETH G.</div>
+                  <div class="gc-inline-num">0912 797 7245</div>
+                </div>
+                <div class="gc-inline-badge">₱200 DP</div>
+              </div>
+            </div>
+            <p>Send <strong>₱200</strong> to the number above, then upload your GCash confirmation screenshot here. <strong>Screenshot is required</strong> before you can continue. 💕</p>
+
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('gcashFile').click()">
+              <span class="upload-icon">📱</span>
+              <span class="upload-label">Tap to upload GCash screenshot</span>
+              <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
+            </div>
+            <input type="file" id="gcashFile" accept="image/*" style="display:none;" onchange="handleGcashUpload(this)"/>
+
+            <div class="gcash-preview" id="gcashPreview">
+              <img id="gcashPreviewImg" src="" alt="GCash Screenshot Preview"/>
+              <div class="gcash-preview-actions">
+                <span class="gcash-preview-label">✅ Screenshot ready</span>
+                <button class="btn-reupload" onclick="reuploadScreenshot()">Change photo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn-back" onclick="goToStep(1)">← Back</button>
+          <button class="btn-next" id="nextTo3" onclick="goToStep(3)">Next →</button>
+        </div>
+        <div class="step-hint" id="step2Hint">Upload your GCash screenshot to continue.</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         STEP 3 — Fine Print + Submit
+    ══════════════════════════════ -->
+    <div class="step-panel" id="step3">
+      <div class="form-body">
+
+        <div class="section-head">🌸 Your Booking Summary</div>
+        <div class="mini-summary cc" id="miniSummary"></div>
+
+        <div class="section-head">📜 The Fine Print (Please Read!)</div>
+        <div class="terms-card">
+          <div class="terms-card-head"><span>🎀 House Rules Before We Slay Together</span></div>
+          <div class="terms-list">
+            <div class="term"><div class="term-dot">1</div><div><strong>Downpayment:</strong> ₱200 non-refundable to lock in your date. Deducted from total!</div></div>
+            <div class="term"><div class="term-dot">2</div><div><strong>Payment:</strong> Remaining balance via Cash or GCash right after the performance. No ghosting! 👻</div></div>
+            <div class="term"><div class="term-dot">3</div><div><strong>Tech Check:</strong> Venue must provide a working sound system and microphone. She brings the voice, you bring the gear! 🎛️</div></div>
+            <div class="term"><div class="term-dot">4</div><div><strong>Early Bird:</strong> She arrives 30 minutes early for soundcheck. ⏰</div></div>
+            <div class="term"><div class="term-dot">5</div><div><strong>Cancellations:</strong> Client cancels = DP forfeited. She cancels due to emergency = 100% full refund. 🤝</div></div>
+            <div class="term"><div class="term-dot">6</div><div><strong>Safety First:</strong> Outdoor venues MUST have a covered area for the performer. ☔</div></div>
+          </div>
+        </div>
+
+        <div class="agree-row" onclick="toggleCB()" style="cursor:pointer;">
+          <input type="checkbox" id="agreeCheck" style="display:none;"/>
+          <div class="custom-cb" id="customCB">
+            <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
+              <path d="M1 4L4 7L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="agree-label">Yes, I've read the fine print and I <strong>agree</strong> to all Terms &amp; Conditions. Let's gooo! 🎉</span>
+        </div>
+
+        <div class="section-head">✅ Lock It In!</div>
+        <div id="submitHintEl" class="submit-hint">Tick the checkbox above to enable the submit button.</div>
+
+        <div class="step-nav">
+          <button class="btn-back" onclick="goToStep(2)">← Back</button>
+          <button class="btn-submit" id="submitBtn" onclick="submitForm()" disabled>🎀 Submit Booking</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /steps-container -->
+</div><!-- /dashPage -->
+
+<!-- ═══════════════════════════════════════════════════════
      THANK YOU PAGE
-════════════════════════════════════════════════════════════ -->
+════════════════════════════════════════════════════════ -->
 <div id="thankYouPage">
   <div class="sparkles" id="sparkles"></div>
   <div class="ty-compact">
@@ -387,18 +324,16 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     CATEGORY MODAL (rates pop-up)
-════════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════
+     CATEGORY MODAL
+════════════════════════════════════════════════════════ -->
 <div class="cm-overlay" id="categoryModal">
-  <div class="cm-box" id="categoryModalContent">
-    <!-- filled dynamically by clientdashboard-modals.js -->
-  </div>
+  <div class="cm-box" id="categoryModalContent"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
+<!-- ═══════════════════════════════════════════════════════
      CANCEL MODAL
-════════════════════════════════════════════════════════════ -->
+════════════════════════════════════════════════════════ -->
 <div class="cd-modal-overlay" id="cancelModal">
   <div class="cd-modal-box">
     <span class="cd-modal-icon">🗑️</span>
@@ -413,11 +348,8 @@
 
 <div class="cd-toast" id="cdToast"></div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     SCRIPTS — load modals first, then core logic
-════════════════════════════════════════════════════════════ -->
 <script src="clientdashboard-modals.js"></script>
 <script src="clientdashboard-scripts.js"></script>
-
+<script src="clientdashboard-steps.js"></script>
 </body>
 </html>
