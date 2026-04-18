@@ -1,16 +1,32 @@
 const API_BASE = window.location.origin;
 
 // ════════════════════════════════════════
-// ALL STATE VARIABLES — declared first
+// STATE
 // ════════════════════════════════════════
 let adminToken = sessionStorage.getItem('admin_token') || null;
 let isLoggedIn = false;
 let currentFilter = 'all';
 let openCardId = null;
 let refreshInterval = null;
+let pendingDeleteId = null;
+
+// Archive stored locally in sessionStorage (soft-delete, server rows untouched)
+function getArchive() {
+  try { return JSON.parse(sessionStorage.getItem('jb_archive') || '[]'); } catch { return []; }
+}
+function saveArchive(arr) { sessionStorage.setItem('jb_archive', JSON.stringify(arr)); }
+function isArchived(id) { return getArchive().some(b => String(b.id) === String(id)); }
+function archiveBooking(booking) {
+  const arr = getArchive();
+  if (!arr.some(b => String(b.id) === String(booking.id))) {
+    arr.unshift({ ...booking, archivedAt: new Date().toISOString() });
+    saveArchive(arr);
+  }
+}
+function restoreFromArchive(id) { saveArchive(getArchive().filter(b => String(b.id) !== String(id))); }
 
 // ════════════════════════════════════════
-// GUARD: no token = back to login
+// GUARD
 // ════════════════════════════════════════
 if (!adminToken) {
   window.location.href = 'admin.html';
@@ -22,16 +38,11 @@ if (!adminToken) {
 // ════════════════════════════════════════
 // AUTH
 // ════════════════════════════════════════
-function confirmLogout() {
-  document.getElementById('logoutModal').classList.add('show');
-}
-function closeLogoutModal() {
-  document.getElementById('logoutModal').classList.remove('show');
-}
+function confirmLogout() { document.getElementById('logoutModal').classList.add('show'); }
+function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
 function doLogout() {
   closeLogoutModal();
-  isLoggedIn = false;
-  adminToken = null;
+  isLoggedIn = false; adminToken = null;
   sessionStorage.removeItem('admin_token');
   window.location.href = 'admin.html';
 }
@@ -40,11 +51,14 @@ function doLogout() {
 // TAB SWITCHING
 // ════════════════════════════════════════
 function switchTab(tab) {
-  document.getElementById('navBookings').classList.toggle('active', tab === 'bookings');
-  document.getElementById('navClients').classList.toggle('active', tab === 'clients');
-  document.getElementById('viewBookings').style.display = tab === 'bookings' ? 'flex' : 'none';
-  document.getElementById('viewClients').style.display  = tab === 'clients'  ? 'flex' : 'none';
-  if (tab === 'clients') loadClients();
+  ['bookings','schedules','archive'].forEach(t => {
+    const nav = document.getElementById('nav' + t.charAt(0).toUpperCase() + t.slice(1));
+    const view = document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (nav) nav.classList.toggle('active', t === tab);
+    if (view) view.style.display = t === tab ? 'flex' : 'none';
+  });
+  if (tab === 'schedules') renderSchedules();
+  if (tab === 'archive')   renderArchive();
 }
 
 // ════════════════════════════════════════
@@ -60,9 +74,9 @@ function loadDashboard() {
 }
 
 // ════════════════════════════════════════
-// BOOKINGS — FETCH & RENDER
+// FETCH
 // ════════════════════════════════════════
-async function fetchBookings() {
+async function fetchBookingsRaw() {
   try {
     const res = await fetch(API_BASE + '/admin/bookings', {
       headers: { 'Authorization': 'Bearer ' + adminToken }
@@ -72,6 +86,14 @@ async function fetchBookings() {
   } catch { return []; }
 }
 
+async function fetchBookings() {
+  const all = await fetchBookingsRaw();
+  return all.filter(b => !isArchived(b.id));
+}
+
+// ════════════════════════════════════════
+// STATS
+// ════════════════════════════════════════
 async function updateStats() {
   const all = await fetchBookings();
   const noSS      = all.filter(b => !b.gcashScreenshot && b.status === 'pending').length;
@@ -88,11 +110,15 @@ async function updateStats() {
   const alertCount = noSS + pending;
   const pb = document.getElementById('navBadgePending');
   pb.textContent = alertCount;
-  pb.className = 'nav-badge' + (noSS > 0 ? ' alert' : '');
+  pb.className = 'nav-badge' + (alertCount > 0 ? ' alert' : '');
 
-  return all;
+  document.getElementById('navBadgeSchedules').textContent = confirmed;
+  document.getElementById('navBadgeArchive').textContent = getArchive().length;
 }
 
+// ════════════════════════════════════════
+// BOOKINGS TAB
+// ════════════════════════════════════════
 async function renderBookings() {
   let all = await fetchBookings();
 
@@ -143,8 +169,7 @@ function formatDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
   return d.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
-       + ' · '
-       + d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
+       + ' · ' + d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
 }
 function setFilter(filter, el) {
   currentFilter = filter;
@@ -159,17 +184,13 @@ function buildCardHTML(b) {
   const ssIcon = b.gcashScreenshot ? '📸 Screenshot' : '⚠️ No Screenshot';
   const isSettled = b.status === 'confirmed' || b.status === 'declined';
 
-  let ssHTML = b.gcashScreenshot
-    ? `<div class="ss-section">
-         <div class="ss-section-head">📸 GCash Screenshot</div>
-         <img class="ss-img" src="${b.gcashScreenshot}" alt="GCash Screenshot"/>
-       </div>`
-    : `<div class="ss-section">
-         <div class="no-ss-warning">
-           <span class="wi">⚠️</span>
-           <div class="wt"><strong>No GCash screenshot provided.</strong><br>This client hasn't uploaded their ₱200 downpayment confirmation yet.</div>
-         </div>
-       </div>`;
+  const ssHTML = b.gcashScreenshot
+    ? `<div class="ss-section"><div class="ss-section-head">📸 GCash Screenshot</div>
+         <img class="ss-img" src="${b.gcashScreenshot}" alt="GCash Screenshot"/></div>`
+    : `<div class="ss-section"><div class="no-ss-warning">
+         <span class="wi">⚠️</span>
+         <div class="wt"><strong>No GCash screenshot provided.</strong><br>This client hasn't uploaded their ₱200 downpayment confirmation yet.</div>
+       </div></div>`;
 
   let actionHTML = '';
   if (b.status === 'confirmed') {
@@ -197,13 +218,17 @@ function buildCardHTML(b) {
       <div class="action-row">
         <button class="btn-confirm" onclick="updateBookingStatus(${b.id},'confirmed')">✅ Confirm</button>
         <button class="btn-decline" onclick="updateBookingStatus(${b.id},'declined')">❌ Decline</button>
+        <button class="btn-archive-booking" onclick="promptDelete(${b.id})" title="Archive">🗂️</button>
       </div>`;
   }
 
-  let noteDisplay = '';
-  if (isSettled && b.adminNote) {
-    noteDisplay = `<div style="margin-top:9px;padding:8px 11px;background:var(--rose-50);border-radius:9px;font-size:12px;color:var(--mauve);"><strong>Note:</strong> ${escHtml(b.adminNote)}</div>`;
-  }
+  const noteDisplay = (isSettled && b.adminNote)
+    ? `<div style="margin-top:9px;padding:8px 11px;background:var(--rose-50);border-radius:9px;font-size:12px;color:var(--mauve);"><strong>Note:</strong> ${escHtml(b.adminNote)}</div>`
+    : '';
+
+  const settledArchiveBtn = isSettled
+    ? `<div style="margin-top:10px;"><button class="btn-archive-booking" style="width:100%" onclick="promptDelete(${b.id})">🗂️ Archive Booking</button></div>`
+    : '';
 
   return `
     <div class="booking-card" id="card-${b.id}">
@@ -230,11 +255,11 @@ function buildCardHTML(b) {
           <div class="detail-item"><div class="dl">Rate Type</div><div class="dv">${escHtml(b.rateType)}</div></div>
           <div class="detail-item"><div class="dl">Package</div><div class="dv"><span class="pkg-badge">${escHtml(b.package)}</span></div></div>
           ${b.notes ? `<div class="detail-item full"><div class="dl">Notes</div><div class="dv">${escHtml(b.notes)}</div></div>` : ''}
-          ${b.clientUsername ? `<div class="detail-item"><div class="dl">Account</div><div class="dv">@${escHtml(b.clientUsername)}</div></div>` : ''}
         </div>
         ${ssHTML}
         ${actionHTML}
         ${noteDisplay}
+        ${settledArchiveBtn}
         <div class="submitted-time">Submitted: ${formatDate(b.submittedAt)}</div>
       </div>
     </div>`;
@@ -243,12 +268,11 @@ function buildCardHTML(b) {
 function toggleCard(id) {
   const body = document.getElementById('body-' + id);
   const chev = document.getElementById('chev-' + id);
+  if (!body) return;
   const isOpen = body.classList.contains('open');
-  if (isOpen) {
-    body.classList.remove('open'); chev.classList.remove('open'); openCardId = null;
-  } else {
-    body.classList.add('open'); chev.classList.add('open'); openCardId = id;
-  }
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+  openCardId = isOpen ? null : id;
 }
 
 async function updateBookingStatus(id, status) {
@@ -262,7 +286,7 @@ async function updateBookingStatus(id, status) {
     });
     showToast(status === 'confirmed' ? '✅ Booking confirmed!' : '❌ Booking declined.');
     updateStats(); renderBookings();
-  } catch (e) { showToast('❌ Error updating booking.'); }
+  } catch { showToast('❌ Error updating booking.'); }
 }
 
 async function revertStatus(id) {
@@ -274,109 +298,187 @@ async function revertStatus(id) {
     });
     showToast('↩️ Booking reverted to pending.');
     updateStats(); renderBookings();
-  } catch (e) { showToast('❌ Error reverting.'); }
+  } catch { showToast('❌ Error reverting.'); }
 }
 
 // ════════════════════════════════════════
-// CLIENTS
+// SCHEDULES TAB
 // ════════════════════════════════════════
-async function loadClients() {
-  const listEl = document.getElementById('clientsList');
-  listEl.innerHTML = '<div class="empty-state"><span class="ei" style="font-size:24px">⏳</span><p>Loading…</p></div>';
-  try {
-    const res = await fetch(API_BASE + '/admin/clients', {
-      headers: { 'Authorization': 'Bearer ' + adminToken }
-    });
-    const clients = await res.json();
-    document.getElementById('clientCount').textContent = clients.length + ' account' + (clients.length === 1 ? '' : 's');
-    document.getElementById('navBadgeClients').textContent = clients.length;
-    if (clients.length === 0) {
-      listEl.innerHTML = '<div class="empty-state"><span class="ei">👤</span><p>No client accounts yet.</p></div>';
-      return;
-    }
-    listEl.innerHTML = clients.map(c => `
-      <div class="client-row" id="cr-${c.id}">
-        <div class="cr-avatar">👤</div>
-        <div class="cr-info">
-          <div class="cr-name">${escHtml(c.display_name)}</div>
-          <div class="cr-user">@${escHtml(c.username)}</div>
-          <div class="cr-date">Created ${formatDate(c.created_at)}</div>
-        </div>
-        <div class="cr-actions">
-          <button class="btn-pw" onclick="resetClientPassword(${c.id},'${escHtml(c.display_name)}')">🔑 Reset PW</button>
-          <button class="btn-del" onclick="deleteClient(${c.id},'${escHtml(c.display_name)}')">🗑️ Delete</button>
-        </div>
+async function renderSchedules() {
+  const area = document.getElementById('schedulesArea');
+  area.innerHTML = '<div class="empty-state"><span class="ei" style="font-size:28px">⏳</span><p>Loading…</p></div>';
+
+  const all = await fetchBookings();
+  const confirmed = all.filter(b => b.status === 'confirmed');
+
+  if (confirmed.length === 0) {
+    area.innerHTML = '<div class="empty-state"><span class="ei">📅</span><p>No confirmed bookings yet.<br>Confirmed bookings will appear here!</p></div>';
+    return;
+  }
+
+  confirmed.sort((a, b) => {
+    const da = new Date(a.date), db = new Date(b.date);
+    if (!isNaN(da) && !isNaN(db)) return da - db;
+    return String(a.date).localeCompare(String(b.date));
+  });
+
+  const groups = {};
+  confirmed.forEach(b => {
+    const d = new Date(b.date);
+    const label = isNaN(d) ? 'Unspecified Date' : d.toLocaleDateString('en-PH', { month: 'long', year: 'numeric' });
+    if (!groups[label]) groups[label] = [];
+    groups[label].push(b);
+  });
+
+  let html = '';
+  Object.entries(groups).forEach(([month, bookings]) => {
+    html += `<div class="schedule-month-label">📅 ${month}</div>`;
+    html += bookings.map(b => buildScheduleCard(b)).join('');
+  });
+  area.innerHTML = html;
+}
+
+function buildScheduleCard(b) {
+  const d = new Date(b.date);
+  const isPast = !isNaN(d) && d < new Date();
+  const day   = isNaN(d) ? '—' : d.getDate();
+  const month = isNaN(d) ? ''  : d.toLocaleDateString('en-PH', { month: 'short' }).toUpperCase();
+  const year  = isNaN(d) ? ''  : d.getFullYear();
+
+  return `
+    <div class="schedule-card${isPast ? ' past' : ''}" id="sched-${b.id}">
+      <div class="schedule-date-col">
+        <div class="schedule-day">${day}</div>
+        <div class="schedule-month">${month}</div>
+        <div class="schedule-year">${year}</div>
       </div>
-    `).join('');
-  } catch (e) {
-    listEl.innerHTML = '<div class="empty-state"><p>Error loading clients.</p></div>';
-  }
+      <div class="schedule-info">
+        <div class="schedule-name">${escHtml(b.name)}</div>
+        <div class="schedule-chips">
+          <span class="chip time">⏰ ${escHtml(b.perfTime)}</span>
+          <span class="chip occasion">${escHtml(b.occasion)}</span>
+          <span class="chip package">${escHtml(b.package)}</span>
+        </div>
+        <div class="schedule-venue">📍 ${escHtml(b.venue)}</div>
+        ${b.phone ? `<div class="schedule-phone">📞 ${escHtml(b.phone)}</div>` : ''}
+        ${b.adminNote ? `<div class="schedule-note">📝 ${escHtml(b.adminNote)}</div>` : ''}
+      </div>
+      <div class="schedule-actions">
+        <button class="btn-done" onclick="markDone(${b.id})">✅ Done</button>
+        <button class="btn-sched-archive" onclick="promptDelete(${b.id})">🗂️ Archive</button>
+      </div>
+    </div>`;
 }
 
-async function createClientAccount() {
-  const displayName = document.getElementById('newDisplayName').value.trim();
-  const username    = document.getElementById('newUsername').value.trim();
-  const password    = document.getElementById('newPassword').value;
-  const errEl = document.getElementById('createError');
-  const sucEl = document.getElementById('createSuccess');
-  const btn   = document.getElementById('createBtn');
-  errEl.classList.remove('show'); sucEl.classList.remove('show');
-  if (!displayName || !username || !password) {
-    errEl.textContent = 'Please fill in all fields.'; errEl.classList.add('show'); return;
-  }
-  if (password.length < 4) {
-    errEl.textContent = 'Password must be at least 4 characters.'; errEl.classList.add('show'); return;
-  }
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Creating…';
-  try {
-    const res = await fetch(API_BASE + '/admin/clients', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
-      body: JSON.stringify({ username, password, displayName })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      errEl.textContent = data.error || 'Could not create account.';
-      errEl.classList.add('show'); btn.disabled = false; btn.innerHTML = '🎀 &nbsp; Create Account'; return;
-    }
-    sucEl.textContent = '✅ Account created! Username: ' + username + ' — Share credentials with client.';
-    sucEl.classList.add('show');
-    document.getElementById('newDisplayName').value = '';
-    document.getElementById('newUsername').value = '';
-    document.getElementById('newPassword').value = '';
-    btn.disabled = false; btn.innerHTML = '🎀 &nbsp; Create Account';
-    loadClients();
-    showToast('✅ Account created for ' + displayName + '!');
-  } catch (e) {
-    errEl.textContent = 'Server error. Please try again.';
-    errEl.classList.add('show'); btn.disabled = false; btn.innerHTML = '🎀 &nbsp; Create Account';
-  }
+function markDone(id) {
+  fetchBookings().then(all => {
+    const b = all.find(x => String(x.id) === String(id));
+    if (b) archiveBooking(b);
+    showToast('✅ Marked as done and archived!');
+    updateStats();
+    renderSchedules();
+  });
 }
 
-async function resetClientPassword(id, name) {
-  const newPw = prompt('Set new password for ' + name + ':');
-  if (!newPw) return;
-  if (newPw.length < 4) { alert('Password must be at least 4 characters.'); return; }
-  try {
-    await fetch(API_BASE + '/admin/clients/' + id + '/password', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
-      body: JSON.stringify({ password: newPw })
-    });
-    showToast('🔑 Password updated for ' + name + '!');
-  } catch (e) { showToast('❌ Error updating password.'); }
+// ════════════════════════════════════════
+// ARCHIVE TAB
+// ════════════════════════════════════════
+function renderArchive() {
+  const area = document.getElementById('archiveArea');
+  const archived = getArchive();
+  document.getElementById('navBadgeArchive').textContent = archived.length;
+
+  if (archived.length === 0) {
+    area.innerHTML = '<div class="empty-state"><span class="ei">🗂️</span><p>Archive is empty.<br>Deleted or finished bookings will appear here.</p></div>';
+    return;
+  }
+  area.innerHTML = archived.map(b => buildArchiveCardHTML(b)).join('');
 }
 
-async function deleteClient(id, name) {
-  if (!confirm('Delete account for ' + name + '? This cannot be undone.')) return;
-  try {
-    await fetch(API_BASE + '/admin/clients/' + id, {
-      method: 'DELETE',
-      headers: { 'Authorization': 'Bearer ' + adminToken }
-    });
-    showToast('🗑️ Account deleted.');
-    loadClients();
-  } catch (e) { showToast('❌ Error deleting account.'); }
+function buildArchiveCardHTML(b) {
+  const archivedDate = b.archivedAt ? formatDate(b.archivedAt) : '';
+  return `
+    <div class="booking-card archived" id="arc-${b.id}">
+      <div class="card-header" onclick="toggleArchiveCard(${b.id})">
+        <span class="status-dot archived"></span>
+        <div class="card-info">
+          <div class="archive-tag">🗂️ Archived · ${escHtml(b.status || '')}</div>
+          <div class="card-name">${escHtml(b.name)}</div>
+          <div class="card-meta">📅 ${escHtml(b.date)} · ${escHtml(b.occasion)} · ${escHtml(b.package)}</div>
+        </div>
+        <span class="chevron" id="arc-chev-${b.id}">▼</span>
+      </div>
+      <div class="card-body" id="arc-body-${b.id}">
+        <div class="detail-grid">
+          <div class="detail-item"><div class="dl">Client Name</div><div class="dv">${escHtml(b.name)}</div></div>
+          ${b.phone ? `<div class="detail-item"><div class="dl">Contact</div><div class="dv">${escHtml(b.phone)}</div></div>` : ''}
+          <div class="detail-item"><div class="dl">Event Date</div><div class="dv">${escHtml(b.date)}</div></div>
+          <div class="detail-item"><div class="dl">Time</div><div class="dv">${escHtml(b.perfTime)}</div></div>
+          <div class="detail-item"><div class="dl">Occasion</div><div class="dv">${escHtml(b.occasion)}</div></div>
+          <div class="detail-item full"><div class="dl">Venue</div><div class="dv">${escHtml(b.venue)}</div></div>
+          <div class="detail-item"><div class="dl">Package</div><div class="dv"><span class="pkg-badge">${escHtml(b.package)}</span></div></div>
+          ${b.notes ? `<div class="detail-item full"><div class="dl">Notes</div><div class="dv">${escHtml(b.notes)}</div></div>` : ''}
+          ${b.adminNote ? `<div class="detail-item full"><div class="dl">Admin Note</div><div class="dv">${escHtml(b.adminNote)}</div></div>` : ''}
+        </div>
+        ${b.gcashScreenshot ? `<div class="ss-section"><div class="ss-section-head">📸 GCash Screenshot</div><img class="ss-img" src="${b.gcashScreenshot}" alt="GCash"/></div>` : ''}
+        <div class="action-row">
+          <button class="btn-restore" onclick="restoreBooking(${b.id})">↩️ Restore</button>
+          <button class="btn-decline" onclick="permanentDelete(${b.id})" style="flex:0 0 auto;padding:11px 16px">🗑️ Delete</button>
+        </div>
+        ${archivedDate ? `<div class="submitted-time">Archived: ${archivedDate}</div>` : ''}
+      </div>
+    </div>`;
+}
+
+function toggleArchiveCard(id) {
+  const body = document.getElementById('arc-body-' + id);
+  const chev = document.getElementById('arc-chev-' + id);
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (chev) chev.classList.toggle('open', !isOpen);
+}
+
+function restoreBooking(id) {
+  restoreFromArchive(id);
+  showToast('↩️ Booking restored!');
+  updateStats(); renderArchive(); renderBookings();
+}
+
+function permanentDelete(id) {
+  saveArchive(getArchive().filter(b => String(b.id) !== String(id)));
+  showToast('🗑️ Permanently deleted.');
+  updateStats(); renderArchive();
+}
+
+function confirmClearArchive() { document.getElementById('clearArchiveModal').classList.add('show'); }
+function doClearArchive() {
+  saveArchive([]);
+  document.getElementById('clearArchiveModal').classList.remove('show');
+  showToast('🗑️ Archive cleared.');
+  updateStats(); renderArchive();
+}
+
+// ════════════════════════════════════════
+// DELETE MODAL
+// ════════════════════════════════════════
+function promptDelete(id) {
+  pendingDeleteId = id;
+  document.getElementById('deleteModal').classList.add('show');
+}
+function closeDeleteModal() {
+  document.getElementById('deleteModal').classList.remove('show');
+  pendingDeleteId = null;
+}
+async function confirmDelete() {
+  if (!pendingDeleteId) return;
+  const id = pendingDeleteId;
+  closeDeleteModal();
+  const all = await fetchBookingsRaw();
+  const b = all.find(x => String(x.id) === String(id));
+  if (b) archiveBooking(b);
+  showToast('🗂️ Moved to archive.');
+  updateStats(); renderBookings();
 }
 
 // ════════════════════════════════════════
@@ -389,5 +491,5 @@ function showToast(msg) {
 }
 function escHtml(s) {
   if (!s) return '';
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
