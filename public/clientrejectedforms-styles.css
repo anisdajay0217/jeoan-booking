@@ -10,6 +10,7 @@
   overflow: hidden;
   transition: all .15s;
   box-shadow: 0 1px 4px rgba(192,57,43,.08);
+  margin-bottom: 10px;
 }
 .rf-card:hover {
   box-shadow: 0 4px 16px rgba(192,57,43,.14);
@@ -50,7 +51,7 @@
 }
 .rf-chevron.open { transform: rotate(180deg); }
 
-/* ── CARD BODY ─────────────────────────── */
+/* ── CARD BODY — hidden by default ────── */
 .rf-card-body {
   display: none;
   border-top: 1px solid #fdecea;
@@ -58,6 +59,7 @@
   animation: rfFade .2s ease;
 }
 .rf-card-body.open { display: block; }
+
 @keyframes rfFade {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0);    }
@@ -90,12 +92,8 @@
   font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
   color: var(--red); font-weight: 700; margin-bottom: 5px;
 }
-.rf-rejection-note .rn-body {
-  font-size: 13px; color: #7a2020; line-height: 1.5;
-}
-.rf-no-note {
-  font-size: 12px; color: var(--muted); font-style: italic;
-}
+.rf-rejection-note .rn-body { font-size: 13px; color: #7a2020; line-height: 1.5; }
+.rf-no-note { font-size: 12px; color: var(--muted); font-style: italic; }
 
 /* ── SCREENSHOT ────────────────────────── */
 .rf-ss-section { margin-bottom: 13px; }
@@ -110,13 +108,14 @@
 
 /* ── EDIT BUTTON ───────────────────────── */
 .rf-edit-btn {
-  width: 100%; padding: 12px;
+  display: block; width: 100%; padding: 12px;
   background: linear-gradient(135deg, #e8728a, var(--rose));
   border: none; border-radius: 10px; color: #fff;
   font-family: 'Lato', sans-serif; font-size: 12px;
   font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
   cursor: pointer; transition: all .15s;
   box-shadow: 0 4px 12px rgba(201,79,106,.3);
+  text-align: center; text-decoration: none;
 }
 .rf-edit-btn:hover {
   transform: translateY(-1px);
@@ -148,8 +147,7 @@
   background: #fff;
   border-radius: 20px;
   width: 100%; max-width: 480px;
-  margin: auto;
-  overflow: hidden;
+  margin: auto; overflow: hidden;
   box-shadow: 0 24px 60px rgba(201,79,106,.3);
   transform: scale(.92) translateY(16px);
   transition: transform .3s cubic-bezier(.34,1.56,.64,1);
@@ -191,7 +189,7 @@
   color: var(--text); font-family: 'Lato', sans-serif;
   font-size: 13px; padding: 9px 12px; outline: none;
   transition: border-color .2s, box-shadow .2s;
-  -webkit-appearance: none; appearance: none;
+  -webkit-appearance: none; appearance: none; box-sizing: border-box;
 }
 .rf-field input[type="text"]:focus,
 .rf-field select:focus,
@@ -207,10 +205,9 @@
 }
 .rf-field textarea { resize: none; }
 .rf-field-hint { font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 5px; }
-
 .rf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-/* RATE TOGGLE IN EDIT MODAL */
+/* RATE TOGGLE */
 .rf-rate-toggle { display: flex; gap: 8px; margin-bottom: 8px; }
 .rf-rate-btn { flex: 1; position: relative; }
 .rf-rate-btn input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -247,7 +244,7 @@
 .rf-price-tag strong { font-size: 14px; display: block; margin-bottom: 2px; }
 .rf-price-tag span { font-size: 11px; color: var(--muted); }
 
-/* SCREENSHOT UPLOAD IN EDIT MODAL */
+/* UPLOAD */
 .rf-upload-area {
   border: 1.5px dashed var(--border); border-radius: 10px;
   padding: 16px 12px; text-align: center; cursor: pointer;
@@ -268,9 +265,7 @@
   width: 100%; max-height: 180px; object-fit: contain;
   border-radius: 8px; border: 1px solid var(--border);
 }
-.rf-preview-actions {
-  display: flex; align-items: center; gap: 8px; margin-top: 6px;
-}
+.rf-preview-actions { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
 .rf-preview-label { font-size: 12px; color: #27ae60; flex: 1; font-weight: 700; }
 .rf-reupload-btn {
   background: none; border: 1.5px solid var(--border);
@@ -279,7 +274,7 @@
 }
 .rf-reupload-btn:hover { border-color: var(--rose); color: var(--rose); }
 
-/* EDIT MODAL FOOTER */
+/* MODAL FOOTER */
 .rf-edit-modal-footer {
   padding: 14px 22px 20px;
   display: flex; gap: 8px; border-top: 1px solid var(--rose-pale);
@@ -311,7 +306,7 @@
 }
 .rf-edit-error.show { display: block; }
 
-/* ── SPINNER ───────────────────────────── */
+/* SPINNER */
 .rf-spinner {
   display: inline-block; width: 11px; height: 11px;
   border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
