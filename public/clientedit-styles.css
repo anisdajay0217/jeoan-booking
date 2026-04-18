@@ -1,0 +1,186 @@
+/* ═══════════════════════════════════════════
+   clientedit-styles.css
+   Standalone Edit & Resubmit Page
+═══════════════════════════════════════════ */
+
+/* ── BACK BUTTON ───────────────────────── */
+.ce-back-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--rose); text-decoration: none; font-weight: 700;
+  margin-bottom: 6px; transition: opacity .15s;
+}
+.ce-back-btn:hover { opacity: .7; }
+
+/* ── REJECTION BANNER ──────────────────── */
+.ce-rejection-banner {
+  padding: 13px 16px;
+  background: var(--red-pale);
+  border: 1.5px solid var(--red-border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.ce-rb-head {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--red); font-weight: 700; margin-bottom: 5px;
+}
+.ce-rb-body { font-size: 13px; color: #7a2020; line-height: 1.5; }
+
+/* ── FORM CARD ─────────────────────────── */
+.ce-form-wrap { max-width: 560px; }
+
+.ce-card {
+  background: #fff;
+  border: 1.5px solid var(--blush);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 2px 12px rgba(201,79,106,.08);
+}
+
+/* ── FIELDS ────────────────────────────── */
+.ce-field { margin-bottom: 13px; }
+.ce-field label {
+  display: block; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 5px; font-weight: 500;
+}
+.ce-field input[type="text"],
+.ce-field select,
+.ce-field textarea {
+  width: 100%; background: var(--rose-50);
+  border: 1.5px solid var(--border); border-radius: 9px;
+  color: var(--text); font-family: 'Lato', sans-serif;
+  font-size: 13px; padding: 9px 12px; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  -webkit-appearance: none; appearance: none; box-sizing: border-box;
+}
+.ce-field input[type="text"]:focus,
+.ce-field select:focus,
+.ce-field textarea:focus {
+  border-color: var(--rose-light);
+  box-shadow: 0 0 0 3px rgba(232,114,138,.1);
+  background: #fff;
+}
+.ce-field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e8728a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px;
+}
+.ce-field textarea { resize: none; }
+.ce-field-hint { font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 6px; }
+
+.ce-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── RATE TOGGLE ───────────────────────── */
+.ce-rate-toggle { display: flex; gap: 8px; margin-bottom: 8px; }
+.ce-rate-btn { flex: 1; position: relative; }
+.ce-rate-btn input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.ce-rate-label {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px; background: #fff; border: 1.5px solid var(--border);
+  border-radius: 9px; font-size: 12px; color: var(--muted);
+  cursor: pointer; transition: all .2s; font-family: 'Lato', sans-serif;
+}
+.ce-rate-label .rb {
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0;
+  transition: all .2s; display: flex; align-items: center; justify-content: center;
+}
+.ce-rate-label .rb::after {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--rose); display: none;
+}
+.ce-rate-btn input[type="radio"]:checked + .ce-rate-label {
+  border-color: var(--rose); background: var(--rose-pale);
+  color: var(--rose); font-weight: 700;
+}
+.ce-rate-btn input[type="radio"]:checked + .ce-rate-label .rb { border-color: var(--rose); }
+.ce-rate-btn input[type="radio"]:checked + .ce-rate-label .rb::after { display: block; }
+
+.ce-pkg-box { display: none; }
+.ce-pkg-box.show { display: block; }
+
+.ce-price-tag {
+  display: none; margin-top: 7px; padding: 9px 12px;
+  background: var(--rose-pale); border: 1.5px solid var(--blush);
+  border-radius: 9px; color: var(--rose); text-align: center; line-height: 1.5;
+}
+.ce-price-tag.show { display: block; }
+.ce-price-tag strong { font-size: 14px; display: block; margin-bottom: 2px; }
+.ce-price-tag span { font-size: 11px; color: var(--muted); }
+
+/* ── UPLOAD ────────────────────────────── */
+.ce-upload-area {
+  border: 1.5px dashed var(--border); border-radius: 10px;
+  padding: 16px 12px; text-align: center; cursor: pointer;
+  transition: all .2s; background: var(--rose-50); position: relative;
+}
+.ce-upload-area:hover { border-color: var(--rose-light); background: var(--rose-pale); }
+.ce-upload-area input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  width: 100%; height: 100%;
+}
+.ce-upload-icon  { font-size: 24px; display: block; margin-bottom: 5px; }
+.ce-upload-label { font-size: 12px; color: var(--rose); font-weight: 700; display: block; margin-bottom: 2px; }
+.ce-upload-sub   { font-size: 10px; color: var(--muted); }
+
+.ce-preview { display: none; margin-top: 9px; }
+.ce-preview.show { display: block; }
+.ce-preview img {
+  width: 100%; max-height: 180px; object-fit: contain;
+  border-radius: 8px; border: 1px solid var(--border);
+}
+.ce-preview-actions {
+  display: flex; align-items: center; gap: 8px; margin-top: 6px;
+}
+.ce-preview-label { font-size: 12px; color: #27ae60; flex: 1; font-weight: 700; }
+.ce-reupload-btn {
+  background: none; border: 1.5px solid var(--border);
+  border-radius: 8px; color: var(--muted); font-family: 'Lato', sans-serif;
+  font-size: 10px; padding: 4px 10px; cursor: pointer; transition: all .15s;
+}
+.ce-reupload-btn:hover { border-color: var(--rose); color: var(--rose); }
+
+/* ── ERROR ─────────────────────────────── */
+.ce-error {
+  padding: 9px 12px; background: var(--red-pale);
+  border: 1px solid var(--red-border); border-radius: 9px;
+  font-size: 12px; color: var(--red); display: none; margin-bottom: 12px;
+}
+.ce-error.show { display: block; }
+
+/* ── ACTION BUTTONS ────────────────────── */
+.ce-actions {
+  display: flex; gap: 10px; margin-top: 6px;
+  padding-top: 16px; border-top: 1px solid var(--rose-pale);
+}
+.ce-btn-cancel {
+  flex: 1; padding: 13px; background: var(--rose-50);
+  border: 1.5px solid var(--blush); border-radius: 11px;
+  color: var(--mauve); font-family: 'Lato', sans-serif;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all .15s; text-align: center;
+  text-decoration: none; display: flex; align-items: center; justify-content: center;
+}
+.ce-btn-cancel:hover { background: var(--blush); }
+.ce-btn-submit {
+  flex: 2; padding: 13px;
+  background: linear-gradient(135deg, var(--rose-light), var(--rose));
+  border: none; border-radius: 11px; color: #fff;
+  font-family: 'Lato', sans-serif; font-size: 11px;
+  font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer; transition: all .15s;
+  box-shadow: 0 4px 14px rgba(201,79,106,.3);
+}
+.ce-btn-submit:hover  { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(201,79,106,.4); }
+.ce-btn-submit:active { transform: scale(.98); }
+.ce-btn-submit:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+/* ── SPINNER ───────────────────────────── */
+.ce-spinner {
+  display: inline-block; width: 11px; height: 11px;
+  border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+  border-radius: 50%; animation: ceSpin .7s linear infinite;
+  vertical-align: middle; margin-right: 5px;
+}
+@keyframes ceSpin { to { transform: rotate(360deg); } }
