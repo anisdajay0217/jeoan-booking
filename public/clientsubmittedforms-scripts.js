@@ -1,12 +1,10 @@
 // ════════════════════════════════════════════
-// STATE — declared first
+// STATE
 // ════════════════════════════════════════════
 const API_BASE          = window.location.origin;
 const clientToken       = sessionStorage.getItem('client_token');
 const clientDisplayName = sessionStorage.getItem('client_display_name') || '';
 const clientUsername    = sessionStorage.getItem('client_username') || '';
-
-let sfOpenCardId = null;
 
 // ── Auth guard ──────────────────────────────
 if (!clientToken) {
@@ -36,11 +34,12 @@ async function loadSubmissions() {
     });
     if (!res.ok) throw new Error('fetch failed');
     const all  = await res.json();
-    // Only show pending + confirmed (not declined)
     const data = all.filter(b => b.status === 'pending' || b.status === 'confirmed');
-    // Update badge
+
+    // Badge
     const badge = document.getElementById('sfBadge');
     if (badge) badge.textContent = data.length || '';
+
     if (data.length === 0) {
       area.innerHTML = `
         <div class="cd-empty">
@@ -49,14 +48,10 @@ async function loadSubmissions() {
         </div>`;
       return;
     }
+
+    // Cards always start collapsed — no sfOpenCardId logic
     area.innerHTML = data.map(b => buildSfCard(b)).join('');
-    // Re-open previously open card
-    if (sfOpenCardId) {
-      const body = document.getElementById('sfbody-' + sfOpenCardId);
-      const chev = document.getElementById('sfchev-' + sfOpenCardId);
-      if (body) body.classList.add('open');
-      if (chev) chev.classList.add('open');
-    }
+
   } catch (e) {
     area.innerHTML = `
       <div class="cd-empty">
@@ -67,7 +62,7 @@ async function loadSubmissions() {
 }
 
 // ════════════════════════════════════════════
-// BUILD CARD HTML
+// BUILD CARD HTML  —  cards start COLLAPSED
 // ════════════════════════════════════════════
 function buildSfCard(b) {
   const isPending   = b.status === 'pending';
@@ -116,15 +111,38 @@ function buildSfCard(b) {
         </div>
         <span class="sf-chevron" id="sfchev-${b.id}">▼</span>
       </div>
+
+      <!-- Body starts CLOSED (no .open class) -->
       <div class="sf-card-body" id="sfbody-${b.id}">
         <div class="sf-detail-grid">
-          <div class="sf-detail-item"><div class="sf-dl">Client Name</div><div class="sf-dv">${escHtml(b.name)}</div></div>
-          <div class="sf-detail-item"><div class="sf-dl">Event Date</div><div class="sf-dv">${escHtml(b.date)}</div></div>
-          <div class="sf-detail-item"><div class="sf-dl">Performance Time</div><div class="sf-dv">${escHtml(b.perfTime)}</div></div>
-          <div class="sf-detail-item"><div class="sf-dl">Occasion</div><div class="sf-dv">${escHtml(b.occasion)}</div></div>
-          <div class="sf-detail-item full"><div class="sf-dl">Venue</div><div class="sf-dv">${escHtml(b.venue)}</div></div>
-          <div class="sf-detail-item"><div class="sf-dl">Rate Type</div><div class="sf-dv">${escHtml(b.rateType)}</div></div>
-          <div class="sf-detail-item"><div class="sf-dl">Package</div><div class="sf-dv"><span class="sf-pkg-badge">${escHtml(b.package)}</span></div></div>
+          <div class="sf-detail-item">
+            <div class="sf-dl">Client Name</div>
+            <div class="sf-dv">${escHtml(b.name)}</div>
+          </div>
+          <div class="sf-detail-item">
+            <div class="sf-dl">Event Date</div>
+            <div class="sf-dv">${escHtml(b.date)}</div>
+          </div>
+          <div class="sf-detail-item">
+            <div class="sf-dl">Performance Time</div>
+            <div class="sf-dv">${escHtml(b.perfTime)}</div>
+          </div>
+          <div class="sf-detail-item">
+            <div class="sf-dl">Occasion</div>
+            <div class="sf-dv">${escHtml(b.occasion)}</div>
+          </div>
+          <div class="sf-detail-item full">
+            <div class="sf-dl">Venue</div>
+            <div class="sf-dv">${escHtml(b.venue)}</div>
+          </div>
+          <div class="sf-detail-item">
+            <div class="sf-dl">Rate Type</div>
+            <div class="sf-dv">${escHtml(b.rateType)}</div>
+          </div>
+          <div class="sf-detail-item">
+            <div class="sf-dl">Package</div>
+            <div class="sf-dv"><span class="sf-pkg-badge">${escHtml(b.package)}</span></div>
+          </div>
           ${b.notes ? `<div class="sf-detail-item full"><div class="sf-dl">Notes</div><div class="sf-dv">${escHtml(b.notes)}</div></div>` : ''}
         </div>
         ${ssHTML}
@@ -134,15 +152,16 @@ function buildSfCard(b) {
     </div>`;
 }
 
+// ════════════════════════════════════════════
+// TOGGLE CARD
+// ════════════════════════════════════════════
 function sfToggleCard(id) {
   const body = document.getElementById('sfbody-' + id);
   const chev = document.getElementById('sfchev-' + id);
+  if (!body || !chev) return;
   const isOpen = body.classList.contains('open');
-  if (isOpen) {
-    body.classList.remove('open'); chev.classList.remove('open'); sfOpenCardId = null;
-  } else {
-    body.classList.add('open');   chev.classList.add('open');    sfOpenCardId = id;
-  }
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
 }
 
 // ════════════════════════════════════════════
@@ -174,7 +193,9 @@ function formatDateShort(iso) {
 }
 function escHtml(s) {
   if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function showToast(msg) {
   const t = document.getElementById('sfToast');
