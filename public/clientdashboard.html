@@ -459,9 +459,14 @@
 
 <script src="client-scripts.js"></script>
 <script>
+// ════════════════════════════════════════════
+// BOOKING MAP — stores full booking objects
+// keyed by id. The edit button passes only
+// the id — never JSON in HTML attributes.
+// ════════════════════════════════════════════
+var _bookingsMap = {};
+
 // ── AUTH GUARD ───────────────────────────────────────────────────────────────
-// Verify token against server before showing dashboard.
-// This prevents the flash-then-redirect caused by stale sessionStorage.
 (async function guard() {
   var token = sessionStorage.getItem('client_token');
   if (!token) { window.location.replace('client.html'); return; }
@@ -507,8 +512,12 @@ function closeSidebar() {
 
 // ── TABS ─────────────────────────────────────────────────────────────────────
 function showTab(tab) {
-  ['tabBooking','tabSubmitted','tabRejected'].forEach(function(id){document.getElementById(id).style.display='none';});
-  ['navBooking','navSubmitted','navRejected'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  ['tabBooking','tabSubmitted','tabRejected'].forEach(function(id){
+    document.getElementById(id).style.display = 'none';
+  });
+  ['navBooking','navSubmitted','navRejected'].forEach(function(id){
+    document.getElementById(id).classList.remove('active');
+  });
   if (tab === 'booking') {
     document.getElementById('tabBooking').style.display = '';
     document.getElementById('navBooking').classList.add('active');
@@ -526,26 +535,30 @@ function showTab(tab) {
 // ── STATUS BADGE ─────────────────────────────────────────────────────────────
 function statusBadge(status) {
   var map = {
-    'pending':  '<span class="status-badge status-pending">⏳ Pending</span>',
-    'approved': '<span class="status-badge status-approved">✅ Approved</span>',
-    'declined': '<span class="status-badge status-declined">✖ Declined</span>'
+    'pending':   '<span class="status-badge status-pending">⏳ Pending</span>',
+    'confirmed': '<span class="status-badge status-approved">✅ Confirmed</span>',
+    'approved':  '<span class="status-badge status-approved">✅ Approved</span>',
+    'declined':  '<span class="status-badge status-declined">✖ Declined</span>'
   };
   return map[status] || '<span class="status-badge status-pending">' + escHtml(status) + '</span>';
 }
 
 // ── BOOKING CARD ─────────────────────────────────────────────────────────────
+// SAFE: only passes b.id (a plain number) into onclick — no JSON in attributes.
 function bookingCard(b, rejected) {
   var ssHtml = '';
   if (b.gcashScreenshot) {
     ssHtml = '<div class="bk-screenshot">'
       + '<div class="bk-ss-label">📱 GCash Screenshot — tap to view</div>'
-      + '<img src="' + escHtml(b.gcashScreenshot) + '" alt="GCash screenshot" onclick="openLightbox(\'' + escHtml(b.gcashScreenshot) + '\')" />'
+      + '<img src="' + escHtml(b.gcashScreenshot) + '" alt="GCash screenshot"'
+      + ' onclick="openLightbox(this.src);event.stopPropagation();" />'
       + '</div>';
   }
   var actionsHtml = '';
   if (rejected) {
     actionsHtml = '<div class="bk-card-actions">'
-      + '<button class="bk-btn-edit" onclick="openEditModal(' + JSON.stringify(b).replace(/'/g,"&#39;") + ')">✏️ Edit &amp; Resubmit</button>'
+      + '<button class="bk-btn-edit" onclick="openEditModal(' + b.id + ')">'
+      + '✏️ Edit &amp; Resubmit</button>'
       + '</div>';
   }
   return '<div class="bk-card">'
@@ -576,9 +589,12 @@ async function loadSubmissions() {
     var res = await fetch(window.location.origin + '/client/bookings', {
       headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('client_token') }
     });
+    if (res.status === 401 || res.status === 403) { doLogout(); return; }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     var data = await res.json();
-    var list = Array.isArray(data) ? data : (data.bookings || []);
+    // Filter out declined — those belong in the Rejected tab
+    var list = (Array.isArray(data) ? data : (data.bookings || []))
+      .filter(function(b) { return b.status !== 'declined'; });
     el.innerHTML = list.length
       ? list.map(function(b) { return bookingCard(b, false); }).join('')
       : '<div class="cd-empty"><span class="cd-ei">📂</span><p>No submissions yet.<br>Fill out the Booking Form to get started! 🌸</p></div>';
@@ -595,9 +611,15 @@ async function loadRejected() {
     var res = await fetch(window.location.origin + '/client/bookings/rejected', {
       headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('client_token') }
     });
+    if (res.status === 401 || res.status === 403) { doLogout(); return; }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     var data = await res.json();
     var list = Array.isArray(data) ? data : (data.bookings || []);
+
+    // Store all rejected bookings in the map keyed by id
+    _bookingsMap = {};
+    list.forEach(function(b) { _bookingsMap[b.id] = b; });
+
     el.innerHTML = list.length
       ? list.map(function(b) { return bookingCard(b, true); }).join('')
       : '<div class="cd-empty"><span class="cd-ei">🎉</span><p>No rejected bookings — you\'re all good! 🌸</p></div>';
@@ -610,29 +632,32 @@ async function loadRejected() {
 function openLightbox(src) {
   document.getElementById('cdLightboxImg').src = src;
   document.getElementById('cdLightbox').classList.add('show');
-  event.stopPropagation();
 }
 function closeLightbox() {
   document.getElementById('cdLightbox').classList.remove('show');
   document.getElementById('cdLightboxImg').src = '';
 }
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'Escape') { closeLightbox(); closeEditModal(); }
 });
 
 // ── EDIT / RESUBMIT MODAL ────────────────────────────────────────────────────
 var editNewScreenshot = null;
 
-function openEditModal(b) {
+// Accepts only the booking ID — looks up full data from _bookingsMap.
+// This is the key fix: no JSON ever passes through an HTML onclick attribute.
+function openEditModal(id) {
+  var b = _bookingsMap[id];
+  if (!b) { console.error('Booking not found in map:', id); return; }
   editNewScreenshot = null;
-  document.getElementById('editBookingId').value = b.id;
-  document.getElementById('editName').value = b.name || '';
-  document.getElementById('editDate').value = b.date || '';
-  document.getElementById('editPerfTime').value = b.perfTime || '';
-  document.getElementById('editOccasion').value = b.occasion || '';
-  document.getElementById('editVenue').value = b.venue || '';
-  document.getElementById('editPackage').value = b.package || '';
-  document.getElementById('editNotes').value = b.notes || '';
+  document.getElementById('editBookingId').value   = b.id;
+  document.getElementById('editName').value         = b.name      || '';
+  document.getElementById('editDate').value         = b.date      || '';
+  document.getElementById('editPerfTime').value     = b.perfTime  || '';
+  document.getElementById('editOccasion').value     = b.occasion  || '';
+  document.getElementById('editVenue').value        = b.venue     || '';
+  document.getElementById('editPackage').value      = b.package   || '';
+  document.getElementById('editNotes').value        = b.notes     || '';
   var preview = document.getElementById('editSsPreview');
   if (b.gcashScreenshot) {
     preview.src = b.gcashScreenshot;
@@ -645,6 +670,7 @@ function openEditModal(b) {
   document.getElementById('editError').classList.remove('show');
   document.getElementById('editError').textContent = '';
   document.getElementById('editSubmitBtn').disabled = false;
+  document.getElementById('editSubmitBtn').textContent = '🎀 Resubmit Booking';
   document.getElementById('cdEditOverlay').classList.add('show');
 }
 
@@ -663,7 +689,7 @@ function handleEditScreenshot(input) {
       var maxDim = 900, w = img.width, h = img.height;
       if (w > maxDim || h > maxDim) {
         if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-        else { w = Math.round(w * maxDim / h); h = maxDim; }
+        else       { w = Math.round(w * maxDim / h); h = maxDim; }
       }
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
@@ -690,13 +716,14 @@ async function doResubmit() {
   errEl.classList.remove('show');
   if (!name || !date || !perfTime || !occasion || !venue) {
     errEl.textContent = 'Please fill in all required fields.';
-    errEl.classList.add('show'); return;
+    errEl.classList.add('show');
+    return;
   }
   var btn = document.getElementById('editSubmitBtn');
   btn.disabled = true;
   btn.textContent = '⏳ Submitting…';
   try {
-    var body = { name, date, perfTime, occasion, venue, package: pkg, notes };
+    var body = { name: name, date: date, perfTime: perfTime, occasion: occasion, venue: venue, package: pkg, notes: notes };
     if (editNewScreenshot) body.gcashScreenshot = editNewScreenshot;
     var res = await fetch(window.location.origin + '/client/bookings/' + id + '/resubmit', {
       method: 'PATCH',
@@ -707,10 +734,12 @@ async function doResubmit() {
       body: JSON.stringify(body)
     });
     if (!res.ok) {
-      var err = await res.json().catch(function(){return{};});
+      var err = await res.json().catch(function() { return {}; });
       errEl.textContent = err.error || 'Could not resubmit. Please try again.';
       errEl.classList.add('show');
-      btn.disabled = false; btn.textContent = '🎀 Resubmit Booking'; return;
+      btn.disabled = false;
+      btn.textContent = '🎀 Resubmit Booking';
+      return;
     }
     closeEditModal();
     showToast('✅ Booking resubmitted! Jeoan will review it shortly 💕');
@@ -718,7 +747,8 @@ async function doResubmit() {
   } catch(e) {
     errEl.textContent = 'Cannot connect to server. Please try again.';
     errEl.classList.add('show');
-    btn.disabled = false; btn.textContent = '🎀 Resubmit Booking';
+    btn.disabled = false;
+    btn.textContent = '🎀 Resubmit Booking';
   }
 }
 
@@ -727,13 +757,14 @@ function showToast(msg) {
   var t = document.getElementById('cdToast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 3200);
+  setTimeout(function() { t.classList.remove('show'); }, 3200);
 }
 
 // ── LOGOUT ───────────────────────────────────────────────────────────────────
-function confirmLogout(){ document.getElementById('logoutModal').classList.add('show'); }
-function closeLogoutModal(){ document.getElementById('logoutModal').classList.remove('show'); }
-function closeCancelModal(){ document.getElementById('cancelModal').classList.remove('show'); }
+function confirmLogout() { document.getElementById('logoutModal').classList.add('show'); }
+function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
+function confirmCancel() { document.getElementById('cancelModal').classList.add('show'); }
+function closeCancelModal() { document.getElementById('cancelModal').classList.remove('show'); }
 
 function doLogout() {
   closeLogoutModal();
