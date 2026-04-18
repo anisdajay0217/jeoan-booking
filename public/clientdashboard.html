@@ -198,6 +198,31 @@
 
 <!-- THANK YOU PAGE -->
 <div id="thankYouPage">
+  <button class="cd-hamburger" id="tyHamburger" onclick="toggleTySidebar()">☰</button>
+  <div class="cd-sidebar-overlay" id="tySidebarOverlay" onclick="closeTySidebar()"></div>
+  <aside class="cd-sidebar" id="tySidebar">
+    <div class="cd-brand">
+      <span class="cd-brand-icon">🎀</span>
+      <div class="cd-brand-name">Jeoan Gwyneth</div>
+      <div class="cd-brand-sub">Client Portal</div>
+    </div>
+    <nav class="cd-nav">
+      <div class="cd-nav-label">Menu</div>
+      <a class="cd-nav-item" onclick="goToDashboard('booking');closeTySidebar();">
+        <span class="ni">📋</span> Booking Form
+      </a>
+      <a class="cd-nav-item" onclick="goToDashboard('submitted');closeTySidebar();">
+        <span class="ni">📂</span> My Submissions
+      </a>
+      <a class="cd-nav-item" onclick="goToDashboard('rejected');closeTySidebar();">
+        <span class="ni">✖</span> Rejected
+      </a>
+    </nav>
+    <div class="cd-sidebar-footer">
+      <div class="cd-welcome" id="tyWelcome"></div>
+      <button class="cd-signout" onclick="confirmLogout()">⇥ Sign Out</button>
+    </div>
+  </aside>
   <div class="sparkles" id="sparkles"></div>
   <div class="ty-compact">
     <div class="ty-top">
