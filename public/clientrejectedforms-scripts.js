@@ -6,8 +6,8 @@ const clientToken       = sessionStorage.getItem('client_token');
 const clientDisplayName = sessionStorage.getItem('client_display_name') || '';
 const clientUsername    = sessionStorage.getItem('client_username') || '';
 
-// THE FIX: bookings stored here after fetch, keyed by id.
-// The edit button just passes the id — no JSON in HTML attributes.
+// Bookings stored in memory after fetch — keyed by id.
+// Button passes only the id. No JSON ever goes in HTML attributes.
 let rfBookingsMap   = {};
 let rfEditImageData = null;
 let rfExistingImage = null;
@@ -36,7 +36,7 @@ if (!clientToken) {
 // ════════════════════════════════════════════
 function rfInitPage() {
   const w = document.getElementById('rfWelcome');
-  if (w) w.innerHTML = `<strong>${escHtml(clientDisplayName || clientUsername)}</strong>@${escHtml(clientUsername)}`;
+  if (w) w.innerHTML = '<strong>' + escHtml(clientDisplayName || clientUsername) + '</strong>@' + escHtml(clientUsername);
   rfLoadRejected();
 }
 
@@ -52,105 +52,99 @@ async function rfLoadRejected() {
     });
     if (!res.ok) throw new Error('fetch failed');
     const all  = await res.json();
-    const data = all.filter(b => b.status === 'declined');
+    const data = all.filter(function(b) { return b.status === 'declined'; });
 
-    // Store in map — button will pass id, we look up here
+    // Save all bookings into the map
     rfBookingsMap = {};
-    data.forEach(b => { rfBookingsMap[b.id] = b; });
+    data.forEach(function(b) { rfBookingsMap[b.id] = b; });
 
     // Badge
     const badge = document.getElementById('rfBadge');
     if (badge) badge.textContent = data.length || '';
 
     if (data.length === 0) {
-      area.innerHTML = `
-        <div class="cd-empty">
-          <span class="cd-ei">🎉</span>
-          <p>No rejected bookings!<br>All your bookings are looking good. 🌸</p>
-        </div>`;
+      area.innerHTML =
+        '<div class="cd-empty">' +
+          '<span class="cd-ei">🎉</span>' +
+          '<p>No rejected bookings!<br>All your bookings are looking good. 🌸</p>' +
+        '</div>';
       return;
     }
 
-    area.innerHTML = data.map(b => buildRfCard(b)).join('');
+    area.innerHTML = data.map(function(b) { return buildRfCard(b); }).join('');
   } catch (e) {
-    area.innerHTML = `
-      <div class="cd-empty">
-        <span class="cd-ei">⚠️</span>
-        <p>Could not load rejected bookings.<br>Please try refreshing the page.</p>
-      </div>`;
+    area.innerHTML =
+      '<div class="cd-empty">' +
+        '<span class="cd-ei">⚠️</span>' +
+        '<p>Could not load rejected bookings.<br>Please try refreshing the page.</p>' +
+      '</div>';
   }
 }
 
 // ════════════════════════════════════════════
-// BUILD CARD — cards start COLLAPSED
+// BUILD CARD — collapsed by default
 // ════════════════════════════════════════════
 function buildRfCard(b) {
-  const rejectionNote = b.adminNote
-    ? `<div class="rf-rejection-note">
-         <div class="rn-head">❌ Rejection Reason</div>
-         <div class="rn-body">${escHtml(b.adminNote)}</div>
-       </div>`
-    : `<div class="rf-rejection-note">
-         <div class="rn-head">❌ Declined</div>
-         <div class="rn-body rf-no-note">No specific reason provided. Please contact Jeoan for details.</div>
-       </div>`;
+  var rejectionNote = b.adminNote
+    ? '<div class="rf-rejection-note"><div class="rn-head">❌ Rejection Reason</div><div class="rn-body">' + escHtml(b.adminNote) + '</div></div>'
+    : '<div class="rf-rejection-note"><div class="rn-head">❌ Declined</div><div class="rn-body rf-no-note">No specific reason provided. Please contact Jeoan for details.</div></div>';
 
-  const ssHTML = b.gcashScreenshot
-    ? `<div class="rf-ss-section">
-         <div class="rf-ss-head">📸 GCash Screenshot Submitted</div>
-         <img class="rf-ss-img" src="${b.gcashScreenshot}" alt="GCash Screenshot"/>
-       </div>`
+  var ssHTML = b.gcashScreenshot
+    ? '<div class="rf-ss-section"><div class="rf-ss-head">📸 GCash Screenshot Submitted</div><img class="rf-ss-img" src="' + b.gcashScreenshot + '" alt="GCash Screenshot"/></div>'
     : '';
 
-  return `
-    <div class="rf-card">
-      <div class="rf-card-header" onclick="rfToggleCard(${b.id})">
-        <span class="rf-status-dot"></span>
-        <div class="rf-card-info">
-          <div class="rf-card-name">${escHtml(b.name)}</div>
-          <div class="rf-card-meta">📅 ${escHtml(b.date)} · ${escHtml(b.occasion)} · ${escHtml(b.package)}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-          <span class="rf-badge">❌ Declined</span>
-          <span class="rf-declined-date">Declined ${formatDateShort(b.updatedAt)}</span>
-        </div>
-        <span class="rf-chevron" id="rfchev-${b.id}">▼</span>
-      </div>
+  var notesRow = b.notes
+    ? '<div class="rf-detail-item full"><div class="rf-dl">Notes</div><div class="rf-dv">' + escHtml(b.notes) + '</div></div>'
+    : '';
 
-      <div class="rf-card-body" id="rfbody-${b.id}">
-        <div class="rf-detail-grid">
-          <div class="rf-detail-item"><div class="rf-dl">Client Name</div><div class="rf-dv">${escHtml(b.name)}</div></div>
-          <div class="rf-detail-item"><div class="rf-dl">Event Date</div><div class="rf-dv">${escHtml(b.date)}</div></div>
-          <div class="rf-detail-item"><div class="rf-dl">Performance Time</div><div class="rf-dv">${escHtml(b.perfTime)}</div></div>
-          <div class="rf-detail-item"><div class="rf-dl">Occasion</div><div class="rf-dv">${escHtml(b.occasion)}</div></div>
-          <div class="rf-detail-item full"><div class="rf-dl">Venue</div><div class="rf-dv">${escHtml(b.venue)}</div></div>
-          <div class="rf-detail-item"><div class="rf-dl">Rate Type</div><div class="rf-dv">${escHtml(b.rateType)}</div></div>
-          <div class="rf-detail-item"><div class="rf-dl">Package</div><div class="rf-dv"><span class="rf-pkg-badge">${escHtml(b.package)}</span></div></div>
-          ${b.notes ? `<div class="rf-detail-item full"><div class="rf-dl">Notes</div><div class="rf-dv">${escHtml(b.notes)}</div></div>` : ''}
-        </div>
-        ${ssHTML}
-        ${rejectionNote}
-        <button class="rf-edit-btn" onclick="rfOpenEdit(${b.id})">
-          ✏️ &nbsp; Edit &amp; Resubmit Booking
-        </button>
-        <div class="rf-submitted-time">Submitted: ${formatDate(b.submittedAt)}</div>
-      </div>
-    </div>`;
+  return '<div class="rf-card">' +
+    '<div class="rf-card-header" onclick="rfToggleCard(' + b.id + ')">' +
+      '<span class="rf-status-dot"></span>' +
+      '<div class="rf-card-info">' +
+        '<div class="rf-card-name">' + escHtml(b.name) + '</div>' +
+        '<div class="rf-card-meta">📅 ' + escHtml(b.date) + ' · ' + escHtml(b.occasion) + ' · ' + escHtml(b.package) + '</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">' +
+        '<span class="rf-badge">❌ Declined</span>' +
+        '<span class="rf-declined-date">Declined ' + formatDateShort(b.updatedAt) + '</span>' +
+      '</div>' +
+      '<span class="rf-chevron" id="rfchev-' + b.id + '">▼</span>' +
+    '</div>' +
+    '<div class="rf-card-body" id="rfbody-' + b.id + '">' +
+      '<div class="rf-detail-grid">' +
+        '<div class="rf-detail-item"><div class="rf-dl">Client Name</div><div class="rf-dv">' + escHtml(b.name) + '</div></div>' +
+        '<div class="rf-detail-item"><div class="rf-dl">Event Date</div><div class="rf-dv">' + escHtml(b.date) + '</div></div>' +
+        '<div class="rf-detail-item"><div class="rf-dl">Performance Time</div><div class="rf-dv">' + escHtml(b.perfTime) + '</div></div>' +
+        '<div class="rf-detail-item"><div class="rf-dl">Occasion</div><div class="rf-dv">' + escHtml(b.occasion) + '</div></div>' +
+        '<div class="rf-detail-item full"><div class="rf-dl">Venue</div><div class="rf-dv">' + escHtml(b.venue) + '</div></div>' +
+        '<div class="rf-detail-item"><div class="rf-dl">Rate Type</div><div class="rf-dv">' + escHtml(b.rateType) + '</div></div>' +
+        '<div class="rf-detail-item"><div class="rf-dl">Package</div><div class="rf-dv"><span class="rf-pkg-badge">' + escHtml(b.package) + '</span></div></div>' +
+        notesRow +
+      '</div>' +
+      ssHTML +
+      rejectionNote +
+      '<button class="rf-edit-btn" onclick="rfOpenEdit(' + b.id + ')">✏️ &nbsp; Edit &amp; Resubmit Booking</button>' +
+      '<div class="rf-submitted-time">Submitted: ' + formatDate(b.submittedAt) + '</div>' +
+    '</div>' +
+  '</div>';
 }
 
+// ════════════════════════════════════════════
+// TOGGLE CARD
+// ════════════════════════════════════════════
 function rfToggleCard(id) {
-  const body = document.getElementById('rfbody-' + id);
-  const chev = document.getElementById('rfchev-' + id);
+  var body = document.getElementById('rfbody-' + id);
+  var chev = document.getElementById('rfchev-' + id);
   if (!body || !chev) return;
   body.classList.toggle('open');
   chev.classList.toggle('open');
 }
 
 // ════════════════════════════════════════════
-// EDIT MODAL
+// EDIT MODAL — reads from rfBookingsMap, never from DOM attributes
 // ════════════════════════════════════════════
 function rfOpenEdit(id) {
-  const booking = rfBookingsMap[id];
+  var booking = rfBookingsMap[id];
   if (!booking) return;
 
   document.getElementById('rfEditId').value   = booking.id;
@@ -161,29 +155,28 @@ function rfOpenEdit(id) {
   document.getElementById('rfOccasion').value = booking.occasion || '';
   document.getElementById('rfEditError').classList.remove('show');
 
-  // Rate type + package
-  const isSong  = booking.rateType && booking.rateType.includes('Song');
-  const rateVal = isSong ? 'song' : 'hour';
-  document.querySelector(`input[name="rfRateType"][value="${rateVal}"]`).checked = true;
+  var isSong  = booking.rateType && booking.rateType.indexOf('Song') !== -1;
+  var rateVal = isSong ? 'song' : 'hour';
+  document.querySelector('input[name="rfRateType"][value="' + rateVal + '"]').checked = true;
   rfSwitchRate(true);
 
   if (isSong) {
-    const songSel = document.getElementById('rfSongPkg');
-    Array.from(songSel.options).forEach(o => {
-      if ((booking.package || '').startsWith(o.value.split('|')[0])) songSel.value = o.value;
+    var songSel = document.getElementById('rfSongPkg');
+    Array.from(songSel.options).forEach(function(o) {
+      if ((booking.package || '').indexOf(o.value.split('|')[0]) === 0) songSel.value = o.value;
     });
     rfShowPrice('song');
   } else {
-    const hourSel = document.getElementById('rfHourPkg');
-    Array.from(hourSel.options).forEach(o => {
-      if ((booking.package || '').startsWith(o.value.split('|')[0])) hourSel.value = o.value;
+    var hourSel = document.getElementById('rfHourPkg');
+    Array.from(hourSel.options).forEach(function(o) {
+      if ((booking.package || '').indexOf(o.value.split('|')[0]) === 0) hourSel.value = o.value;
     });
     rfShowPrice('hour');
   }
 
-  // Screenshot read from the map — never from a DOM attribute
   rfExistingImage = booking.gcashScreenshot || null;
   rfEditImageData = null;
+
   if (rfExistingImage) {
     document.getElementById('rfPreviewImg').src = rfExistingImage;
     document.getElementById('rfPreview').classList.add('show');
@@ -204,12 +197,12 @@ function rfCloseEdit() {
 }
 
 // ════════════════════════════════════════════
-// RATE / PACKAGE LOGIC
+// RATE / PACKAGE
 // ════════════════════════════════════════════
 function rfSwitchRate(skipReset) {
-  const radio = document.querySelector('input[name="rfRateType"]:checked');
+  var radio = document.querySelector('input[name="rfRateType"]:checked');
   if (!radio) return;
-  const type = radio.value;
+  var type = radio.value;
   document.getElementById('rfSongBox').classList.toggle('show', type === 'song');
   document.getElementById('rfHourBox').classList.toggle('show', type === 'hour');
   if (!skipReset) {
@@ -221,13 +214,13 @@ function rfSwitchRate(skipReset) {
 }
 
 function rfShowPrice(type) {
-  const sel = document.getElementById(type === 'song' ? 'rfSongPkg' : 'rfHourPkg');
-  const tag = document.getElementById(type === 'song' ? 'rfSongPrice' : 'rfHourPrice');
+  var sel = document.getElementById(type === 'song' ? 'rfSongPkg' : 'rfHourPkg');
+  var tag = document.getElementById(type === 'song' ? 'rfSongPrice' : 'rfHourPrice');
   if (!sel.value) return;
-  const parts = sel.value.split('|');
-  const label = parts[0], price = parts[1];
-  const note  = type === 'song' ? rfSongNotes[label] : rfHourNotes[label];
-  tag.innerHTML = `<strong>${label} — ${price}</strong><span>${note || ''}</span>`;
+  var parts = sel.value.split('|');
+  var label = parts[0], price = parts[1];
+  var note  = type === 'song' ? rfSongNotes[label] : rfHourNotes[label];
+  tag.innerHTML = '<strong>' + label + ' — ' + price + '</strong><span>' + (note || '') + '</span>';
   tag.classList.add('show');
 }
 
@@ -236,7 +229,7 @@ function rfShowPrice(type) {
 // ════════════════════════════════════════════
 function rfHandleUpload(input) {
   if (!input.files || !input.files[0]) return;
-  rfCompressImage(input.files[0], function (dataUrl) {
+  rfCompressImage(input.files[0], function(dataUrl) {
     rfEditImageData = dataUrl;
     document.getElementById('rfPreviewImg').src = dataUrl;
     document.getElementById('rfPreview').classList.add('show');
@@ -254,13 +247,12 @@ function rfClearUpload() {
 }
 
 function rfCompressImage(file, callback) {
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const img = new Image();
-    img.onload = function () {
-      const canvas = document.createElement('canvas');
-      const maxDim = 900;
-      let w = img.width, h = img.height;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var maxDim = 900, w = img.width, h = img.height;
       if (w > maxDim || h > maxDim) {
         if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
         else       { w = Math.round(w * maxDim / h); h = maxDim; }
@@ -278,56 +270,57 @@ function rfCompressImage(file, callback) {
 // SUBMIT
 // ════════════════════════════════════════════
 async function rfSubmitEdit() {
-  const errEl = document.getElementById('rfEditError');
+  var errEl = document.getElementById('rfEditError');
   errEl.classList.remove('show');
 
-  const id       = document.getElementById('rfEditId').value;
-  const date     = document.getElementById('rfDate').value.trim();
-  const perfTime = document.getElementById('rfPerfTime').value.trim();
-  const occasion = document.getElementById('rfOccasion').value;
-  const venue    = document.getElementById('rfVenue').value.trim();
-  const notes    = document.getElementById('rfNotes').value.trim();
-  const radio    = document.querySelector('input[name="rfRateType"]:checked');
+  var id       = document.getElementById('rfEditId').value;
+  var date     = document.getElementById('rfDate').value.trim();
+  var perfTime = document.getElementById('rfPerfTime').value.trim();
+  var occasion = document.getElementById('rfOccasion').value;
+  var venue    = document.getElementById('rfVenue').value.trim();
+  var notes    = document.getElementById('rfNotes').value.trim();
+  var radio    = document.querySelector('input[name="rfRateType"]:checked');
 
   if (!date || !perfTime || !occasion || !venue || !radio) {
     errEl.textContent = 'Please fill in all required fields.';
     errEl.classList.add('show'); return;
   }
-  const pkgVal = radio.value === 'song'
+  var pkgVal = radio.value === 'song'
     ? document.getElementById('rfSongPkg').value
     : document.getElementById('rfHourPkg').value;
   if (!pkgVal) {
     errEl.textContent = 'Please select a package.';
     errEl.classList.add('show'); return;
   }
-  const screenshot = rfEditImageData || rfExistingImage;
+  var screenshot = rfEditImageData || rfExistingImage;
   if (!screenshot) {
     errEl.textContent = 'Please upload a GCash screenshot.';
     errEl.classList.add('show'); return;
   }
 
-  const parts     = pkgVal.split('|');
-  const pkg       = parts[0] + ' — ' + parts[1];
-  const rateLabel = radio.value === 'song' ? '🎵 Per Song' : '⏱️ Per Hour';
+  var parts     = pkgVal.split('|');
+  var pkg       = parts[0] + ' — ' + parts[1];
+  var rateLabel = radio.value === 'song' ? '🎵 Per Song' : '⏱️ Per Hour';
 
-  const btn = document.getElementById('rfResubmitBtn');
+  var btn = document.getElementById('rfResubmitBtn');
   btn.disabled = true;
   btn.innerHTML = '<span class="rf-spinner"></span> Resubmitting…';
 
   try {
-    const res = await fetch(API_BASE + '/client/bookings/' + id + '/resubmit', {
+    var res = await fetch(API_BASE + '/client/bookings/' + id + '/resubmit', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + clientToken
       },
       body: JSON.stringify({
-        date, perfTime, occasion, venue, notes,
+        date: date, perfTime: perfTime, occasion: occasion,
+        venue: venue, notes: notes,
         rateType: rateLabel, package: pkg, gcashScreenshot: screenshot
       })
     });
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
+      var err = await res.json().catch(function() { return {}; });
       errEl.textContent = err.error || 'Could not resubmit. Please try again.';
       errEl.classList.add('show');
       btn.disabled = false;
@@ -363,7 +356,7 @@ function rfDoLogout() {
 // ════════════════════════════════════════════
 function formatDate(iso) {
   if (!iso) return '';
-  const d = new Date(iso);
+  var d = new Date(iso);
   return d.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
        + ' · '
        + d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
@@ -379,8 +372,8 @@ function escHtml(s) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function showToast(msg) {
-  const t = document.getElementById('rfToast');
+  var t = document.getElementById('rfToast');
   if (!t) return;
   t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
+  setTimeout(function() { t.classList.remove('show'); }, 3500);
 }
