@@ -24,9 +24,13 @@
         <span class="ni">📋</span> Bookings
         <span class="nav-badge" id="navBadgePending">0</span>
       </button>
-      <button class="nav-item" id="navClients" onclick="switchTab('clients')">
-        <span class="ni">👤</span> Clients
-        <span class="nav-badge" id="navBadgeClients">0</span>
+      <button class="nav-item" id="navSchedules" onclick="switchTab('schedules')">
+        <span class="ni">📅</span> Schedules
+        <span class="nav-badge" id="navBadgeSchedules">0</span>
+      </button>
+      <button class="nav-item" id="navArchive" onclick="switchTab('archive')">
+        <span class="ni">🗂️</span> Archive
+        <span class="nav-badge" id="navBadgeArchive">0</span>
       </button>
     </nav>
     <div class="sidebar-footer">
@@ -79,49 +83,32 @@
       </div>
     </div>
 
-    <!-- ── CLIENTS VIEW ── -->
-    <div id="viewClients" style="display:none;flex-direction:column;flex:1;min-height:0">
+    <!-- ── SCHEDULES VIEW ── -->
+    <div id="viewSchedules" style="display:none;flex-direction:column;flex:1;min-height:0">
       <div class="page-header">
         <div class="page-header-left">
-          <div class="page-title">Client Accounts</div>
-          <div class="page-subtitle">Create and manage client login credentials</div>
+          <div class="page-title">Schedules</div>
+          <div class="page-subtitle">Confirmed bookings — your upcoming performances</div>
         </div>
       </div>
-      <div class="clients-content">
-        <div class="panel">
-          <div class="panel-head">
-            <span class="panel-head-title">➕ Create New Client Account</span>
-          </div>
-          <div class="panel-body">
-            <div class="form-row">
-              <div class="field">
-                <label>Display Name</label>
-                <input type="text" id="newDisplayName" placeholder="e.g. Maria Santos"/>
-              </div>
-              <div class="field">
-                <label>Username</label>
-                <input type="text" id="newUsername" placeholder="e.g. maria_santos" autocomplete="off"/>
-              </div>
-            </div>
-            <div class="field">
-              <label>Password</label>
-              <input type="password" id="newPassword" placeholder="Create a password for them" autocomplete="new-password"/>
-            </div>
-            <div class="msg-error" id="createError"></div>
-            <div class="msg-success" id="createSuccess"></div>
-            <button class="btn-create" id="createBtn" onclick="createClientAccount()">🎀 &nbsp; Create Account</button>
-          </div>
-        </div>
+      <div class="bookings-scroll" id="schedulesArea">
+        <div class="empty-state"><span class="ei">📅</span><p>No confirmed bookings yet.<br>Confirmed bookings will appear here!</p></div>
+      </div>
+    </div>
 
-        <div class="panel">
-          <div class="panel-head" style="justify-content:space-between">
-            <span class="panel-head-title">Existing Accounts</span>
-            <span id="clientCount" style="font-size:11px;color:rgba(255,255,255,.7)"></span>
-          </div>
-          <div class="panel-body" id="clientsList">
-            <div class="empty-state"><span class="ei">👤</span><p>No client accounts yet.<br>Create one above!</p></div>
-          </div>
+    <!-- ── ARCHIVE VIEW ── -->
+    <div id="viewArchive" style="display:none;flex-direction:column;flex:1;min-height:0">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-title">Archive</div>
+          <div class="page-subtitle">Deleted, finished, and flagged bookings</div>
         </div>
+        <div class="page-header-right">
+          <button class="btn-clear-archive" onclick="confirmClearArchive()">🗑️ Clear All</button>
+        </div>
+      </div>
+      <div class="bookings-scroll" id="archiveArea">
+        <div class="empty-state"><span class="ei">🗂️</span><p>Archive is empty.<br>Deleted or finished bookings will appear here.</p></div>
       </div>
     </div>
 
@@ -144,7 +131,32 @@
   </div>
 </div>
 
-<!-- SINGLE script tag at the bottom only -->
+<!-- DELETE BOOKING MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <span class="modal-icon">🗑️</span>
+    <div class="modal-title">Delete Booking?</div>
+    <div class="modal-msg" id="deleteModalMsg">This will move the booking to the Archive. You can view it there anytime.</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="modal-btn-confirm" onclick="confirmDelete()" style="background:linear-gradient(135deg,#e74c3c,#c0392b)">Move to Archive</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLEAR ARCHIVE MODAL -->
+<div class="modal-overlay" id="clearArchiveModal">
+  <div class="modal-box">
+    <span class="modal-icon">⚠️</span>
+    <div class="modal-title">Clear Archive?</div>
+    <div class="modal-msg">This will <strong>permanently delete</strong> all archived bookings. This cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="document.getElementById('clearArchiveModal').classList.remove('show')">Cancel</button>
+      <button class="modal-btn-confirm" onclick="doClearArchive()" style="background:linear-gradient(135deg,#e74c3c,#c0392b)">Clear All</button>
+    </div>
+  </div>
+</div>
+
 <script src="admindashboard-scripts.js"></script>
 </body>
 </html>
