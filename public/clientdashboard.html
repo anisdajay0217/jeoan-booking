@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400;700&family=Pinyon+Script&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="clientdashboard-styles.css"/>
   <style>
+    /* ── WELCOME PAGE ─────────────────────────────────────── */
     #welcomePage {
       position: fixed; inset: 0;
       background: linear-gradient(150deg, #f5c8d8 0%, #fce8ee 40%, #f0b8c8 80%, #fce8ee 100%);
@@ -52,6 +53,7 @@
     .wlc-divider { width: 40px; height: 1px; background: linear-gradient(90deg, transparent, #f0c8d4, transparent); margin: 22px auto; }
     .wlc-note { font-size: 11px; color: #b07080; line-height: 1.6; }
 
+    /* ── CATEGORY TOGGLE (form page) ──────────────────────── */
     .category-toggle { display: flex; gap: 8px; margin-bottom: 8px; }
     .category-btn { flex: 1; position: relative; }
     .category-btn input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -70,11 +72,71 @@
     .category-box { display: none; }
     .category-box.show { display: block; animation: fadeIn .25s ease both; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── CATEGORY MODAL ───────────────────────────────────── */
+    .cm-overlay {
+      position: fixed; inset: 0; background: rgba(58,31,40,.55);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      z-index: 600; display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity .25s ease;
+    }
+    .cm-overlay.show { opacity: 1; pointer-events: all; }
+    .cm-box {
+      background: #fff8fa; border-radius: 24px; padding: 28px 24px 22px;
+      max-width: 340px; width: 100%; text-align: center;
+      box-shadow: 0 24px 60px rgba(201,79,106,.28);
+      border: 1.5px solid #f0c8d4;
+      transform: scale(.9) translateY(14px);
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+      max-height: 90vh; overflow-y: auto;
+    }
+    .cm-overlay.show .cm-box { transform: scale(1) translateY(0); }
+    .cm-icon   { font-size: 36px; display: block; margin-bottom: 8px; animation: sway 3s ease-in-out infinite; }
+    .cm-title  { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #c94f6a; margin-bottom: 4px; }
+    .cm-sub    { font-size: 12px; color: #b08090; margin-bottom: 2px; }
+    .cm-divider { width: 40px; height: 1px; background: linear-gradient(90deg, transparent, #f0c8d4, transparent); margin: 14px auto; }
+    .cm-section-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #b08090; margin-bottom: 10px; }
+    .cm-rate-toggle { display: flex; gap: 8px; margin-bottom: 4px; }
+    .cm-rate-btn {
+      flex: 1; padding: 14px 8px; background: #fff; border: 1.5px solid #f0c8d4; border-radius: 12px;
+      cursor: pointer; transition: all .2s;
+    }
+    .cm-rate-btn:hover { border-color: #c94f6a; background: #fff0f4; }
+    .cm-rate-btn.active { border-color: #c94f6a; background: #fce8ee; }
+    .cm-rate-icon { font-size: 22px; margin-bottom: 4px; }
+    .cm-rate-name { font-size: 12px; font-weight: 700; color: #3a1f28; }
+    .cm-pkg-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .cm-pkg-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; background: #fff; border: 1.5px solid #f0c8d4; border-radius: 12px;
+      cursor: pointer; transition: all .2s; text-align: left;
+    }
+    .cm-pkg-item:hover { border-color: #c94f6a; background: #fff0f4; }
+    .cm-pkg-item.active { border-color: #c94f6a; background: #fce8ee; }
+    .cm-pkg-name  { font-size: 13px; font-weight: 700; color: #3a1f28; }
+    .cm-pkg-price { font-size: 14px; font-weight: 700; color: #c94f6a; }
+    .cm-actions { display: flex; gap: 8px; margin-top: 18px; }
+    .cm-btn-cancel {
+      flex: 1; padding: 12px; background: #fff0f4; border: 1.5px solid #f0c8d4; border-radius: 12px;
+      color: #b08090; font-family: 'Lato', sans-serif; font-size: 12px; letter-spacing: 1px;
+      text-transform: uppercase; cursor: pointer; transition: all .15s;
+    }
+    .cm-btn-cancel:hover { background: #f7d6e0; }
+    .cm-btn-confirm {
+      flex: 1; padding: 12px; background: linear-gradient(135deg, #e8728a, #c94f6a);
+      border: none; border-radius: 12px; color: #fff;
+      font-family: 'Lato', sans-serif; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; box-shadow: 0 4px 14px rgba(201,79,106,.3); transition: all .15s;
+    }
+    .cm-btn-confirm:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(201,79,106,.4); }
+    .cm-btn-confirm:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
   </style>
 </head>
 <body>
 
-<!-- WELCOME PAGE -->
+<!-- ═══════════════════════════════════════════════════════════
+     WELCOME PAGE
+════════════════════════════════════════════════════════════ -->
 <div id="welcomePage">
   <div class="wlc-petals" id="wlcPetals"></div>
   <div class="wlc-card">
@@ -96,10 +158,11 @@
   </div>
 </div>
 
-<!-- BOOKING FORM PAGE -->
+<!-- ═══════════════════════════════════════════════════════════
+     BOOKING FORM PAGE
+════════════════════════════════════════════════════════════ -->
 <div id="dashPage" style="display:none;">
 
-  <!-- FALLING PETALS (fixed, full page) -->
   <div class="petals" id="petals"></div>
 
   <div class="hero">
@@ -153,7 +216,7 @@
       <!-- CATEGORY -->
       <div class="field">
         <label>What Do You Need? *</label>
-        <p class="field-hint">Choose your slay package 💅</p>
+        <p class="field-hint">Choose your slay package 💅 — a pop-up will show the rates!</p>
         <div class="category-toggle">
           <div class="category-btn">
             <input type="radio" name="categoryType" id="catSinger" value="singer" onchange="switchCategory()"/>
@@ -173,11 +236,10 @@
           </div>
         </div>
 
-        <!-- SINGER RATES -->
+        <!-- SINGER RATES (shown after modal confirm) -->
         <div class="category-box" id="singerBox">
-          <div class="field">
-            <label>Rate Type *</label>
-            <p class="field-hint">How do you want to book her? 🎵</p>
+          <div class="field" style="margin-bottom:0;">
+            <label>Rate Type</label>
             <div class="rate-toggle">
               <div class="rate-btn">
                 <input type="radio" name="rateType" id="rateSong" value="song" onchange="switchRate()"/>
@@ -212,7 +274,7 @@
           </div>
         </div>
 
-        <!-- SINGER + HOST RATES -->
+        <!-- SINGER + HOST RATES (shown after modal confirm) -->
         <div class="category-box" id="hostBox">
           <p class="field-hint">She'll sing AND host — full package energy! 🎙️✨</p>
           <select id="hostPkg" onchange="showHostPrice()">
@@ -243,15 +305,14 @@
         </div>
       </div>
 
-      <!-- ✅ FIX: removed for="agreeCheck" from label — input is already inside it,
-           having both caused a double-toggle that kept the checkbox permanently unchecked -->
-      <label class="agree-row" onclick="toggleCB()">
-        <input type="checkbox" id="agreeCheck"/>
+      <!-- ✅ CHECKBOX FIX: no onclick on label, no nested label conflict -->
+      <div class="agree-row" id="agreeRow" onclick="toggleCB()" style="cursor:pointer;">
+        <input type="checkbox" id="agreeCheck" style="display:none;"/>
         <div class="custom-cb" id="customCB">
           <svg width="11" height="8" viewBox="0 0 11 8" fill="none"><path d="M1 4L4 7L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <span class="agree-label">Yes, I've read the fine print and I <strong>agree</strong> to all Terms &amp; Conditions. Let's gooo! 🎉</span>
-      </label>
+      </div>
 
       <div class="section-head">💚 Secure Your Slot via GCash</div>
       <div class="gcash-form-box">
@@ -265,12 +326,15 @@
             </div>
           </div>
           <p>Send <strong>₱200</strong> to the number above, then upload your GCash confirmation screenshot here. <strong>Screenshot is required</strong> before your booking can be submitted. 💕</p>
-          <div class="upload-area" id="uploadArea">
-            <input type="file" id="gcashFile" accept="image/*" onchange="handleGcashUpload(this)"/>
+
+          <!-- ✅ UPLOAD FIX: file input outside upload-area to avoid stacking conflicts -->
+          <div class="upload-area" id="uploadArea" onclick="document.getElementById('gcashFile').click()">
             <span class="upload-icon">📱</span>
             <span class="upload-label">Tap to upload GCash screenshot</span>
             <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
           </div>
+          <input type="file" id="gcashFile" accept="image/*" style="display:none;" onchange="handleGcashUpload(this)"/>
+
           <div class="gcash-preview" id="gcashPreview">
             <img id="gcashPreviewImg" src="" alt="GCash Screenshot Preview"/>
             <div class="gcash-preview-actions">
@@ -291,7 +355,9 @@
   </div>
 </div>
 
-<!-- THANK YOU PAGE -->
+<!-- ═══════════════════════════════════════════════════════════
+     THANK YOU PAGE
+════════════════════════════════════════════════════════════ -->
 <div id="thankYouPage">
   <div class="sparkles" id="sparkles"></div>
   <div class="ty-compact">
@@ -321,7 +387,18 @@
   </div>
 </div>
 
-<!-- CANCEL MODAL -->
+<!-- ═══════════════════════════════════════════════════════════
+     CATEGORY MODAL (rates pop-up)
+════════════════════════════════════════════════════════════ -->
+<div class="cm-overlay" id="categoryModal">
+  <div class="cm-box" id="categoryModalContent">
+    <!-- filled dynamically by clientdashboard-modals.js -->
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CANCEL MODAL
+════════════════════════════════════════════════════════════ -->
 <div class="cd-modal-overlay" id="cancelModal">
   <div class="cd-modal-box">
     <span class="cd-modal-icon">🗑️</span>
@@ -336,35 +413,11 @@
 
 <div class="cd-toast" id="cdToast"></div>
 
-<script>
-  function spawnWelcomePetals() {
-    const pc = document.getElementById('wlcPetals');
-    if (!pc) return;
-    ['🌸','🌸','🌷','🌸','🌺','🌸','🌷'].forEach(p => {
-      for (let i = 0; i < (p === '🌸' ? 5 : 3); i++) {
-        const el = document.createElement('div');
-        el.className = 'petal';
-        el.textContent = p;
-        el.style.left = Math.random() * 100 + '%';
-        el.style.setProperty('--sz',  (13 + Math.random() * 12) + 'px');
-        el.style.setProperty('--dur', (5  + Math.random() * 6)  + 's');
-        el.style.setProperty('--del', (Math.random() * 8)       + 's');
-        pc.appendChild(el);
-      }
-    });
-  }
-  function goToBooking() {
-    const wp = document.getElementById('welcomePage');
-    wp.classList.add('hide');
-    setTimeout(function() {
-      wp.style.display = 'none';
-      document.getElementById('dashPage').style.display = '';
-      if (typeof initFormPetals === 'function') initFormPetals();
-      window.scrollTo(0, 0);
-    }, 550);
-  }
-  spawnWelcomePetals();
-</script>
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS — load modals first, then core logic
+════════════════════════════════════════════════════════════ -->
+<script src="clientdashboard-modals.js"></script>
 <script src="clientdashboard-scripts.js"></script>
+
 </body>
 </html>
