@@ -259,9 +259,11 @@ app.patch('/client/bookings/:id/resubmit', requireClient, async (req: AuthReques
   res.json({ ok: true });
 });
 
-// ─── CATCH-ALL — serve clientdashboard.html as default ───────────────────────
+// ─── CATCH-ALL ────────────────────────────────────────────────────────────────
+// IMPORTANT: serve client.html (login) as the default for unknown routes.
+// clientdashboard.html is only loaded explicitly after login via JS redirect.
 app.get('*', (_req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '../public/clientdashboard.html'));
+  res.sendFile(path.join(__dirname, '../public/client.html'));
 });
 
 // ─── START ────────────────────────────────────────────────────────────────────
