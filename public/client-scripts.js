@@ -21,12 +21,19 @@ function closeCancelModal() { document.getElementById('cancelModal').classList.r
 
 function doCancelForm() {
   closeCancelModal();
-  ['clientName','eventDate','perfTime','venue','notes'].forEach(id => {
+  ['clientName','clientPhone','eventDate','perfTime','venue','notes'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
   const occ = document.getElementById('occasion');
   if (occ) occ.value = '';
+
+  // Reset category
+  document.querySelectorAll('input[name="categoryType"]').forEach(r => r.checked = false);
+  document.getElementById('singerBox').classList.remove('show');
+  document.getElementById('hostBox').classList.remove('show');
+
+  // Reset singer rate fields
   document.querySelectorAll('input[name="rateType"]').forEach(r => r.checked = false);
   document.getElementById('songBox').classList.remove('show');
   document.getElementById('hourBox').classList.remove('show');
@@ -34,6 +41,12 @@ function doCancelForm() {
   document.getElementById('hourPkg').value = '';
   document.getElementById('songPrice').classList.remove('show');
   document.getElementById('hourPrice').classList.remove('show');
+
+  // Reset host fields
+  document.getElementById('hostPkg').value = '';
+  document.getElementById('hostPrice').classList.remove('show');
+
+  // Reset agreement & GCash
   document.getElementById('agreeCheck').checked = false;
   document.getElementById('customCB').classList.remove('checked');
   pendingImageData = null;
@@ -47,7 +60,29 @@ function doCancelForm() {
 }
 
 // ════════════════════════════════════════════
-// BOOKING FORM LOGIC
+// CATEGORY: SINGER vs SINGER+HOST
+// ════════════════════════════════════════════
+function switchCategory() {
+  const cat = document.querySelector('input[name="categoryType"]:checked').value;
+  document.getElementById('singerBox').classList.toggle('show', cat === 'singer');
+  document.getElementById('hostBox').classList.toggle('show',   cat === 'host');
+
+  // Reset all rate fields when switching
+  document.querySelectorAll('input[name="rateType"]').forEach(r => r.checked = false);
+  document.getElementById('songBox').classList.remove('show');
+  document.getElementById('hourBox').classList.remove('show');
+  document.getElementById('songPkg').value = '';
+  document.getElementById('hourPkg').value = '';
+  document.getElementById('songPrice').classList.remove('show');
+  document.getElementById('hourPrice').classList.remove('show');
+  document.getElementById('hostPkg').value = '';
+  document.getElementById('hostPrice').classList.remove('show');
+
+  updateSubmitHint();
+}
+
+// ════════════════════════════════════════════
+// BOOKING FORM LOGIC — SINGER RATES
 // ════════════════════════════════════════════
 function switchRate() {
   const type = document.querySelector('input[name="rateType"]:checked').value;
@@ -61,24 +96,40 @@ function switchRate() {
 }
 
 const songNotes = {
-  '1–6 Songs':  'Up to 6 songs of live performance 🎵',
-  '1–10 Songs': 'Up to 10 songs of live performance 🎵',
-  '1–15 Songs': 'Up to 15 songs of live performance 🎵',
-  'Band Sub':   'Rate is negotiable — please discuss with Jeoan',
+  '1–6 Songs':  'Up to 6 bops of live performance 🎵',
+  '1–10 Songs': 'Up to 10 bops of live performance 🎵',
+  '1–15 Songs': 'Up to 15 bops of live performance 🎵',
+  'Band Sub':   'Rate is negotiable — let\'s talk it out! 💬',
 };
 const hourNotes = {
-  '1 Hour':       '1 hour of live performance 🎤',
-  '1 Hr 30 Mins': '1 hour and 30 minutes of live performance 🎤',
-  '2 Hours':      '2 hours of live performance 🎤',
+  '1 Hour':       '1 hour of pure vocal slay 🎤',
+  '1 Hr 30 Mins': '1.5 hours of non-stop serves 🎤',
+  '2 Hours':      '2 full hours of live performance magic 🎤',
+};
+const hostNotes = {
+  '1 Hour':   'Singer + Host for 1 hour — double the talent! 🎙️',
+  '2 Hours':  'Singer + Host for 2 hours — she\'s running the show! 🎙️✨',
+  '3 Hours':  'Singer + Host for 3 hours — full event takeover! 👑',
 };
 
 function showPrice(type) {
-  const sel   = document.getElementById(type === 'song' ? 'songPkg'   : 'hourPkg');
+  const sel   = document.getElementById(type === 'song' ? 'songPkg' : 'hourPkg');
   const tag   = document.getElementById(type === 'song' ? 'songPrice' : 'hourPrice');
   const parts = sel.value.split('|');
   const label = parts[0], price = parts[1];
   const note  = type === 'song' ? songNotes[label] : hourNotes[label];
   tag.innerHTML = '<strong>' + label + ' — ' + price + '</strong><span>' + (note || '') + '</span>';
+  tag.classList.add('show');
+  updateSubmitHint();
+}
+
+function showHostPrice() {
+  const sel   = document.getElementById('hostPkg');
+  const tag   = document.getElementById('hostPrice');
+  const parts = sel.value.split('|');
+  const label = parts[0], price = parts[1];
+  const note  = hostNotes[label] || '';
+  tag.innerHTML = '<strong>' + label + ' — ' + price + '</strong><span>' + note + '</span>';
   tag.classList.add('show');
   updateSubmitHint();
 }
@@ -91,42 +142,64 @@ function toggleCB() {
   }, 0);
 }
 
+// ════════════════════════════════════════════
+// VALIDATION
+// ════════════════════════════════════════════
 function isFormValid() {
   const name   = document.getElementById('clientName').value.trim();
+  const phone  = document.getElementById('clientPhone').value.trim();
   const date   = document.getElementById('eventDate').value.trim();
   const perf   = document.getElementById('perfTime').value.trim();
   const occ    = document.getElementById('occasion').value;
   const venue  = document.getElementById('venue').value.trim();
   const agreed = document.getElementById('agreeCheck').checked;
-  const radio  = document.querySelector('input[name="rateType"]:checked');
-  let pkgOk    = false;
-  if (radio) {
-    const v = radio.value === 'song'
-      ? document.getElementById('songPkg').value
-      : document.getElementById('hourPkg').value;
-    pkgOk = !!v;
+  const catRad = document.querySelector('input[name="categoryType"]:checked');
+  if (!catRad) return false;
+
+  let pkgOk = false;
+  if (catRad.value === 'singer') {
+    const radio = document.querySelector('input[name="rateType"]:checked');
+    if (radio) {
+      const v = radio.value === 'song'
+        ? document.getElementById('songPkg').value
+        : document.getElementById('hourPkg').value;
+      pkgOk = !!v;
+    }
+  } else if (catRad.value === 'host') {
+    pkgOk = !!document.getElementById('hostPkg').value;
   }
-  return !!(name && date && perf && occ && venue && agreed && radio && pkgOk && pendingImageData);
+
+  return !!(name && phone && date && perf && occ && venue && agreed && pkgOk && pendingImageData);
 }
 
 function getMissingFields() {
   const missing = [];
-  if (!document.getElementById('clientName').value.trim()) missing.push('Client Name');
-  if (!document.getElementById('eventDate').value.trim())  missing.push('Event Date');
-  if (!document.getElementById('perfTime').value.trim())   missing.push('Performance Time');
-  if (!document.getElementById('occasion').value)          missing.push('Event Occasion');
-  if (!document.getElementById('venue').value.trim())      missing.push('Venue Address');
-  const radio = document.querySelector('input[name="rateType"]:checked');
-  if (!radio) {
-    missing.push('Rate Type');
-  } else {
-    const v = radio.value === 'song'
-      ? document.getElementById('songPkg').value
-      : document.getElementById('hourPkg').value;
-    if (!v) missing.push('Package');
+  if (!document.getElementById('clientName').value.trim())  missing.push('Your Name');
+  if (!document.getElementById('clientPhone').value.trim()) missing.push('Contact Number');
+  if (!document.getElementById('eventDate').value.trim())   missing.push('Event Date');
+  if (!document.getElementById('perfTime').value.trim())    missing.push('Performance Time');
+  if (!document.getElementById('occasion').value)           missing.push('Event Occasion');
+  if (!document.getElementById('venue').value.trim())       missing.push('Venue Address');
+
+  const catRad = document.querySelector('input[name="categoryType"]:checked');
+  if (!catRad) {
+    missing.push('Service Type (Singer or Singer + Host)');
+  } else if (catRad.value === 'singer') {
+    const radio = document.querySelector('input[name="rateType"]:checked');
+    if (!radio) {
+      missing.push('Rate Type');
+    } else {
+      const v = radio.value === 'song'
+        ? document.getElementById('songPkg').value
+        : document.getElementById('hourPkg').value;
+      if (!v) missing.push('Package');
+    }
+  } else if (catRad.value === 'host') {
+    if (!document.getElementById('hostPkg').value) missing.push('Singer + Host Package');
   }
+
   if (!document.getElementById('agreeCheck').checked) missing.push('Terms Agreement');
-  if (!pendingImageData) missing.push('GCash Screenshot');
+  if (!pendingImageData) missing.push('GCash Receipt');
   return missing;
 }
 
@@ -137,23 +210,23 @@ function updateSubmitHint() {
   const valid = isFormValid();
   btn.disabled = !valid;
   if (valid) {
-    hint.textContent = 'Everything looks good! Tap Submit Booking to confirm. 🎀';
+    hint.textContent = 'Yasss! Everything\'s good — tap that button and let\'s make it happen! 🎀';
     hint.classList.remove('error');
   } else {
     const missing = getMissingFields();
     hint.textContent = missing.length
-      ? 'Still needed: ' + missing.join(', ') + '.'
-      : 'Fill in all required fields and upload your GCash screenshot to proceed.';
+      ? 'Still needed, sis: ' + missing.join(', ') + '.'
+      : 'Fill in everything above and upload your GCash receipt to proceed! 💅';
     hint.classList.remove('error');
   }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  ['clientName','eventDate','perfTime','venue','notes'].forEach(id => {
+  ['clientName','clientPhone','eventDate','perfTime','venue','notes'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', updateSubmitHint);
   });
-  ['occasion','songPkg','hourPkg'].forEach(id => {
+  ['occasion','songPkg','hourPkg','hostPkg'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', updateSubmitHint);
   });
@@ -165,38 +238,58 @@ document.addEventListener('DOMContentLoaded', function () {
 async function submitForm() {
   if (!isFormValid()) {
     const hint = document.getElementById('submitHintEl');
-    hint.textContent = 'Please complete all required fields and upload your GCash screenshot.';
+    hint.textContent = 'Oops! Please complete all required fields and upload your GCash receipt first, sis! 💕';
     hint.classList.add('error'); return;
   }
+
   const name     = document.getElementById('clientName').value.trim();
+  const phone    = document.getElementById('clientPhone').value.trim();
   const date     = document.getElementById('eventDate').value.trim();
   const perfTime = document.getElementById('perfTime').value.trim();
   const occ      = document.getElementById('occasion').value;
   const venue    = document.getElementById('venue').value.trim();
   const notes    = document.getElementById('notes').value.trim();
-  const radio    = document.querySelector('input[name="rateType"]:checked');
-  const rateType = radio.value;
-  const pkgRaw   = rateType === 'song'
-    ? document.getElementById('songPkg').value
-    : document.getElementById('hourPkg').value;
-  const parts     = pkgRaw.split('|');
-  const pkg       = parts[0] + ' — ' + parts[1];
-  const rateLabel = rateType === 'song' ? '🎵 Per Song' : '⏱️ Per Hour';
-  const bookingId = Date.now();
-  const btn       = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Submitting…';
+  const catRad   = document.querySelector('input[name="categoryType"]:checked');
+  const category = catRad.value;
+
+  let pkg = '', rateLabel = '';
+
+  if (category === 'singer') {
+    const radio    = document.querySelector('input[name="rateType"]:checked');
+    const rateType = radio.value;
+    const pkgRaw   = rateType === 'song'
+      ? document.getElementById('songPkg').value
+      : document.getElementById('hourPkg').value;
+    const parts = pkgRaw.split('|');
+    pkg       = parts[0] + ' — ' + parts[1];
+    rateLabel = rateType === 'song' ? '🎵 Per Song' : '⏱️ Per Hour';
+  } else {
+    const parts = document.getElementById('hostPkg').value.split('|');
+    pkg       = parts[0] + ' — ' + parts[1];
+    rateLabel = '🎙️ Singer + Host';
+  }
+
+  const categoryLabel = category === 'singer' ? '🎤 Singer Only' : '🎤🎙️ Singer + Host';
+  const bookingId     = Date.now();
+  const btn           = document.getElementById('submitBtn');
+  btn.disabled  = true;
+  btn.innerHTML = '<span class="spinner"></span> Locking you in…';
+
   try {
     const res = await fetch(API_BASE + '/client/bookings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: bookingId, name, date, perfTime, occasion: occ, venue, rateType: rateLabel, package: pkg, notes })
+      body: JSON.stringify({
+        id: bookingId, name, phone, date, perfTime,
+        occasion: occ, venue, category: categoryLabel,
+        rateType: rateLabel, package: pkg, notes
+      })
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      document.getElementById('submitHintEl').textContent = err.error || 'Could not save booking.';
+      document.getElementById('submitHintEl').textContent = err.error || 'Yikes! Something went wrong. Try again?';
       document.getElementById('submitHintEl').classList.add('error');
-      btn.disabled = false; btn.innerHTML = '🎀 Submit Booking'; return;
+      btn.disabled = false; btn.innerHTML = '🎀 Lock In My Booking!'; return;
     }
     await fetch(API_BASE + '/client/bookings/' + bookingId + '/screenshot', {
       method: 'PATCH',
@@ -204,23 +297,31 @@ async function submitForm() {
       body: JSON.stringify({ gcashScreenshot: pendingImageData })
     });
   } catch (e) {
-    document.getElementById('submitHintEl').textContent = 'Cannot connect to server. Please try again.';
+    document.getElementById('submitHintEl').textContent = 'Cannot connect to server. Please try again, bestie!';
     document.getElementById('submitHintEl').classList.add('error');
-    btn.disabled = false; btn.innerHTML = '🎀 Submit Booking'; return;
+    btn.disabled = false; btn.innerHTML = '🎀 Lock In My Booking!'; return;
   }
 
-  // ── Build summary rows ───────────────────────────────────────────────────
+  // Build summary rows
   const rows = [
-    ['Client', name], ['Date', date], ['Time', perfTime],
-    ['Occasion', occ], ['Venue', venue], ['Rate', rateLabel], ['Package', pkg],
+    ['Name',     name],
+    ['Phone',    phone],
+    ['Date',     date],
+    ['Time',     perfTime],
+    ['Occasion', occ],
+    ['Venue',    venue],
+    ['Service',  categoryLabel],
+    ['Rate',     rateLabel],
+    ['Package',  pkg],
   ];
   if (notes) rows.push(['Notes', notes]);
+
   document.getElementById('summaryRows').innerHTML = rows.map(r =>
     '<div class="cc-row"><span class="lbl">' + r[0] + '</span><span class="val">' + r[1] + '</span></div>'
   ).join('');
   document.getElementById('tyScreenshot').src = pendingImageData;
 
-  // ── Show thank-you page ──────────────────────────────────────────────────
+  // Show thank-you page
   document.getElementById('dashPage').style.display = 'none';
   document.getElementById('thankYouPage').classList.add('show');
 }
@@ -270,7 +371,7 @@ function reuploadScreenshot() {
 }
 
 // ════════════════════════════════════════════
-// SPARKLES
+// PETALS & SPARKLES
 // ════════════════════════════════════════════
 function initFormPetals() {
   const pc = document.getElementById('petals');
