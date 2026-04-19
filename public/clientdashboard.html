@@ -6,6 +6,7 @@
   <title>Book Jeoan Gwyneth 🎀</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400;700&family=Pinyon+Script&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="clientdashboard-styles.css"/>
+  <link rel="stylesheet" href="clientdashboard-styles-append.css"/>
   <link rel="stylesheet" href="clientdashboard-steps.css"/>
 </head>
 <body>
@@ -36,7 +37,6 @@
      BOOKING FORM PAGE
 ════════════════════════════════════════════════════════ -->
 <div id="dashPage" style="display:none;">
-
   <div class="petals" id="petals"></div>
 
   <div class="hero">
@@ -70,7 +70,6 @@
     </div>
   </div>
 
-  <!-- STEP PANELS WRAPPER -->
   <div class="steps-container">
 
     <!-- ══════════════════════════════
@@ -86,7 +85,7 @@
           <input type="text" id="clientName" placeholder="What do we call you, your honor?"/>
         </div>
 
-        <!-- CONTACT NUMBER — PH 11-digit, starts with 09 -->
+        <!-- CONTACT NUMBER -->
         <div class="field">
           <label>Contact Number *</label>
           <input
@@ -100,89 +99,38 @@
           <div class="field-error" id="phoneError"></div>
         </div>
 
-        <!-- EVENT DATE — 3 cute dropdowns -->
+        <!-- EVENT DATE — modal trigger -->
         <div class="field">
           <label>Event Date *</label>
-          <div class="cute-date-row">
-            <div class="cute-select-wrap">
-              <select id="eventMonth" class="cute-select" onchange="syncEventDate()">
-                <option value="" disabled selected>🌸 Month</option>
-                <option value="January">January</option>
-                <option value="February">February</option>
-                <option value="March">March</option>
-                <option value="April">April</option>
-                <option value="May">May</option>
-                <option value="June">June</option>
-                <option value="July">July</option>
-                <option value="August">August</option>
-                <option value="September">September</option>
-                <option value="October">October</option>
-                <option value="November">November</option>
-                <option value="December">December</option>
-              </select>
-              <span class="cute-select-arrow">🌷</span>
-            </div>
-            <div class="cute-select-wrap">
-              <select id="eventDay" class="cute-select" onchange="syncEventDate()">
-                <option value="" disabled selected>💕 Day</option>
-              </select>
-              <span class="cute-select-arrow">🌷</span>
-            </div>
-            <div class="cute-select-wrap">
-              <select id="eventYear" class="cute-select" onchange="syncEventDate()">
-                <option value="" disabled selected>✨ Year</option>
-              </select>
-              <span class="cute-select-arrow">🌷</span>
-            </div>
+          <div class="modal-trigger-btn" onclick="openDateModal()">
+            <span class="modal-trigger-icon">📅</span>
+            <span class="modal-trigger-text" id="eventDateDisplay">Pick your date, babe~ 🌸</span>
+            <span class="modal-trigger-arrow">🌷</span>
           </div>
-          <!-- hidden field that holds the combined value -->
           <input type="hidden" id="eventDate"/>
         </div>
 
-        <!-- PERFORMANCE TIME — cute dropdown -->
+        <!-- PERFORMANCE TIME — modal trigger -->
         <div class="field">
           <label>Performance Time *</label>
-          <div class="cute-select-wrap">
-            <select id="perfTime" class="cute-select" onchange="checkSubmit()">
-              <option value="" disabled selected>🕐 Pick a time, babe~</option>
-              <option>6:00 AM</option>  <option>6:30 AM</option>
-              <option>7:00 AM</option>  <option>7:30 AM</option>
-              <option>8:00 AM</option>  <option>8:30 AM</option>
-              <option>9:00 AM</option>  <option>9:30 AM</option>
-              <option>10:00 AM</option> <option>10:30 AM</option>
-              <option>11:00 AM</option> <option>11:30 AM</option>
-              <option>12:00 PM</option> <option>12:30 PM</option>
-              <option>1:00 PM</option>  <option>1:30 PM</option>
-              <option>2:00 PM</option>  <option>2:30 PM</option>
-              <option>3:00 PM</option>  <option>3:30 PM</option>
-              <option>4:00 PM</option>  <option>4:30 PM</option>
-              <option>5:00 PM</option>  <option>5:30 PM</option>
-              <option>6:00 PM</option>  <option>6:30 PM</option>
-              <option>7:00 PM</option>  <option>7:30 PM</option>
-              <option>8:00 PM</option>  <option>8:30 PM</option>
-              <option>9:00 PM</option>  <option>9:30 PM</option>
-              <option>10:00 PM</option>
-            </select>
-            <span class="cute-select-arrow">🌷</span>
+          <div class="modal-trigger-btn" onclick="openTimeModal()">
+            <span class="modal-trigger-icon">🕐</span>
+            <span class="modal-trigger-text" id="perfTimeDisplay">Pick a time, babe~ ✨</span>
+            <span class="modal-trigger-arrow">🌷</span>
           </div>
+          <input type="hidden" id="perfTime"/>
         </div>
 
-        <!-- EVENT OCCASION — cute dropdown -->
+        <!-- EVENT OCCASION — modal trigger -->
         <div class="field">
           <label>Event Occasion *</label>
           <p class="field-hint">Spill — what are we celebrating? 🎉</p>
-          <div class="cute-select-wrap">
-            <select id="occasion" class="cute-select" onchange="checkSubmit()">
-              <option value="" disabled selected>🎀 Pick your vibe —</option>
-              <option>Birthday Party</option>
-              <option>Session Vocalist / Band Sub</option>
-              <option>Party</option>
-              <option>Resto Bar</option>
-              <option>Wedding</option>
-              <option>Reception</option>
-            </select>
-            <span class="cute-select-arrow">🌷</span>
+          <div class="modal-trigger-btn" onclick="openOccasionModal()">
+            <span class="modal-trigger-icon">🎉</span>
+            <span class="modal-trigger-text" id="occasionDisplay">Pick your vibe — 💅</span>
+            <span class="modal-trigger-arrow">🌷</span>
           </div>
+          <input type="hidden" id="occasion"/>
         </div>
 
         <!-- VENUE -->
@@ -229,29 +177,12 @@
               </div>
               <div class="pkg-box" id="songBox">
                 <p class="field-hint">Pick your song count 🎶</p>
-                <div class="cute-select-wrap">
-                  <select id="songPkg" class="cute-select" onchange="showPrice('song')">
-                    <option value="" disabled selected>🎵 Choose your bop package —</option>
-                    <option value="1–6 Songs|₱300">1–6 Songs — ₱300</option>
-                    <option value="1–10 Songs|₱350">1–10 Songs — ₱350</option>
-                    <option value="1–15 Songs|₱400">1–15 Songs — ₱400</option>
-                    <option value="Band Sub|Negotiable">Band Sub — Negotiable 💬</option>
-                  </select>
-                  <span class="cute-select-arrow">🌷</span>
-                </div>
+                <input type="hidden" id="songPkg"/>
                 <div class="price-tag" id="songPrice"></div>
               </div>
               <div class="pkg-box" id="hourBox">
                 <p class="field-hint">How many hours of pure slay? ⏱️</p>
-                <div class="cute-select-wrap">
-                  <select id="hourPkg" class="cute-select" onchange="showPrice('hour')">
-                    <option value="" disabled selected>⏱️ Pick your hours —</option>
-                    <option value="1 Hour|₱400">1 Hour — ₱400</option>
-                    <option value="1 Hr 30 Mins|₱450">1 Hour 30 Mins — ₱450</option>
-                    <option value="2 Hours|₱500">2 Hours — ₱500</option>
-                  </select>
-                  <span class="cute-select-arrow">🌷</span>
-                </div>
+                <input type="hidden" id="hourPkg"/>
                 <div class="price-tag" id="hourPrice"></div>
               </div>
             </div>
@@ -259,15 +190,7 @@
 
           <div class="category-box" id="hostBox">
             <p class="field-hint">She'll sing AND host — full package energy! 🎙️✨</p>
-            <div class="cute-select-wrap">
-              <select id="hostPkg" class="cute-select" onchange="showHostPrice()">
-                <option value="" disabled selected>💅 Choose your full-glam package —</option>
-                <option value="1 Hour|₱800">1 Hour — ₱800</option>
-                <option value="2 Hours|₱900">2 Hours — ₱900</option>
-                <option value="3 Hours|₱1,000">3 Hours — ₱1,000</option>
-              </select>
-              <span class="cute-select-arrow">🌷</span>
-            </div>
+            <input type="hidden" id="hostPkg"/>
             <div class="price-tag" id="hostPrice"></div>
           </div>
         </div>
@@ -292,7 +215,6 @@
     <div class="step-panel" id="step2">
       <div class="form-body">
         <div class="section-head">💚 Secure Your Slot via GCash</div>
-
         <div class="gcash-form-box">
           <div class="gcash-form-head"><span>📸</span><span>Send ₱200 &amp; Upload Your Proof</span></div>
           <div class="gcash-form-body">
@@ -307,14 +229,12 @@
               </div>
             </div>
             <p>Send <strong>₱200</strong> to the number above, then upload your GCash confirmation screenshot here. <strong>Screenshot is required</strong> before you can continue. 💕</p>
-
             <div class="upload-area" id="uploadArea" onclick="document.getElementById('gcashFile').click()">
               <span class="upload-icon">📱</span>
               <span class="upload-label">Tap to upload GCash screenshot</span>
               <span class="upload-sublabel">JPG, PNG — your GCash confirmation receipt</span>
             </div>
             <input type="file" id="gcashFile" accept="image/*" style="display:none;" onchange="handleGcashUpload(this)"/>
-
             <div class="gcash-preview" id="gcashPreview">
               <img id="gcashPreviewImg" src="" alt="GCash Screenshot Preview"/>
               <div class="gcash-preview-actions">
@@ -324,7 +244,6 @@
             </div>
           </div>
         </div>
-
         <div class="step-nav">
           <button class="btn-back" onclick="goToStep(1)">← Back</button>
           <button class="btn-next" id="nextTo3" onclick="goToStep(3)">Next →</button>
@@ -338,7 +257,6 @@
     ══════════════════════════════ -->
     <div class="step-panel" id="step3">
       <div class="form-body">
-
         <div class="section-head">🌸 Your Booking Summary</div>
         <div class="mini-summary cc" id="miniSummary"></div>
 
@@ -372,7 +290,6 @@
           <button class="btn-back" onclick="goToStep(2)">← Back</button>
           <button class="btn-submit" id="submitBtn" onclick="submitForm()" disabled>🎀 Submit Booking</button>
         </div>
-
       </div>
     </div>
 
@@ -416,6 +333,74 @@
 ════════════════════════════════════════════════════════ -->
 <div class="cm-overlay" id="categoryModal">
   <div class="cm-box" id="categoryModalContent"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     DATE MODAL
+════════════════════════════════════════════════════════ -->
+<div class="cm-overlay" id="dateModal">
+  <div class="cm-box">
+    <span class="cm-icon">📅</span>
+    <div class="cm-title">Pick Your Date</div>
+    <div class="cm-sub">When's the big day? 🌸</div>
+    <div class="cm-divider"></div>
+    <div class="cm-section-label">Month</div>
+    <div class="cm-grid-3" id="monthGrid"></div>
+    <div class="cm-section-label" style="margin-top:14px;">Day</div>
+    <div class="cm-grid-7" id="dayGrid"></div>
+    <div class="cm-section-label" style="margin-top:14px;">Year</div>
+    <div class="cm-grid-3" id="yearGrid"></div>
+    <div class="cm-selected-preview" id="datePreview">No date selected yet 🌷</div>
+    <div class="cm-actions">
+      <button class="cm-btn-cancel" onclick="closeDateModal()">Cancel</button>
+      <button class="cm-btn-confirm" id="dateConfirmBtn" onclick="confirmDateModal()" disabled>Confirm 🎀</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TIME MODAL
+════════════════════════════════════════════════════════ -->
+<div class="cm-overlay" id="timeModal">
+  <div class="cm-box">
+    <span class="cm-icon">🕐</span>
+    <div class="cm-title">Performance Time</div>
+    <div class="cm-sub">What time does the magic start? ✨</div>
+    <div class="cm-divider"></div>
+    <div class="cm-section-label">Morning ☀️</div>
+    <div class="cm-time-grid" id="timeGridAM"></div>
+    <div class="cm-section-label" style="margin-top:12px;">Afternoon &amp; Evening 🌙</div>
+    <div class="cm-time-grid" id="timeGridPM"></div>
+    <div class="cm-selected-preview" id="timePreview">No time selected yet 🌷</div>
+    <div class="cm-actions">
+      <button class="cm-btn-cancel" onclick="closeTimeModal()">Cancel</button>
+      <button class="cm-btn-confirm" id="timeConfirmBtn" onclick="confirmTimeModal()" disabled>Confirm 🎀</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     OCCASION MODAL
+════════════════════════════════════════════════════════ -->
+<div class="cm-overlay" id="occasionModal">
+  <div class="cm-box">
+    <span class="cm-icon">🎉</span>
+    <div class="cm-title">Event Occasion</div>
+    <div class="cm-sub">Spill — what are we celebrating? 💅</div>
+    <div class="cm-divider"></div>
+    <div class="cm-pkg-list">
+      <div class="cm-pkg-item" onclick="selectOccasion(this,'Birthday Party')"><div class="cm-pkg-name">🎂 Birthday Party</div></div>
+      <div class="cm-pkg-item" onclick="selectOccasion(this,'Session Vocalist / Band Sub')"><div class="cm-pkg-name">🎸 Session Vocalist / Band Sub</div></div>
+      <div class="cm-pkg-item" onclick="selectOccasion(this,'Party')"><div class="cm-pkg-name">🪩 Party</div></div>
+      <div class="cm-pkg-item" onclick="selectOccasion(this,'Resto Bar')"><div class="cm-pkg-name">🍹 Resto Bar</div></div>
+      <div class="cm-pkg-item" onclick="selectOccasion(this,'Wedding')"><div class="cm-pkg-name">💍 Wedding</div></div>
+      <div class="cm-pkg-item" onclick="selectOccasion(this,'Reception')"><div class="cm-pkg-name">🥂 Reception</div></div>
+    </div>
+    <div class="cm-actions">
+      <button class="cm-btn-cancel" onclick="closeOccasionModal()">Cancel</button>
+      <button class="cm-btn-confirm" id="occasionConfirmBtn" onclick="confirmOccasionModal()" disabled>Confirm 🎀</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════
