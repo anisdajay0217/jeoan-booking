@@ -133,10 +133,15 @@
           <input type="hidden" id="occasion"/>
         </div>
 
-        <!-- VENUE -->
+        <!-- VENUE ADDRESS — modal trigger -->
         <div class="field">
           <label>Venue Address *</label>
-          <textarea id="venue" rows="2" placeholder="Drop the location, sis…"></textarea>
+          <div class="modal-trigger-btn" onclick="openVenueModal()">
+            <span class="modal-trigger-icon">📍</span>
+            <span class="modal-trigger-text" id="venueDisplay">Drop the location, sis… 📍</span>
+            <span class="modal-trigger-arrow">🌷</span>
+          </div>
+          <input type="hidden" id="venue"/>
         </div>
 
         <!-- CATEGORY -->
@@ -400,6 +405,82 @@
       <button class="cm-btn-cancel" onclick="closeOccasionModal()">Cancel</button>
       <button class="cm-btn-confirm" id="occasionConfirmBtn" onclick="confirmOccasionModal()" disabled>Confirm 🎀</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     VENUE MODAL
+════════════════════════════════════════════════════════ -->
+<div class="cm-overlay" id="venueModal">
+  <div class="cm-box">
+
+    <span class="cm-icon">📍</span>
+    <div class="cm-title">Drop the Location, Sis</div>
+    <div class="cm-sub">Where's the party happening? We won't be late. 🗺️</div>
+    <div class="cm-divider"></div>
+
+    <!-- hidden datalists — JS populates these -->
+    <datalist id="cityList"></datalist>
+    <datalist id="barangayList"></datalist>
+
+    <!-- CITY -->
+    <div class="cm-section-label">City / Municipality 🏙️</div>
+    <input
+      type="text"
+      id="venueCity"
+      list="cityList"
+      placeholder="Type or pick — Koronadal, GenSan, Tupi…"
+      autocomplete="off"
+      oninput="_refreshBarangayList(); updateVenuePreview();"
+      style="margin-top:4px;"
+    />
+    <p class="field-hint" style="margin-top:5px; margin-bottom:0;">Not on the list? Type it yourself. We trust you. 😌</p>
+
+    <!-- BARANGAY -->
+    <div class="cm-section-label" style="margin-top:14px;">Barangay 🏘️</div>
+    <input
+      type="text"
+      id="venueBarangay"
+      list="barangayList"
+      placeholder="Pick or type your barangay…"
+      autocomplete="off"
+      oninput="updateVenuePreview();"
+      style="margin-top:4px;"
+    />
+    <p class="field-hint" style="margin-top:5px; margin-bottom:0;">Suggestions load once you type a city. Smart, right? ✨</p>
+
+    <!-- STREET / PUROK -->
+    <div class="cm-section-label" style="margin-top:14px;">Street / Purok 🛣️</div>
+    <input
+      type="text"
+      id="venueStreet"
+      placeholder="e.g. Purok 3, Mabini St. — go wild!"
+      autocomplete="off"
+      oninput="updateVenuePreview();"
+      style="margin-top:4px;"
+    />
+    <p class="field-hint" style="margin-top:5px; margin-bottom:0;">Optional but the GPS will thank you. 🛰️</p>
+
+    <!-- LANDMARK / SPECS -->
+    <div class="cm-section-label" style="margin-top:14px;">Landmark / Specs 🧭</div>
+    <input
+      type="text"
+      id="venueSpecs"
+      placeholder="e.g. 2 blocks behind Rizal Park, blue gate, can't miss it 💅"
+      autocomplete="off"
+      oninput="updateVenuePreview();"
+      style="margin-top:4px;"
+    />
+    <p class="field-hint" style="margin-top:5px; margin-bottom:0;">Spill the tea on how to find you. Every clue counts! ☕</p>
+
+    <!-- LIVE PREVIEW -->
+    <div class="cm-selected-preview" id="venuePreview">No venue locked in yet 🌷</div>
+
+    <div class="cm-actions">
+      <button class="cm-btn-cancel" onclick="closeVenueModal()">Cancel</button>
+      <button class="cm-btn-confirm" id="venueConfirmBtn" onclick="confirmVenueModal()" disabled>Confirm 🎀</button>
+    </div>
+
   </div>
 </div>
 
