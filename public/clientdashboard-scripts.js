@@ -341,6 +341,30 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 2800);
 }
 
+/* ── DONE MODAL (Thank You Page) ──────────────────────────── */
+function openTyDoneModal() {
+  document.getElementById('tyDoneModal').classList.add('show');
+}
+
+function closeTyDoneModal() {
+  document.getElementById('tyDoneModal').classList.remove('show');
+}
+
+function goBackToWelcome() {
+  closeTyDoneModal();
+
+  /* Hide thank you page */
+  var ty = document.getElementById('thankYouPage');
+  ty.classList.remove('show');
+
+  /* Show welcome page */
+  var wp = document.getElementById('welcomePage');
+  wp.style.display = '';
+  wp.classList.remove('hide');
+
+  window.scrollTo(0, 0);
+}
+
 /* ── INIT ─────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   spawnWelcomePetals();
