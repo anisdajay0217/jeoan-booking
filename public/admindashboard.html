@@ -46,32 +46,27 @@
       <div class="page-header">
         <div class="page-header-left">
           <div class="page-title">Bookings</div>
-          <div class="page-subtitle">Manage all incoming booking requests</div>
+          <div class="page-subtitle">Tap a card below to filter · manage all incoming requests</div>
         </div>
       </div>
+      <!-- Stat cards double as filter buttons -->
       <div class="stats-row">
-        <div class="stat-card" onclick="setFilter('all',this)" style="cursor:pointer">
+        <div class="stat-card" id="filterAll" onclick="setFilter('all',this)">
           <span class="stat-num" id="statTotal">0</span>
-          <div class="stat-lbl">Total</div>
+          <div class="stat-lbl">All Bookings</div>
         </div>
-        <div class="stat-card" onclick="setFilter('pending',this)" style="cursor:pointer">
+        <div class="stat-card" id="filterPending" onclick="setFilter('pending',this)">
           <span class="stat-num" id="statPending">0</span>
           <div class="stat-lbl">Pending</div>
         </div>
-        <div class="stat-card" onclick="setFilter('confirmed',this)" style="cursor:pointer">
+        <div class="stat-card" id="filterConfirmed" onclick="setFilter('confirmed',this)">
           <span class="stat-num green" id="statConfirmed">0</span>
           <div class="stat-lbl">Confirmed</div>
         </div>
-        <div class="stat-card" onclick="setFilter('declined',this)" style="cursor:pointer">
+        <div class="stat-card" id="filterDeclined" onclick="setFilter('declined',this)">
           <span class="stat-num red" id="statDeclined">0</span>
           <div class="stat-lbl">Declined</div>
         </div>
-      </div>
-      <div class="filter-bar">
-        <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
-        <button class="filter-btn" data-filter="pending" onclick="setFilter('pending',this)">⏳ Pending</button>
-        <button class="filter-btn" data-filter="confirmed" onclick="setFilter('confirmed',this)">✅ Confirmed</button>
-        <button class="filter-btn" data-filter="declined" onclick="setFilter('declined',this)">❌ Declined</button>
       </div>
       <div class="bookings-scroll" id="bookingsArea">
         <div class="empty-state"><span class="ei">🌸</span><p>No bookings yet.<br>They'll appear here once clients fill out the form!</p></div>
@@ -130,7 +125,7 @@
 <div class="modal-overlay" id="deleteModal">
   <div class="modal-box">
     <span class="modal-icon">🗑️</span>
-    <div class="modal-title">Delete Booking?</div>
+    <div class="modal-title">Archive Booking?</div>
     <div class="modal-msg" id="deleteModalMsg">This will move the booking to the Archive. You can view it there anytime.</div>
     <div class="modal-actions">
       <button class="modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
