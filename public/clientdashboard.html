@@ -6,7 +6,6 @@
   <title>Book Jeoan Gwyneth 🎀</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lato:wght@300;400;700&family=Pinyon+Script&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="clientdashboard-styles.css"/>
-  <link rel="stylesheet" href="clientdashboard-styles-append.css"/>
   <link rel="stylesheet" href="clientdashboard-steps.css"/>
 </head>
 <body>
@@ -330,6 +329,14 @@
       <div class="tc-row"><span class="tc-n">6.</span><span>Outdoor venues must have covered area for performer.</span></div>
     </div>
     <div class="ty-sig">Jeoan Gwyneth Dajay Gran ✦ Singer for Hire</div>
+
+    <!-- DONE BUTTON -->
+    <div style="text-align:center; margin-top: 16px; padding-bottom: 16px;">
+      <button class="btn-submit" style="max-width:260px; margin:0 auto; display:block;" onclick="openTyDoneModal()">
+        🎀 Done!
+      </button>
+    </div>
+
   </div>
 </div>
 
@@ -419,11 +426,9 @@
     <div class="cm-sub">Where's the party happening? We won't be late. 🗺️</div>
     <div class="cm-divider"></div>
 
-    <!-- hidden datalists — JS populates these -->
     <datalist id="cityList"></datalist>
     <datalist id="barangayList"></datalist>
 
-    <!-- CITY -->
     <div class="cm-section-label">City / Municipality 🏙️</div>
     <input
       type="text"
@@ -435,8 +440,8 @@
       style="margin-top:4px;"
     />
     <p class="field-hint" style="margin-top:5px; margin-bottom:0;">Not on the list? Type it yourself. We trust you. 😌</p>
-<br><br>
-    <!-- BARANGAY -->
+    <br><br>
+
     <div class="cm-section-label" style="margin-top:14px;">Barangay 🏘️</div>
     <input
       type="text"
@@ -448,8 +453,8 @@
       style="margin-top:4px;"
     />
     <p class="field-hint" style="margin-top:5px; margin-bottom:0;">Suggestions load once you type a city. ✨</p>
-<br><br>
-    <!-- STREET / PUROK -->
+    <br><br>
+
     <div class="cm-section-label" style="margin-top:14px;">Street / Purok 🛣️</div>
     <input
       type="text"
@@ -460,8 +465,8 @@
       style="margin-top:4px;"
     />
     <p class="field-hint" style="margin-top:5px; margin-bottom:0;">Optional but the GPS will thank you. 🛰️</p>
-<br><br>
-    <!-- LANDMARK / SPECS -->
+    <br><br>
+
     <div class="cm-section-label" style="margin-top:14px;">Landmark / Specs 🧭</div>
     <input
       type="text"
@@ -472,8 +477,8 @@
       style="margin-top:4px;"
     />
     <p class="field-hint" style="margin-top:5px; margin-bottom:0;">Spill the tea on how to find you. Every clue counts! ☕</p>
-<br><br>
-    <!-- LIVE PREVIEW -->
+    <br><br>
+
     <div class="cm-selected-preview" id="venuePreview">No venue locked in yet 🌷</div>
 
     <div class="cm-actions">
@@ -495,6 +500,24 @@
     <div class="cd-modal-actions">
       <button class="cd-modal-btn-cancel" onclick="closeCancelModal()">Go Back</button>
       <button class="cd-modal-btn-confirm" onclick="doCancelForm()">Yes, Clear Form</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     DONE MODAL (Thank You Page)
+════════════════════════════════════════════════════════ -->
+<div class="cd-modal-overlay" id="tyDoneModal">
+  <div class="cd-modal-box">
+    <span class="cd-modal-icon">💌</span>
+    <div class="cd-modal-title">You're all set! 🎀</div>
+    <div class="cd-modal-msg">
+      Jeoan will reach out to you shortly via <strong>text or Messenger</strong> to confirm your booking details.
+      Keep your phone close, babe! 💕
+    </div>
+    <div class="cd-modal-actions">
+      <button class="cd-modal-btn-cancel" onclick="closeTyDoneModal()">Stay Here</button>
+      <button class="cd-modal-btn-confirm" onclick="goBackToWelcome()">Back to Home 🌸</button>
     </div>
   </div>
 </div>
