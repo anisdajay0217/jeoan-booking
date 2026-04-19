@@ -1,7 +1,10 @@
 /* ============================================================
-   clientdashboard-modals.js  —  CATEGORY CHOICE MODALS
+   clientdashboard-modals.js  —  ALL MODALS
    ============================================================ */
 
+/* ══════════════════════════════════════════════════════════
+   CATEGORY MODAL (existing)
+══════════════════════════════════════════════════════════ */
 function openCategoryModal(type) {
   var content = document.getElementById('categoryModalContent');
 
@@ -153,4 +156,201 @@ function confirmCategoryModal() {
 
 function closeCategoryModal() {
   document.getElementById('categoryModal').classList.remove('show');
+}
+
+/* ══════════════════════════════════════════════════════════
+   DATE MODAL
+══════════════════════════════════════════════════════════ */
+var _selMonth = null, _selDay = null, _selYear = null;
+
+var MONTHS = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December'
+];
+
+function openDateModal() {
+  /* Build month grid */
+  var mg = document.getElementById('monthGrid');
+  mg.innerHTML = '';
+  MONTHS.forEach(function(m) {
+    var el = document.createElement('div');
+    el.className = 'cm-date-chip' + (_selMonth === m ? ' active' : '');
+    el.textContent = m.slice(0,3);
+    el.onclick = function() {
+      _selMonth = m;
+      mg.querySelectorAll('.cm-date-chip').forEach(function(c){ c.classList.remove('active'); });
+      el.classList.add('active');
+      updateDatePreview();
+    };
+    mg.appendChild(el);
+  });
+
+  /* Build day grid */
+  var dg = document.getElementById('dayGrid');
+  dg.innerHTML = '';
+  for (var d = 1; d <= 31; d++) {
+    (function(day) {
+      var el = document.createElement('div');
+      el.className = 'cm-date-chip' + (_selDay === day ? ' active' : '');
+      el.textContent = day;
+      el.onclick = function() {
+        _selDay = day;
+        dg.querySelectorAll('.cm-date-chip').forEach(function(c){ c.classList.remove('active'); });
+        el.classList.add('active');
+        updateDatePreview();
+      };
+      dg.appendChild(el);
+    })(d);
+  }
+
+  /* Build year grid */
+  var yg = document.getElementById('yearGrid');
+  yg.innerHTML = '';
+  var curYear = new Date().getFullYear();
+  for (var y = curYear; y <= curYear + 3; y++) {
+    (function(yr) {
+      var el = document.createElement('div');
+      el.className = 'cm-date-chip' + (_selYear === yr ? ' active' : '');
+      el.textContent = yr;
+      el.onclick = function() {
+        _selYear = yr;
+        yg.querySelectorAll('.cm-date-chip').forEach(function(c){ c.classList.remove('active'); });
+        el.classList.add('active');
+        updateDatePreview();
+      };
+      yg.appendChild(el);
+    })(y);
+  }
+
+  updateDatePreview();
+  document.getElementById('dateModal').classList.add('show');
+}
+
+function updateDatePreview() {
+  var prev = document.getElementById('datePreview');
+  var btn  = document.getElementById('dateConfirmBtn');
+  if (_selMonth && _selDay && _selYear) {
+    prev.textContent = '📅 ' + _selMonth + ' ' + _selDay + ', ' + _selYear;
+    btn.disabled = false;
+  } else {
+    prev.textContent = 'No date selected yet 🌷';
+    btn.disabled = true;
+  }
+}
+
+function confirmDateModal() {
+  var val = _selMonth + ' ' + _selDay + ', ' + _selYear;
+  document.getElementById('eventDate').value        = val;
+  document.getElementById('eventDateDisplay').textContent = '📅 ' + val;
+  document.getElementById('eventDateDisplay').classList.add('selected');
+  closeDateModal();
+  checkSubmit();
+}
+
+function closeDateModal() {
+  document.getElementById('dateModal').classList.remove('show');
+}
+
+/* ══════════════════════════════════════════════════════════
+   TIME MODAL
+══════════════════════════════════════════════════════════ */
+var _selTime = null;
+
+var TIMES_AM = [
+  '6:00 AM','6:30 AM','7:00 AM','7:30 AM',
+  '8:00 AM','8:30 AM','9:00 AM','9:30 AM',
+  '10:00 AM','10:30 AM','11:00 AM','11:30 AM'
+];
+var TIMES_PM = [
+  '12:00 PM','12:30 PM','1:00 PM','1:30 PM',
+  '2:00 PM','2:30 PM','3:00 PM','3:30 PM',
+  '4:00 PM','4:30 PM','5:00 PM','5:30 PM',
+  '6:00 PM','6:30 PM','7:00 PM','7:30 PM',
+  '8:00 PM','8:30 PM','9:00 PM','9:30 PM','10:00 PM'
+];
+
+function openTimeModal() {
+  buildTimeGrid('timeGridAM', TIMES_AM);
+  buildTimeGrid('timeGridPM', TIMES_PM);
+  updateTimePreview();
+  document.getElementById('timeModal').classList.add('show');
+}
+
+function buildTimeGrid(gridId, times) {
+  var grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+  times.forEach(function(t) {
+    var el = document.createElement('div');
+    el.className = 'cm-time-chip' + (_selTime === t ? ' active' : '');
+    el.textContent = t;
+    el.onclick = function() {
+      _selTime = t;
+      /* clear all chips across both grids */
+      document.querySelectorAll('.cm-time-chip').forEach(function(c){ c.classList.remove('active'); });
+      el.classList.add('active');
+      updateTimePreview();
+    };
+    grid.appendChild(el);
+  });
+}
+
+function updateTimePreview() {
+  var prev = document.getElementById('timePreview');
+  var btn  = document.getElementById('timeConfirmBtn');
+  if (_selTime) {
+    prev.textContent = '🕐 ' + _selTime;
+    btn.disabled = false;
+  } else {
+    prev.textContent = 'No time selected yet 🌷';
+    btn.disabled = true;
+  }
+}
+
+function confirmTimeModal() {
+  document.getElementById('perfTime').value           = _selTime;
+  document.getElementById('perfTimeDisplay').textContent = '🕐 ' + _selTime;
+  document.getElementById('perfTimeDisplay').classList.add('selected');
+  closeTimeModal();
+  checkSubmit();
+}
+
+function closeTimeModal() {
+  document.getElementById('timeModal').classList.remove('show');
+}
+
+/* ══════════════════════════════════════════════════════════
+   OCCASION MODAL
+══════════════════════════════════════════════════════════ */
+var _selOccasion = null;
+
+function selectOccasion(el, val) {
+  _selOccasion = val;
+  document.querySelectorAll('#occasionModal .cm-pkg-item').forEach(function(i){
+    i.classList.remove('active');
+  });
+  el.classList.add('active');
+  document.getElementById('occasionConfirmBtn').disabled = false;
+}
+
+function confirmOccasionModal() {
+  document.getElementById('occasion').value          = _selOccasion;
+  document.getElementById('occasionDisplay').textContent = '🎉 ' + _selOccasion;
+  document.getElementById('occasionDisplay').classList.add('selected');
+  closeOccasionModal();
+  checkSubmit();
+}
+
+function closeOccasionModal() {
+  document.getElementById('occasionModal').classList.remove('show');
+}
+
+function openOccasionModal() {
+  /* Re-highlight previous selection if any */
+  _selOccasion = document.getElementById('occasion').value || null;
+  document.querySelectorAll('#occasionModal .cm-pkg-item').forEach(function(el) {
+    var name = el.querySelector('.cm-pkg-name').textContent.replace(/^.+?\s/, ''); /* strip emoji */
+    el.classList.toggle('active', _selOccasion && el.querySelector('.cm-pkg-name').textContent.includes(_selOccasion));
+  });
+  document.getElementById('occasionConfirmBtn').disabled = !_selOccasion;
+  document.getElementById('occasionModal').classList.add('show');
 }
