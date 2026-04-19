@@ -345,10 +345,16 @@ async function revertStatus(id) {
   } catch { showToast('❌ Error reverting.'); }
 }
 
-// ════════════════════════════════════════════════════
-// RECEIPT — cute minimalist, no wasted space
-// Replace the existing generateReceipt function with this
-// ════════════════════════════════════════════════════
+// ════════════════════════════════════════
+// RECEIPT
+// ════════════════════════════════════════
+async function downloadReceipt(id) {
+  const all = await fetchBookingsRaw();
+  const b = all.find(x => String(x.id) === String(id));
+  if (!b) { showToast('❌ Could not load booking data.'); return; }
+  generateReceipt(b);
+}
+
 function generateReceipt(b) {
   const canvas = document.getElementById('receiptCanvas');
   const W = 700, H = 980;
@@ -368,7 +374,6 @@ function generateReceipt(b) {
   const green     = '#1a7a50';
   const softBdr   = '#f0c0d0';
   const accentBar = '#e8a0b8';
-  const starColor = '#e0607a';
   const PAD = 30;
 
   // ── BACKGROUND ─────────────────────────────────────
@@ -378,22 +383,21 @@ function generateReceipt(b) {
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  // ── DECORATIVE HELPERS ────────────────────────────
+  // ── DECORATIVE SHAPE HELPERS ───────────────────────
 
-  // Draw a 5-pointed star
   function drawStar(cx, cy, r, alpha, color) {
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = color;
     ctx.beginPath();
     for (let i = 0; i < 5; i++) {
-      const angle = (Math.PI / 2) + (i * 2 * Math.PI / 5);
+      const outerAngle = (Math.PI / 2) + (i * 2 * Math.PI / 5);
+      const innerAngle = outerAngle + Math.PI / 5;
       const ir = r * 0.42;
-      const ox = cx + r * Math.cos(angle);
-      const oy = cy - r * Math.sin(angle);
-      const ia = angle + Math.PI / 5;
-      const ix = cx + ir * Math.cos(ia);
-      const iy = cy - ir * Math.sin(ia);
+      const ox = cx + r  * Math.cos(outerAngle);
+      const oy = cy - r  * Math.sin(outerAngle);
+      const ix = cx + ir * Math.cos(innerAngle);
+      const iy = cy - ir * Math.sin(innerAngle);
       if (i === 0) { ctx.moveTo(ox, oy); } else { ctx.lineTo(ox, oy); }
       ctx.lineTo(ix, iy);
     }
@@ -402,7 +406,6 @@ function generateReceipt(b) {
     ctx.restore();
   }
 
-  // Draw a tiny 4-petal flower
   function drawFlower(cx, cy, r, alpha, color) {
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -416,16 +419,14 @@ function generateReceipt(b) {
       ctx.fill();
       ctx.restore();
     }
-    // center dot
     ctx.fillStyle = '#f9a8c0';
-    ctx.globalAlpha = alpha * 1.2;
+    ctx.globalAlpha = Math.min(alpha * 1.3, 1);
     ctx.beginPath();
     ctx.arc(cx, cy, r * 0.3, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
 
-  // Draw a tiny diamond
   function drawDiamond(cx, cy, r, alpha, color) {
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -440,31 +441,27 @@ function generateReceipt(b) {
     ctx.restore();
   }
 
-  // Scatter background decorations
+  // ── BACKGROUND DECORATIONS ─────────────────────────
   const bgDecos = [
-    // corners and edges
-    { t:'star',    x:38,     y:38,     r:10, a:0.18 },
-    { t:'flower',  x:W-38,   y:38,     r:8,  a:0.15 },
-    { t:'star',    x:W-38,   y:H-38,   r:9,  a:0.17 },
-    { t:'flower',  x:38,     y:H-38,   r:7,  a:0.14 },
-    { t:'diamond', x:W/2,    y:22,     r:7,  a:0.18 },
-    { t:'diamond', x:W/2,    y:H-22,   r:7,  a:0.18 },
-    // left edge mid
-    { t:'star',    x:22,     y:H*0.3,  r:7,  a:0.13 },
-    { t:'flower',  x:22,     y:H*0.55, r:6,  a:0.12 },
-    { t:'star',    x:22,     y:H*0.75, r:6,  a:0.11 },
-    // right edge mid
-    { t:'star',    x:W-22,   y:H*0.3,  r:7,  a:0.13 },
-    { t:'flower',  x:W-22,   y:H*0.55, r:6,  a:0.12 },
-    { t:'star',    x:W-22,   y:H*0.75, r:6,  a:0.11 },
-    // small accent fillers
-    { t:'diamond', x:70,     y:H*0.42, r:4,  a:0.10 },
-    { t:'diamond', x:W-70,   y:H*0.42, r:4,  a:0.10 },
-    { t:'star',    x:100,    y:H*0.88, r:5,  a:0.10 },
-    { t:'star',    x:W-100,  y:H*0.88, r:5,  a:0.10 },
+    { t:'star',    x:38,    y:38,     r:10, a:0.18 },
+    { t:'flower',  x:W-38,  y:38,     r:8,  a:0.15 },
+    { t:'star',    x:W-38,  y:H-38,   r:9,  a:0.17 },
+    { t:'flower',  x:38,    y:H-38,   r:7,  a:0.14 },
+    { t:'diamond', x:W/2,   y:22,     r:7,  a:0.18 },
+    { t:'diamond', x:W/2,   y:H-22,   r:7,  a:0.18 },
+    { t:'star',    x:22,    y:H*0.30, r:7,  a:0.13 },
+    { t:'flower',  x:22,    y:H*0.55, r:6,  a:0.12 },
+    { t:'star',    x:22,    y:H*0.75, r:6,  a:0.11 },
+    { t:'star',    x:W-22,  y:H*0.30, r:7,  a:0.13 },
+    { t:'flower',  x:W-22,  y:H*0.55, r:6,  a:0.12 },
+    { t:'star',    x:W-22,  y:H*0.75, r:6,  a:0.11 },
+    { t:'diamond', x:70,    y:H*0.42, r:4,  a:0.10 },
+    { t:'diamond', x:W-70,  y:H*0.42, r:4,  a:0.10 },
+    { t:'star',    x:100,   y:H*0.88, r:5,  a:0.10 },
+    { t:'star',    x:W-100, y:H*0.88, r:5,  a:0.10 },
   ];
   bgDecos.forEach(d => {
-    if (d.t === 'star')    drawStar(d.x, d.y, d.r, d.a, starColor);
+    if (d.t === 'star')    drawStar(d.x, d.y, d.r, d.a, rose);
     if (d.t === 'flower')  drawFlower(d.x, d.y, d.r, d.a, rose);
     if (d.t === 'diamond') drawDiamond(d.x, d.y, d.r, d.a, deepRose);
   });
@@ -472,22 +469,22 @@ function generateReceipt(b) {
   // ── CARD HELPER ────────────────────────────────────
   function card(x, y, w, h, radius) {
     ctx.save();
-    ctx.shadowColor  = 'rgba(210,110,140,0.14)';
-    ctx.shadowBlur   = 18;
+    ctx.shadowColor   = 'rgba(210,110,140,0.14)';
+    ctx.shadowBlur    = 18;
     ctx.shadowOffsetY = 4;
     roundRect(ctx, x, y, w, h, radius);
     ctx.fillStyle = cardWhite;
     ctx.fill();
     ctx.restore();
     ctx.strokeStyle = softBdr;
-    ctx.lineWidth = 1;
+    ctx.lineWidth   = 1;
     roundRect(ctx, x, y, w, h, radius);
     ctx.stroke();
   }
 
-  // ── SPACED-CAP LABEL ────────────────────────────────
+  // ── SPACED-CAP LABEL ───────────────────────────────
   function label(text, x, y) {
-    ctx.font = '700 9.5px Arial, sans-serif';
+    ctx.font      = '700 9.5px Arial, sans-serif';
     ctx.fillStyle = rose;
     ctx.textAlign = 'left';
     let cx = x;
@@ -497,25 +494,40 @@ function generateReceipt(b) {
     });
   }
 
-  // ── FIELD ───────────────────────────────────────────
+  // ── FIELD (label + value) ──────────────────────────
   function field(lbl, val, x, y, maxW) {
     label(lbl, x, y);
-    ctx.font = '400 15.5px Georgia, serif';
+    ctx.font      = '400 15.5px Georgia, serif';
     ctx.fillStyle = ink;
     ctx.textAlign = 'left';
     let v = val || '—';
     if (maxW) {
-      while (ctx.measureText(v).width > maxW && v.length > 2) v = v.slice(0,-1);
-      if (v !== (val||'—')) v += '…';
+      while (ctx.measureText(v).width > maxW && v.length > 2) v = v.slice(0, -1);
+      if (v !== (val || '—')) v += '…';
     }
     ctx.fillText(v, x, y + 20);
   }
 
-  const cX = PAD;
-  const cW = W - PAD * 2;
+  // ── SECTION TITLE + RULE ───────────────────────────
+  function sectionTitle(text, x, y, lineEnd) {
+    ctx.fillStyle = roseText;
+    ctx.font      = '700 11px Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(text, x, y);
+    ctx.strokeStyle = softBdr;
+    ctx.lineWidth   = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(x, y + 6);
+    ctx.lineTo(lineEnd, y + 6);
+    ctx.stroke();
+  }
+
+  const cX   = PAD;
+  const cW   = W - PAD * 2;
   const col1 = PAD + 14;
   const col2 = W / 2 + 10;
   const colW = W / 2 - PAD - 24;
+  const sR   = W - PAD - 14;
 
   // ════════════════════════════════
   // CARD 1 — HEADER
@@ -523,32 +535,31 @@ function generateReceipt(b) {
   const hY = 26, hH = 150;
   card(cX, hY, cW, hH, 18);
 
-  // top color bar
   ctx.fillStyle = accentBar;
-  roundRect(ctx, cX, hY, cW, 5, {tl:18,tr:18,bl:0,br:0});
+  roundRect(ctx, cX, hY, cW, 5, { tl:18, tr:18, bl:0, br:0 });
   ctx.fill();
 
-  // Inline star decorations on header bar
-  drawStar(col1 + 6,       hY + 2.5, 4, 0.55, '#ffffff');
-  drawStar(W - PAD - 20,   hY + 2.5, 3, 0.45, '#ffffff');
-  drawStar(W/2,            hY + 2.5, 3, 0.40, '#ffffff');
+  // stars on bar
+  drawStar(col1 + 6,     hY + 2.5, 4,   0.55, '#ffffff');
+  drawStar(W / 2,        hY + 2.5, 3,   0.40, '#ffffff');
+  drawStar(W - PAD - 20, hY + 2.5, 3,   0.45, '#ffffff');
 
-  // Brand name
   ctx.fillStyle = deepRose;
-  ctx.font = 'bold 25px Georgia, serif';
+  ctx.font      = 'bold 25px Georgia, serif';
   ctx.textAlign = 'left';
   ctx.fillText('Jeoan Gwyneth Dajay Gran', col1, hY + 40);
 
-  // Tagline
-  ctx.font = '400 12.5px Arial, sans-serif';
+  ctx.font      = '400 12.5px Arial, sans-serif';
   ctx.fillStyle = mauve;
   ctx.fillText('Singer & Host for Hire  ·  South Cotabato  ·  0912 797 7245', col1, hY + 60);
 
-  // Rule
+  // thin rule
   ctx.strokeStyle = softBdr; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(col1, hY + 74); ctx.lineTo(W - PAD - 14, hY + 74); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(col1, hY + 74); ctx.lineTo(sR, hY + 74); ctx.stroke();
+  drawFlower(col1 - 4,    hY + 74, 5, 0.25, rose);
+  drawFlower(sR + 4,      hY + 74, 5, 0.25, rose);
 
-  // BOOKING CONFIRMED badge
+  // confirmed badge
   ctx.fillStyle = '#e6f5ee';
   roundRect(ctx, col1, hY + 84, 188, 28, 9);
   ctx.fill();
@@ -556,158 +567,117 @@ function generateReceipt(b) {
   roundRect(ctx, col1, hY + 84, 188, 28, 9);
   ctx.stroke();
   ctx.fillStyle = green;
-  ctx.font = 'bold 11.5px Arial, sans-serif';
+  ctx.font      = 'bold 11.5px Arial, sans-serif';
   ctx.textAlign = 'left';
   ctx.fillText('✓  BOOKING CONFIRMED', col1 + 12, hY + 103);
 
-  // Issue date
-  ctx.font = '11px Arial, sans-serif';
+  ctx.font      = '11px Arial, sans-serif';
   ctx.fillStyle = mauve;
   ctx.textAlign = 'right';
   ctx.fillText(
-    'Issued ' + new Date().toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}),
-    W - PAD - 14, hY + 103
+    'Issued ' + new Date().toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' }),
+    sR, hY + 103
   );
-
-  // Tiny flowers flanking the rule
-  drawFlower(col1 - 4,       hY + 74, 5, 0.25, rose);
-  drawFlower(W - PAD - 10,   hY + 74, 5, 0.25, rose);
 
   // ════════════════════════════════
   // CARD 2 — BOOKING DETAILS
-  // (tighter rows, no wasted space)
   // ════════════════════════════════
-  const dY = hY + hH + 12, dH = 248;
+  const dY = hY + hH + 12, dH = 252;
   card(cX, dY, cW, dH, 18);
 
   ctx.fillStyle = accentBar;
-  roundRect(ctx, cX, dY, cW, 5, {tl:18,tr:18,bl:0,br:0});
+  roundRect(ctx, cX, dY, cW, 5, { tl:18, tr:18, bl:0, br:0 });
   ctx.fill();
-
-  // Star accents on bar
   drawStar(col1 + 6,     dY + 2.5, 3.5, 0.50, '#ffffff');
   drawStar(W - PAD - 18, dY + 2.5, 3,   0.40, '#ffffff');
 
-  // Section title
-  ctx.fillStyle = roseText;
-  ctx.font = '700 11px Arial, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('BOOKING DETAILS', col1, dY + 24);
-
-  // Thin rule under section title
-  ctx.strokeStyle = softBdr; ctx.lineWidth = 0.8;
-  ctx.beginPath(); ctx.moveTo(col1, dY + 30); ctx.lineTo(W - PAD - 14, dY + 30); ctx.stroke();
+  sectionTitle('BOOKING DETAILS', col1, dY + 24, sR);
 
   let fy = dY + 46;
   const fROW = 52;
 
-  field('Client Name',       b.name,            col1, fy, colW);
-  field('Event Date',        b.date,             col2, fy, colW);
+  field('Client Name',       b.name,             col1, fy, colW);
+  field('Event Date',        b.date,              col2, fy, colW);
+  fy += fROW;
+  field('Contact Number',    b.phone || '—',     col1, fy, colW);
+  field('Performance Time',  b.perfTime || '—',  col2, fy, colW);
+  fy += fROW;
+  field('Occasion',          b.occasion,          col1, fy, colW);
+  field('Package',           b.package,           col2, fy, colW);
+  fy += fROW;
+  field('Venue',             b.venue,             col1, fy, cW - 28);
   fy += fROW;
 
-  field('Contact Number',    b.phone || '—',    col1, fy, colW);
-  field('Performance Time',  b.perfTime || '—', col2, fy, colW);
-  fy += fROW;
-
-  field('Occasion',          b.occasion,         col1, fy, colW);
-  field('Package',           b.package,          col2, fy, colW);
-  fy += fROW;
-
-  field('Venue',             b.venue,            col1, fy, cW - 28);
-  fy += fROW;
-
-  // Notes — italic, fills remaining space
   if (b.notes) {
-    ctx.font = 'italic 13px Georgia, serif';
+    ctx.font      = 'italic 13px Georgia, serif';
     ctx.fillStyle = mauve;
     ctx.textAlign = 'left';
     ctx.fillText('" ' + b.notes + ' "', col1, fy - 4);
   }
 
-  // Tiny star dividers between field rows
-  [dY+96, dY+148, dY+200].forEach(sy => {
-    drawStar(W/2 - 6, sy, 3, 0.15, rose);
-    drawStar(W/2 + 6, sy, 3, 0.15, rose);
+  // mid-card star dividers
+  [dY + 96, dY + 148, dY + 200].forEach(sy => {
+    drawStar(W / 2 - 7, sy, 3, 0.15, rose);
+    drawStar(W / 2 + 7, sy, 3, 0.15, rose);
   });
 
   // ════════════════════════════════
   // CARD 3 — PAYMENT
   // ════════════════════════════════
-  const pY = dY + dH + 12, pH = 130;
+  const pY = dY + dH + 12, pH = 134;
   card(cX, pY, cW, pH, 18);
 
-  // Rose top bar
   ctx.fillStyle = rose;
-  roundRect(ctx, cX, pY, cW, 5, {tl:18,tr:18,bl:0,br:0});
+  roundRect(ctx, cX, pY, cW, 5, { tl:18, tr:18, bl:0, br:0 });
   ctx.fill();
-
-  // Stars on payment bar
   drawStar(col1 + 6,     pY + 2.5, 3.5, 0.55, '#ffffff');
+  drawFlower(W / 2,      pY + 2.5, 4,   0.35, '#ffffff');
   drawStar(W - PAD - 18, pY + 2.5, 3,   0.45, '#ffffff');
-  drawFlower(W/2,        pY + 2.5, 4,   0.35, '#ffffff');
 
-  // Section title
-  ctx.fillStyle = roseText;
-  ctx.font = '700 11px Arial, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('PAYMENT SUMMARY', col1, pY + 24);
+  sectionTitle('PAYMENT SUMMARY', col1, pY + 24, sR);
 
-  ctx.strokeStyle = softBdr; ctx.lineWidth = 0.8;
-  ctx.beginPath(); ctx.moveTo(col1, pY + 30); ctx.lineTo(W - PAD - 14, pY + 30); ctx.stroke();
+  const bd = getPriceBreakdown(b);
 
-  const bd  = getPriceBreakdown(b);
-  const sL  = col1, sR = W - PAD - 14;
-
-  ctx.font = '400 13.5px Arial, sans-serif';
+  ctx.font      = '400 13.5px Arial, sans-serif';
   ctx.fillStyle = mauve; ctx.textAlign = 'left';
-  ctx.fillText('Package Total', sL, pY + 50);
-  ctx.font = '500 14px Arial, sans-serif';
+  ctx.fillText('Package Total', col1, pY + 50);
+  ctx.font      = '500 14px Arial, sans-serif';
   ctx.fillStyle = ink; ctx.textAlign = 'right';
   ctx.fillText(bd.totalStr, sR, pY + 50);
 
-  ctx.font = '400 13.5px Arial, sans-serif';
+  ctx.font      = '400 13.5px Arial, sans-serif';
   ctx.fillStyle = mauve; ctx.textAlign = 'left';
-  ctx.fillText('Downpayment Paid (GCash)', sL, pY + 72);
-  ctx.font = '600 13.5px Arial, sans-serif';
+  ctx.fillText('Downpayment Paid (GCash)', col1, pY + 74);
+  ctx.font      = '600 13.5px Arial, sans-serif';
   ctx.fillStyle = green; ctx.textAlign = 'right';
-  ctx.fillText('− ' + bd.dpStr, sR, pY + 72);
+  ctx.fillText('− ' + bd.dpStr, sR, pY + 74);
 
-  // Dashed divider
   ctx.strokeStyle = softBdr; ctx.lineWidth = 1;
-  ctx.setLineDash([4,4]);
-  ctx.beginPath(); ctx.moveTo(sL, pY + 84); ctx.lineTo(sR, pY + 84); ctx.stroke();
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(col1, pY + 87); ctx.lineTo(sR, pY + 87); ctx.stroke();
   ctx.setLineDash([]);
 
-  // Remaining balance
-  ctx.font = '700 12px Arial, sans-serif';
+  ctx.font      = '700 12px Arial, sans-serif';
   ctx.fillStyle = deepRose; ctx.textAlign = 'left';
-  ctx.fillText('Remaining Balance', sL, pY + 108);
-  ctx.font = 'bold 26px Georgia, serif';
+  ctx.fillText('Remaining Balance', col1, pY + 112);
+  ctx.font      = 'bold 26px Georgia, serif';
   ctx.fillStyle = deepRose; ctx.textAlign = 'right';
-  ctx.fillText(bd.balanceStr, sR, pY + 112);
+  ctx.fillText(bd.balanceStr, sR, pY + 116);
 
   // ════════════════════════════════
-  // CARD 4 — REMINDERS / TIPS
-  // (fills space that was wasted before)
+  // CARD 4 — REMINDERS
   // ════════════════════════════════
-  const rY = pY + pH + 12, rH = 116;
+  const rY = pY + pH + 12, rH = 118;
   card(cX, rY, cW, rH, 18);
 
   ctx.fillStyle = '#f5c0d0';
-  roundRect(ctx, cX, rY, cW, 5, {tl:18,tr:18,bl:0,br:0});
+  roundRect(ctx, cX, rY, cW, 5, { tl:18, tr:18, bl:0, br:0 });
   ctx.fill();
-
   drawStar(col1 + 6,     rY + 2.5, 3.5, 0.50, deepRose);
+  drawFlower(W / 2,      rY + 2.5, 4,   0.38, deepRose);
   drawStar(W - PAD - 18, rY + 2.5, 3,   0.40, deepRose);
-  drawFlower(W/2,        rY + 2.5, 4,   0.35, deepRose);
 
-  ctx.fillStyle = roseText;
-  ctx.font = '700 11px Arial, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('IMPORTANT REMINDERS', col1, rY + 24);
-
-  ctx.strokeStyle = softBdr; ctx.lineWidth = 0.8;
-  ctx.beginPath(); ctx.moveTo(col1, rY + 30); ctx.lineTo(W - PAD - 14, rY + 30); ctx.stroke();
+  sectionTitle('IMPORTANT REMINDERS', col1, rY + 24, sR);
 
   const reminders = [
     '✦  Please settle the remaining balance on the day of the event.',
@@ -715,10 +685,10 @@ function generateReceipt(b) {
     '✦  For changes or cancellations, contact us as soon as possible.',
   ];
   reminders.forEach((r, i) => {
-    ctx.font = '400 12.5px Arial, sans-serif';
+    ctx.font      = '400 12.5px Arial, sans-serif';
     ctx.fillStyle = roseText;
     ctx.textAlign = 'left';
-    ctx.fillText(r, col1, rY + 50 + i * 22);
+    ctx.fillText(r, col1, rY + 50 + i * 24);
   });
 
   // ════════════════════════════════
@@ -731,29 +701,27 @@ function generateReceipt(b) {
   ftGrad.addColorStop(0, '#fde0ec');
   ftGrad.addColorStop(1, '#f9c8d8');
   ctx.save();
-  ctx.shadowColor  = 'rgba(210,110,140,0.15)';
-  ctx.shadowBlur   = 18;
+  ctx.shadowColor   = 'rgba(210,110,140,0.15)';
+  ctx.shadowBlur    = 18;
   ctx.shadowOffsetY = 4;
   roundRect(ctx, cX, fY, cW, fH, 18);
   ctx.fillStyle = ftGrad;
   ctx.fill();
   ctx.restore();
-
   ctx.strokeStyle = softBdr; ctx.lineWidth = 1;
   roundRect(ctx, cX, fY, cW, fH, 18);
   ctx.stroke();
 
-  // Rose top bar
   ctx.fillStyle = rose;
-  roundRect(ctx, cX, fY, cW, 5, {tl:18,tr:18,bl:0,br:0});
+  roundRect(ctx, cX, fY, cW, 5, { tl:18, tr:18, bl:0, br:0 });
   ctx.fill();
 
-  // Stars on footer bar — more festive
-  [col1+6, W/2-40, W/2, W/2+40, W-PAD-18].forEach((sx, i) => {
-    drawStar(sx, fY + 2.5, i===2?4.5:3, 0.55, '#ffffff');
+  // festive star row on footer bar
+  [col1 + 6, W/2 - 40, W/2, W/2 + 40, W - PAD - 18].forEach((sx, i) => {
+    drawStar(sx, fY + 2.5, i === 2 ? 4.5 : 3, 0.55, '#ffffff');
   });
 
-  // Dot grid texture inside footer
+  // dot grid texture
   ctx.save();
   ctx.globalAlpha = 0.09;
   ctx.fillStyle = '#ffffff';
@@ -764,16 +732,16 @@ function generateReceipt(b) {
   }
   ctx.restore();
 
-  // Decorative stars scattered in footer
+  // corner decorations in footer
   const footerDecos = [
-    { t:'star',    x:col1+14,     y:fY+40,  r:6,  a:0.22 },
-    { t:'flower',  x:W-PAD-26,   y:fY+38,  r:6,  a:0.20 },
-    { t:'diamond', x:col1+40,    y:fY+80,  r:4,  a:0.16 },
-    { t:'diamond', x:W-PAD-52,   y:fY+80,  r:4,  a:0.16 },
-    { t:'star',    x:col1+10,    y:fY+130, r:5,  a:0.18 },
-    { t:'star',    x:W-PAD-22,   y:fY+130, r:5,  a:0.18 },
-    { t:'flower',  x:col1+30,    y:fY+164, r:5,  a:0.15 },
-    { t:'flower',  x:W-PAD-42,   y:fY+164, r:5,  a:0.15 },
+    { t:'star',    x:col1 + 14,   y:fY + 40,  r:6, a:0.22 },
+    { t:'flower',  x:W-PAD-26,   y:fY + 38,  r:6, a:0.20 },
+    { t:'diamond', x:col1 + 40,  y:fY + 80,  r:4, a:0.16 },
+    { t:'diamond', x:W-PAD-52,   y:fY + 80,  r:4, a:0.16 },
+    { t:'star',    x:col1 + 10,  y:fY + 130, r:5, a:0.18 },
+    { t:'star',    x:W-PAD-22,   y:fY + 130, r:5, a:0.18 },
+    { t:'flower',  x:col1 + 30,  y:fY + 168, r:5, a:0.15 },
+    { t:'flower',  x:W-PAD-42,   y:fY + 168, r:5, a:0.15 },
   ];
   footerDecos.forEach(d => {
     if (d.t === 'star')    drawStar(d.x, d.y, d.r, d.a, deepRose);
@@ -781,47 +749,74 @@ function generateReceipt(b) {
     if (d.t === 'diamond') drawDiamond(d.x, d.y, d.r, d.a, deepRose);
   });
 
-  // Mic emoji
-  ctx.font = '34px serif';
+  // mic
+  ctx.font      = '34px serif';
   ctx.textAlign = 'center';
-  ctx.fillText('🎤', W/2, fY + 56);
+  ctx.fillText('🎤', W / 2, fY + 56);
 
-  // Thank you
+  // thank you
   const firstName = (b.name || 'dear').split(' ')[0];
   ctx.fillStyle = deepRose;
-  ctx.font = 'bold 30px Georgia, serif';
+  ctx.font      = 'bold 30px Georgia, serif';
   ctx.textAlign = 'center';
-  ctx.fillText('Thank you, ' + firstName + '!', W/2, fY + 98);
+  ctx.fillText('Thank you, ' + firstName + '!', W / 2, fY + 98);
 
-  // Tagline
-  ctx.font = 'italic 14.5px Georgia, serif';
+  // tagline
+  ctx.font      = 'italic 14.5px Georgia, serif';
   ctx.fillStyle = roseText;
   ctx.textAlign = 'center';
-  ctx.fillText("Can't wait to perform for your special day!", W/2, fY + 126);
+  ctx.fillText("Can't wait to perform for your special day!", W / 2, fY + 126);
 
-  // Star row ornament
-  const starRow = [W/2-60, W/2-30, W/2, W/2+30, W/2+60];
-  starRow.forEach((sx, i) => {
-    drawStar(sx, fY+148, i===2?5:3.5, i===2?0.4:0.25, deepRose);
+  // 5-star ornament row
+  [-60, -30, 0, 30, 60].forEach((ox, i) => {
+    drawStar(W / 2 + ox, fY + 150, i === 2 ? 5.5 : 3.5, i === 2 ? 0.42 : 0.26, deepRose);
   });
 
-  // Contact
-  ctx.font = '11.5px Arial, sans-serif';
+  // contact
+  ctx.font      = '11.5px Arial, sans-serif';
   ctx.fillStyle = '#b06080';
   ctx.textAlign = 'center';
-  ctx.fillText('0912 797 7245  ·  South Cotabato', W/2, fY + 174);
+  ctx.fillText('0912 797 7245  ·  South Cotabato', W / 2, fY + 176);
 
-  // Flower row at very bottom
-  [-90,-45,0,45,90].forEach(ox => {
-    drawFlower(W/2 + ox, fY + 196, 5, 0.20, rose);
+  // flower row at bottom
+  [-90, -45, 0, 45, 90].forEach(ox => {
+    drawFlower(W / 2 + ox, fY + 200, 5, 0.20, rose);
   });
 
-  // ── DOWNLOAD ────────────────────────────────────────
+  // ── DOWNLOAD ──────────────────────────────────────
   const link = document.createElement('a');
   const safeName = (b.name || 'client').replace(/[^a-z0-9]/gi, '_');
   link.download = 'Receipt_' + safeName + '_' + (b.date || 'booking').replace(/[^a-z0-9]/gi, '_') + '.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
+}
+
+// ── Canvas helpers ────────────────────────────────────
+function roundRect(ctx, x, y, w, h, r) {
+  if (typeof r === 'number') r = { tl:r, tr:r, br:r, bl:r };
+  ctx.beginPath();
+  ctx.moveTo(x + r.tl, y);
+  ctx.lineTo(x + w - r.tr, y);
+  ctx.quadraticCurveTo(x + w, y,     x + w, y + r.tr);
+  ctx.lineTo(x + w, y + h - r.br);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+  ctx.lineTo(x + r.bl, y + h);
+  ctx.quadraticCurveTo(x, y + h,     x, y + h - r.bl);
+  ctx.lineTo(x, y + r.tl);
+  ctx.quadraticCurveTo(x, y,         x + r.tl, y);
+  ctx.closePath();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ');
+  let line = '';
+  for (let i = 0; i < words.length; i++) {
+    const test = line + words[i] + ' ';
+    if (ctx.measureText(test).width > maxWidth && i > 0) {
+      ctx.fillText(line, x, y); line = words[i] + ' '; y += lineHeight;
+    } else { line = test; }
+  }
+  ctx.fillText(line, x, y);
 }
 
 // ════════════════════════════════════════
@@ -848,9 +843,9 @@ async function renderSchedules() {
   const groups = {};
   confirmed.forEach(b => {
     const d = new Date(b.date);
-    const label = isNaN(d) ? 'Unspecified Date' : d.toLocaleDateString('en-PH', { month: 'long', year: 'numeric' });
-    if (!groups[label]) groups[label] = [];
-    groups[label].push(b);
+    const lbl = isNaN(d) ? 'Unspecified Date' : d.toLocaleDateString('en-PH', { month:'long', year:'numeric' });
+    if (!groups[lbl]) groups[lbl] = [];
+    groups[lbl].push(b);
   });
 
   let html = '';
@@ -865,7 +860,7 @@ function buildScheduleCard(b) {
   const d = new Date(b.date);
   const isPast  = !isNaN(d) && d < new Date();
   const day   = isNaN(d) ? '—' : d.getDate();
-  const month = isNaN(d) ? ''  : d.toLocaleDateString('en-PH', { month: 'short' }).toUpperCase();
+  const month = isNaN(d) ? ''  : d.toLocaleDateString('en-PH', { month:'short' }).toUpperCase();
   const year  = isNaN(d) ? ''  : d.getFullYear();
   const bd = getPriceBreakdown(b);
 
