@@ -3,7 +3,7 @@
    ============================================================ */
 
 /* ══════════════════════════════════════════════════════════
-   CATEGORY MODAL (existing)
+   CATEGORY MODAL
 ══════════════════════════════════════════════════════════ */
 function openCategoryModal(type) {
   var content = document.getElementById('categoryModalContent');
@@ -169,7 +169,6 @@ var MONTHS = [
 ];
 
 function openDateModal() {
-  /* Build month grid */
   var mg = document.getElementById('monthGrid');
   mg.innerHTML = '';
   MONTHS.forEach(function(m) {
@@ -185,7 +184,6 @@ function openDateModal() {
     mg.appendChild(el);
   });
 
-  /* Build day grid */
   var dg = document.getElementById('dayGrid');
   dg.innerHTML = '';
   for (var d = 1; d <= 31; d++) {
@@ -203,7 +201,6 @@ function openDateModal() {
     })(d);
   }
 
-  /* Build year grid */
   var yg = document.getElementById('yearGrid');
   yg.innerHTML = '';
   var curYear = new Date().getFullYear();
@@ -240,7 +237,7 @@ function updateDatePreview() {
 
 function confirmDateModal() {
   var val = _selMonth + ' ' + _selDay + ', ' + _selYear;
-  document.getElementById('eventDate').value        = val;
+  document.getElementById('eventDate').value              = val;
   document.getElementById('eventDateDisplay').textContent = '📅 ' + val;
   document.getElementById('eventDateDisplay').classList.add('selected');
   closeDateModal();
@@ -285,7 +282,6 @@ function buildTimeGrid(gridId, times) {
     el.textContent = t;
     el.onclick = function() {
       _selTime = t;
-      /* clear all chips across both grids */
       document.querySelectorAll('.cm-time-chip').forEach(function(c){ c.classList.remove('active'); });
       el.classList.add('active');
       updateTimePreview();
@@ -307,7 +303,7 @@ function updateTimePreview() {
 }
 
 function confirmTimeModal() {
-  document.getElementById('perfTime').value           = _selTime;
+  document.getElementById('perfTime').value              = _selTime;
   document.getElementById('perfTimeDisplay').textContent = '🕐 ' + _selTime;
   document.getElementById('perfTimeDisplay').classList.add('selected');
   closeTimeModal();
@@ -333,7 +329,7 @@ function selectOccasion(el, val) {
 }
 
 function confirmOccasionModal() {
-  document.getElementById('occasion').value          = _selOccasion;
+  document.getElementById('occasion').value           = _selOccasion;
   document.getElementById('occasionDisplay').textContent = '🎉 ' + _selOccasion;
   document.getElementById('occasionDisplay').classList.add('selected');
   closeOccasionModal();
@@ -345,21 +341,17 @@ function closeOccasionModal() {
 }
 
 function openOccasionModal() {
-  /* Re-highlight previous selection if any */
   _selOccasion = document.getElementById('occasion').value || null;
   document.querySelectorAll('#occasionModal .cm-pkg-item').forEach(function(el) {
-    var name = el.querySelector('.cm-pkg-name').textContent.replace(/^.+?\s/, ''); /* strip emoji */
     el.classList.toggle('active', _selOccasion && el.querySelector('.cm-pkg-name').textContent.includes(_selOccasion));
   });
   document.getElementById('occasionConfirmBtn').disabled = !_selOccasion;
   document.getElementById('occasionModal').classList.add('show');
 }
 
-/* ══════════════════════════════════════════════════════════════
-   VENUE MODAL  —  add this block to clientdashboard-modals.js
-   (paste at the very bottom of the file)
-══════════════════════════════════════════════════════════════ */
-
+/* ══════════════════════════════════════════════════════════
+   VENUE MODAL
+══════════════════════════════════════════════════════════ */
 var VENUE_BARANGAYS = {
   'Koronadal City': [
     'Assumption','Avanceña','Cacub','Caloocan','Carpenter Hill',
@@ -438,10 +430,8 @@ var VENUE_BARANGAYS = {
   ],
 };
 
-/* All cities flat list for the city datalist */
 var VENUE_CITIES = Object.keys(VENUE_BARANGAYS);
 
-/* ── helpers ──────────────────────────────────────────────── */
 function _buildDatalist(id, items) {
   var dl = document.getElementById(id);
   if (!dl) return;
@@ -455,7 +445,6 @@ function _buildDatalist(id, items) {
 
 function _refreshBarangayList() {
   var cityVal = (document.getElementById('venueCity').value || '').trim();
-  /* exact match first, then partial */
   var list = VENUE_BARANGAYS[cityVal];
   if (!list) {
     var lower = cityVal.toLowerCase();
@@ -466,10 +455,10 @@ function _refreshBarangayList() {
 }
 
 function updateVenuePreview() {
-  var city   = (document.getElementById('venueCity').value   || '').trim();
+  var city   = (document.getElementById('venueCity').value    || '').trim();
   var brgy   = (document.getElementById('venueBarangay').value || '').trim();
-  var street = (document.getElementById('venueStreet').value  || '').trim();
-  var specs  = (document.getElementById('venueSpecs').value   || '').trim();
+  var street = (document.getElementById('venueStreet').value   || '').trim();
+  var specs  = (document.getElementById('venueSpecs').value    || '').trim();
 
   var parts = [];
   if (street) parts.push(street);
@@ -489,7 +478,6 @@ function updateVenuePreview() {
   }
 }
 
-/* ── open / close ─────────────────────────────────────────── */
 function openVenueModal() {
   _buildDatalist('cityList', VENUE_CITIES);
   _refreshBarangayList();
@@ -501,12 +489,11 @@ function closeVenueModal() {
   document.getElementById('venueModal').classList.remove('show');
 }
 
-/* ── confirm ──────────────────────────────────────────────── */
 function confirmVenueModal() {
-  var city   = (document.getElementById('venueCity').value   || '').trim();
+  var city   = (document.getElementById('venueCity').value    || '').trim();
   var brgy   = (document.getElementById('venueBarangay').value || '').trim();
-  var street = (document.getElementById('venueStreet').value  || '').trim();
-  var specs  = (document.getElementById('venueSpecs').value   || '').trim();
+  var street = (document.getElementById('venueStreet').value   || '').trim();
+  var specs  = (document.getElementById('venueSpecs').value    || '').trim();
 
   if (!city) return;
 
