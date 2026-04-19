@@ -345,9 +345,10 @@ async function revertStatus(id) {
   } catch { showToast('❌ Error reverting.'); }
 }
 
-// ════════════════════════════════════════
-// RECEIPT — soft coquette themed
-// ════════════════════════════════════════
+// ════════════════════════════════════════════════════
+// RECEIPT — soft coquette, messenger-ready
+// Everything stays light pink. No dark backgrounds.
+// ════════════════════════════════════════════════════
 async function downloadReceipt(id) {
   const all = await fetchBookingsRaw();
   const b = all.find(x => String(x.id) === String(id));
@@ -357,302 +358,302 @@ async function downloadReceipt(id) {
 
 function generateReceipt(b) {
   const canvas = document.getElementById('receiptCanvas');
-
-  const W = 700, H = 780;
+  const W = 700, H = 860;
   canvas.width  = W;
   canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // ── PALETTE ──────────────────────────────────────────────
-  const rose      = '#c94f6a';
-  const roseDark  = '#7a2040';
-  const roseDeep  = '#5c1228';
-  const roseLight = '#e8728a';
-  const rosePale  = '#fce8ee';
-  const mauve     = '#9a6070';
-  const ink       = '#2d1520';
-  const muted     = '#b08090';
+  // ── PALETTE — all soft & light ────────────────────────
+  const bgTop     = '#fff4f7';   // nearly white pink top
+  const bgBottom  = '#fce4ef';   // soft blush bottom
+  const cardWhite = '#ffffff';
+  const rose      = '#e0607a';   // medium rose — labels, accents
+  const deepRose  = '#c0405a';   // only for big bold text
+  const roseText  = '#a03050';   // readable rose on white
+  const mauve     = '#9a6070';   // muted secondary text
+  const ink       = '#2d1520';   // near-black body text
   const green     = '#1a7a50';
-  const white     = '#ffffff';
-  const borderCol = '#f0c8d4';
+  const softBdr   = '#f0c0d0';   // card borders
+  const accentBar = '#e8a0b8';   // top accent bars on cards
 
-  const HDR = 138;
-  const FTR = 200;
   const PAD = 36;
 
-  // ── BACKGROUND — dreamy blush gradient ───────────────────
-  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-  bgGrad.addColorStop(0,   '#fff8fa');
-  bgGrad.addColorStop(0.5, '#fef2f5');
-  bgGrad.addColorStop(1,   '#fce8ee');
-  ctx.fillStyle = bgGrad;
+  // ── FULL CANVAS BACKGROUND — soft blush gradient ──────
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, bgTop);
+  bg.addColorStop(1, bgBottom);
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  // Faint dot grid on body
-  ctx.save();
-  ctx.globalAlpha = 0.04;
-  ctx.fillStyle = rose;
-  for (let x = PAD; x < W - PAD; x += 20) {
-    for (let y = HDR + 8; y < H - FTR - 8; y += 20) {
-      ctx.beginPath(); ctx.arc(x, y, 1.1, 0, Math.PI * 2); ctx.fill();
-    }
-  }
-  ctx.restore();
+  // Subtle warm radial glow in center
+  const glow = ctx.createRadialGradient(W/2, H*0.4, 0, W/2, H*0.4, W*0.65);
+  glow.addColorStop(0, 'rgba(255,255,255,0.6)');
+  glow.addColorStop(1, 'rgba(252,228,239,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
 
-  // Decorative lace rings — top-left corner
+  // Delicate scattered petal circles
   ctx.save();
-  ctx.globalAlpha = 0.055;
-  ctx.strokeStyle = rose;
-  ctx.lineWidth = 1.2;
-  [40, 65, 90].forEach(r => {
-    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
-  });
-  // bottom-right corner
-  [40, 65, 90].forEach(r => {
-    ctx.beginPath(); ctx.arc(W, H, r, 0, Math.PI * 2); ctx.stroke();
+  const petals = [[55,55,20],[W-50,75,16],[40,210,12],[W-38,240,14],
+                  [52,H-90,18],[W-55,H-110,15],[W/2-170,H*0.72,10],[W/2+155,H*0.68,12]];
+  petals.forEach(([px,py,pr]) => {
+    ctx.globalAlpha = 0.12;
+    ctx.fillStyle = rose;
+    ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 0.06;
+    ctx.beginPath(); ctx.arc(px,py,pr+7,0,Math.PI*2); ctx.fill();
   });
   ctx.restore();
 
-  // ── HEADER BAND ──────────────────────────────────────────
-  const hdrGrad = ctx.createLinearGradient(0, 0, W, HDR);
-  hdrGrad.addColorStop(0,   roseDeep);
-  hdrGrad.addColorStop(0.6, '#8a2a40');
-  hdrGrad.addColorStop(1,   rose);
-  ctx.fillStyle = hdrGrad;
-  ctx.fillRect(0, 0, W, HDR);
-
-  // Soft glow bubbles in header
-  ctx.save();
-  ctx.globalAlpha = 0.09;
-  ctx.fillStyle = white;
-  ctx.beginPath(); ctx.arc(W - 30, -10, 150, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(W - 80, HDR + 5, 55, 0, Math.PI * 2); ctx.fill();
-  ctx.restore();
-
-  // Ribbon accent at bottom of header
-  const ribbonGrad = ctx.createLinearGradient(0, 0, W, 0);
-  ribbonGrad.addColorStop(0, roseLight);
-  ribbonGrad.addColorStop(0.5, '#f9a0b8');
-  ribbonGrad.addColorStop(1, roseLight);
-  ctx.fillStyle = ribbonGrad;
-  ctx.fillRect(0, HDR - 4, W, 4);
-
-  // 🎀 bow emoji
-  ctx.font = '30px serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('🎀', PAD, 46);
-
-  // Brand name
-  ctx.fillStyle = white;
-  ctx.font = 'bold 23px "Playfair Display", Georgia, serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('Jeoan Gwyneth Dajay Gran', PAD + 44, 42);
-
-  // Tagline
-  ctx.font = '400 11px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.fillText('Singer & Host for Hire  ·  South Cotabato  ·  0912 797 7245', PAD + 44, 61);
-
-  // CONFIRMED pill badge
-  ctx.fillStyle = 'rgba(255,255,255,0.14)';
-  roundRect(ctx, W - 204, HDR - 56, 168, 30, 15);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-  ctx.lineWidth = 1;
-  roundRect(ctx, W - 204, HDR - 56, 168, 30, 15);
-  ctx.stroke();
-  ctx.fillStyle = white;
-  ctx.font = 'bold 11px "DM Sans", Arial, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('✅  BOOKING CONFIRMED', W - 120, HDR - 36);
-
-  // Issue date
-  ctx.font = '400 9.5px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.38)';
-  ctx.textAlign = 'right';
-  ctx.fillText(
-    'Issued ' + new Date().toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' }),
-    W - PAD, HDR - 10
-  );
-
-  // ── BODY FIELDS ──────────────────────────────────────────
-  const bd  = getPriceBreakdown(b);
-  const MID = W / 2;
-  const COL1 = PAD;
-  const COL2 = MID + 12;
-  const COL_W = MID - PAD - 20;
-
-  // helper — draws label + value pair
-  function field(lbl, val, x, yy, maxW) {
-    // label
+  // ── HELPER: draw a white card with pink shadow ─────────
+  function card(x, y, w, h, radius) {
     ctx.save();
-    ctx.font = '600 9.5px "DM Sans", Arial, sans-serif';
-    ctx.fillStyle = roseLight;
-    ctx.textAlign = 'left';
-    // letter-spacing simulation: draw char by char
-    let cx = x;
-    const spaced = lbl.toUpperCase().split('');
-    spaced.forEach(ch => {
-      ctx.fillText(ch, cx, yy);
-      cx += ctx.measureText(ch).width + 1.2;
-    });
+    ctx.shadowColor  = 'rgba(210,110,140,0.14)';
+    ctx.shadowBlur   = 22;
+    ctx.shadowOffsetY = 5;
+    roundRect(ctx, x, y, w, h, radius);
+    ctx.fillStyle = cardWhite;
+    ctx.fill();
     ctx.restore();
+    // border
+    ctx.strokeStyle = softBdr;
+    ctx.lineWidth = 1;
+    roundRect(ctx, x, y, w, h, radius);
+    ctx.stroke();
+  }
 
-    // value
-    ctx.font = '400 14.5px "DM Sans", Arial, sans-serif';
+  // ── HELPER: spaced-cap label ───────────────────────────
+  function label(text, x, y) {
+    ctx.font = '700 10px Arial, sans-serif';
+    ctx.fillStyle = rose;
+    ctx.textAlign = 'left';
+    let cx = x;
+    text.toUpperCase().split('').forEach(ch => {
+      ctx.fillText(ch, cx, y);
+      cx += ctx.measureText(ch).width + 1.3;
+    });
+  }
+
+  // ── HELPER: field (label + value) ─────────────────────
+  function field(lbl, val, x, y, maxW) {
+    label(lbl, x, y);
+    ctx.font = '400 16px Georgia, serif';
     ctx.fillStyle = ink;
     ctx.textAlign = 'left';
     let v = val || '—';
     if (maxW) {
-      while (ctx.measureText(v).width > maxW && v.length > 2) v = v.slice(0, -1);
-      if (v !== (val || '—')) v += '…';
+      while (ctx.measureText(v).width > maxW && v.length > 2) v = v.slice(0,-1);
+      if (v !== (val||'—')) v += '…';
     }
-    ctx.fillText(v, x, yy + 18);
+    ctx.fillText(v, x, y + 22);
   }
 
-  let y = HDR + 28;
-  const ROW = 50;
+  const cX = PAD - 8;           // card left x
+  const cW = W - (PAD-8)*2;     // card width
+  const col1 = PAD + 10;
+  const col2 = W/2 + 14;
+  const colW = W/2 - PAD - 22;
 
-  field('Client Name',       b.name,          COL1, y, COL_W);
-  field('Event Date',        b.date,           COL2, y, COL_W);
-  y += ROW;
+  // ════════════════════════════════════════════════
+  // CARD 1 — HEADER
+  // ════════════════════════════════════════════════
+  const hY = 28, hH = 142;
+  card(cX, hY, cW, hH, 20);
 
-  field('Contact Number',    b.phone || '—',  COL1, y, COL_W);
-  field('Performance Time',  b.perfTime || '—', COL2, y, COL_W);
-  y += ROW;
-
-  field('Occasion',          b.occasion,       COL1, y, COL_W);
-  field('Package',           b.package,        COL2, y, COL_W);
-  y += ROW;
-
-  field('Venue',             b.venue,          COL1, y, W - PAD * 2);
-  y += ROW;
-
-  // ── DASHED DIVIDER ───────────────────────────────────────
-  ctx.strokeStyle = borderCol;
-  ctx.lineWidth = 1;
-  ctx.setLineDash([5, 5]);
-  ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
-  ctx.setLineDash([]);
-  y += 16;
-
-  // ── PAYMENT STRIP ────────────────────────────────────────
-  const stripH = 86;
-  const stripGrad = ctx.createLinearGradient(PAD, y, W - PAD, y + stripH);
-  stripGrad.addColorStop(0, '#fff0f5');
-  stripGrad.addColorStop(1, '#fce8ee');
-  ctx.fillStyle = stripGrad;
-  roundRect(ctx, PAD, y, W - PAD * 2, stripH, 14);
+  // Pink top bar
+  ctx.fillStyle = accentBar;
+  roundRect(ctx, cX, hY, cW, 5, {tl:20,tr:20,bl:0,br:0});
   ctx.fill();
-  ctx.strokeStyle = borderCol;
-  ctx.lineWidth = 1.2;
-  roundRect(ctx, PAD, y, W - PAD * 2, stripH, 14);
-  ctx.stroke();
 
-  const sL = PAD + 22, sR = W - PAD - 22;
+  // Brand name — large, readable, deep rose
+  ctx.fillStyle = deepRose;
+  ctx.font = 'bold 26px Georgia, serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('Jeoan Gwyneth Dajay Gran', col1, hY + 44);
+
+  // Subtitle
+  ctx.font = '400 13px Arial, sans-serif';
+  ctx.fillStyle = mauve;
+  ctx.fillText('Singer & Host for Hire  ·  South Cotabato  ·  0912 797 7245', col1, hY + 66);
+
+  // Thin rule inside header
+  ctx.strokeStyle = softBdr; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(col1, hY + 82); ctx.lineTo(W-PAD-10, hY+82); ctx.stroke();
+
+  // BOOKING CONFIRMED badge — green pill
+  ctx.fillStyle = '#e6f5ee';
+  roundRect(ctx, col1, hY+94, 184, 30, 10);
+  ctx.fill();
+  ctx.strokeStyle = '#9dd4b8'; ctx.lineWidth = 1;
+  roundRect(ctx, col1, hY+94, 184, 30, 10);
+  ctx.stroke();
+  ctx.fillStyle = green;
+  ctx.font = 'bold 12px Arial, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('✓  BOOKING CONFIRMED', col1+14, hY+114);
+
+  // Issue date
+  ctx.font = '11px Arial, sans-serif';
+  ctx.fillStyle = mauve;
+  ctx.textAlign = 'right';
+  ctx.fillText(
+    'Issued ' + new Date().toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}),
+    W - PAD - 10, hY + 114
+  );
+
+  // ════════════════════════════════════════════════
+  // CARD 2 — BOOKING DETAILS
+  // ════════════════════════════════════════════════
+  const dY = hY + hH + 14, dH = 260;
+  card(cX, dY, cW, dH, 20);
+
+  // Pink top bar
+  ctx.fillStyle = accentBar;
+  roundRect(ctx, cX, dY, cW, 5, {tl:20,tr:20,bl:0,br:0});
+  ctx.fill();
+
+  let fy = dY + 32;
+  const fROW = 58;
+
+  field('Client Name',       b.name,            col1, fy, colW);
+  field('Event Date',        b.date,             col2, fy, colW);
+  fy += fROW;
+
+  field('Contact Number',    b.phone || '—',    col1, fy, colW);
+  field('Performance Time',  b.perfTime || '—', col2, fy, colW);
+  fy += fROW;
+
+  field('Occasion',          b.occasion,         col1, fy, colW);
+  field('Package',           b.package,          col2, fy, colW);
+  fy += fROW;
+
+  field('Venue',             b.venue,            col1, fy, cW - 24);
+  fy += fROW;
+
+  // Song note if present — italic, muted
+  if (b.notes) {
+    ctx.font = 'italic 13px Georgia, serif';
+    ctx.fillStyle = mauve;
+    ctx.textAlign = 'left';
+    ctx.fillText('" ' + b.notes + ' "', col1, fy - 10);
+  }
+
+  // ════════════════════════════════════════════════
+  // CARD 3 — PAYMENT
+  // ════════════════════════════════════════════════
+  const pY = dY + dH + 14, pH = 118;
+  card(cX, pY, cW, pH, 20);
+
+  // Rose top bar
+  ctx.fillStyle = rose;
+  roundRect(ctx, cX, pY, cW, 5, {tl:20,tr:20,bl:0,br:0});
+  ctx.fill();
+
+  const bd  = getPriceBreakdown(b);
+  const sL  = col1, sR = W - PAD - 10;
 
   // Package Total
-  ctx.font = '400 12px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = muted; ctx.textAlign = 'left';
-  ctx.fillText('Package Total', sL, y + 22);
-  ctx.font = '500 13.5px "DM Sans", Arial, sans-serif';
+  ctx.font = '400 14px Arial, sans-serif';
+  ctx.fillStyle = mauve; ctx.textAlign = 'left';
+  ctx.fillText('Package Total', sL, pY + 30);
+  ctx.font = '500 15px Arial, sans-serif';
   ctx.fillStyle = ink; ctx.textAlign = 'right';
-  ctx.fillText(bd.totalStr, sR, y + 22);
+  ctx.fillText(bd.totalStr, sR, pY + 30);
 
-  // Downpayment Paid
-  ctx.font = '400 12px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = muted; ctx.textAlign = 'left';
-  ctx.fillText('Downpayment Paid (GCash)', sL, y + 42);
-  ctx.font = '600 13px "DM Sans", Arial, sans-serif';
+  // Downpayment
+  ctx.font = '400 14px Arial, sans-serif';
+  ctx.fillStyle = mauve; ctx.textAlign = 'left';
+  ctx.fillText('Downpayment Paid (GCash)', sL, pY + 54);
+  ctx.font = '600 14px Arial, sans-serif';
   ctx.fillStyle = green; ctx.textAlign = 'right';
-  ctx.fillText('− ' + bd.dpStr, sR, y + 42);
+  ctx.fillText('− ' + bd.dpStr, sR, pY + 54);
 
-  // Thin divider
-  ctx.strokeStyle = borderCol; ctx.lineWidth = 0.8;
-  ctx.beginPath(); ctx.moveTo(sL, y + 54); ctx.lineTo(sR, y + 54); ctx.stroke();
+  // Dashed divider
+  ctx.strokeStyle = softBdr; ctx.lineWidth = 1;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(sL, pY+68); ctx.lineTo(sR, pY+68); ctx.stroke();
+  ctx.setLineDash([]);
 
-  // Remaining Balance
-  ctx.font = '700 12px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = rose; ctx.textAlign = 'left';
-  ctx.fillText('Remaining Balance', sL, y + 72);
-  ctx.font = '700 20px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = roseDark; ctx.textAlign = 'right';
-  ctx.fillText(bd.balanceStr, sR, y + 72);
+  // Remaining Balance — bold, prominent
+  ctx.font = '700 13px Arial, sans-serif';
+  ctx.fillStyle = deepRose; ctx.textAlign = 'left';
+  ctx.fillText('Remaining Balance', sL, pY + 94);
+  ctx.font = 'bold 28px Georgia, serif';
+  ctx.fillStyle = deepRose; ctx.textAlign = 'right';
+  ctx.fillText(bd.balanceStr, sR, pY + 98);
 
-  y += stripH + 12;
+  // ════════════════════════════════════════════════
+  // CARD 4 — FOOTER (LIGHT pink, NOT dark)
+  // ════════════════════════════════════════════════
+  const fY = pY + pH + 14;
+  const fH = H - fY - 28;
 
-  // Notes / song request (only if present)
-  if (b.notes || b.adminNote) {
-    const noteText = [b.notes ? '🎵 ' + b.notes : '', b.adminNote ? '📝 ' + b.adminNote : ''].filter(Boolean).join('   ');
-    ctx.font = 'italic 11px "DM Sans", Arial, sans-serif';
-    ctx.fillStyle = muted;
-    ctx.textAlign = 'left';
-    wrapText(ctx, noteText, PAD, y + 10, W - PAD * 2, 16);
-    y += 28;
-  }
-
-  // ── FOOTER BAND ──────────────────────────────────────────
-  const footerY = H - FTR;
-
-  // Footer background — deep coquette rose
-  const ftrGrad = ctx.createLinearGradient(0, footerY, W, H);
-  ftrGrad.addColorStop(0, roseDeep);
-  ftrGrad.addColorStop(0.5, '#8a2040');
-  ftrGrad.addColorStop(1, '#6a1530');
-  ctx.fillStyle = ftrGrad;
-  ctx.fillRect(0, footerY, W, FTR);
-
-  // Soft glow orbs in footer
+  // Footer card — soft pink gradient (still light!)
+  const ftGrad = ctx.createLinearGradient(0, fY, 0, H);
+  ftGrad.addColorStop(0, '#fde0ec');
+  ftGrad.addColorStop(1, '#f9c8d8');
   ctx.save();
-  ctx.globalAlpha = 0.08;
-  ctx.fillStyle = white;
-  ctx.beginPath(); ctx.arc(-10, H + 10, 130, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(W + 10, H - 30, 110, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(W / 2, footerY, 40, 0, Math.PI * 2); ctx.fill();
+  ctx.shadowColor  = 'rgba(210,110,140,0.15)';
+  ctx.shadowBlur   = 20;
+  ctx.shadowOffsetY = 5;
+  roundRect(ctx, cX, fY, cW, fH, 20);
+  ctx.fillStyle = ftGrad;
+  ctx.fill();
   ctx.restore();
 
-  // Ribbon top of footer
-  ctx.fillStyle = ribbonGrad;
-  ctx.fillRect(0, footerY, W, 3);
+  ctx.strokeStyle = softBdr; ctx.lineWidth = 1;
+  roundRect(ctx, cX, fY, cW, fH, 20);
+  ctx.stroke();
 
-  // Small bow cluster above thank-you
-  ctx.font = '28px serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('🎀', W / 2 - 34, footerY + 46);
+  // Soft dot grid in footer
+  ctx.save();
+  ctx.globalAlpha = 0.1;
+  ctx.fillStyle = '#ffffff';
+  for (let dx = cX+18; dx < cX+cW-10; dx+=26) {
+    for (let dy = fY+16; dy < H-22; dy+=26) {
+      ctx.beginPath(); ctx.arc(dx,dy,2.2,0,Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.restore();
+
+  // Rose top bar on footer
+  ctx.fillStyle = rose;
+  roundRect(ctx, cX, fY, cW, 5, {tl:20,tr:20,bl:0,br:0});
+  ctx.fill();
+
+  // Mic — single, clean
   ctx.font = '36px serif';
-  ctx.fillText('🎤', W / 2, footerY + 52);
-  ctx.font = '28px serif';
-  ctx.fillText('🎀', W / 2 + 34, footerY + 46);
-
-  // "Thank you, [Name]!" — personal & large
-  ctx.fillStyle = white;
-  ctx.font = 'bold 27px "Playfair Display", Georgia, serif';
   ctx.textAlign = 'center';
-  // Get first name only for a warmer feel
+  ctx.fillText('🎤', W/2, fY + 56);
+
+  // "Thank you, [Name]!" — BIG, very readable, deep rose on light pink = perfect contrast
   const firstName = (b.name || 'dear').split(' ')[0];
-  ctx.fillText('Thank you, ' + firstName + '! 🌸', W / 2, footerY + 90);
+  ctx.fillStyle = deepRose;
+  ctx.font = 'bold 32px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Thank you, ' + firstName + '!', W/2, fY + 100);
 
-  // Tagline
-  ctx.font = 'italic 13.5px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.75)';
-  ctx.fillText("Can't wait to perform for your special day — see you there!", W / 2, footerY + 118);
+  // Tagline — italic, rose
+  ctx.font = 'italic 15px Georgia, serif';
+  ctx.fillStyle = roseText;
+  ctx.textAlign = 'center';
+  ctx.fillText("Can't wait to perform for your special day!", W/2, fY + 130);
 
-  // Dot separator
-  ctx.font = '10px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.25)';
-  ctx.fillText('· · · · · · · · · · · · · · · · · · · · · · · · · ·', W / 2, footerY + 145);
-
-  // Balance payable note
-  ctx.font = '400 10.5px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.45)';
-  ctx.fillText('Remaining balance is payable via Cash or GCash after the performance.', W / 2, footerY + 166);
+  // Short ornamental rule
+  ctx.strokeStyle = 'rgba(180,80,110,0.2)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(W/2 - 70, fY + 150);
+  ctx.lineTo(W/2 + 70, fY + 150);
+  ctx.stroke();
 
   // Contact
-  ctx.font = '500 11px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.fillText('0912 797 7245  ·  South Cotabato', W / 2, footerY + 185);
+  ctx.font = '12px Arial, sans-serif';
+  ctx.fillStyle = '#b06080';
+  ctx.textAlign = 'center';
+  ctx.fillText('0912 797 7245  ·  South Cotabato', W/2, fY + 172);
 
-  // ── DOWNLOAD ─────────────────────────────────────────────
+  // ── DOWNLOAD ────────────────────────────────────────────
   const link = document.createElement('a');
   const safeName = (b.name || 'client').replace(/[^a-z0-9]/gi, '_');
   link.download = 'Receipt_' + safeName + '_' + (b.date || 'booking').replace(/[^a-z0-9]/gi, '_') + '.png';
@@ -660,19 +661,19 @@ function generateReceipt(b) {
   link.click();
 }
 
-// ── Canvas helpers ────────────────────────────────────────
+// ── Canvas helpers ───────────────────────────────────────
 function roundRect(ctx, x, y, w, h, r) {
-  if (typeof r === 'number') r = { tl: r, tr: r, br: r, bl: r };
+  if (typeof r === 'number') r = { tl:r, tr:r, br:r, bl:r };
   ctx.beginPath();
   ctx.moveTo(x + r.tl, y);
   ctx.lineTo(x + w - r.tr, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
-  ctx.lineTo(x + w, y + h - r.br);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
-  ctx.lineTo(x + r.bl, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
-  ctx.lineTo(x, y + r.tl);
-  ctx.quadraticCurveTo(x, y, x + r.tl, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r.tr);
+  ctx.lineTo(x+w, y+h-r.br);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r.br, y+h);
+  ctx.lineTo(x+r.bl, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r.bl);
+  ctx.lineTo(x, y+r.tl);
+  ctx.quadraticCurveTo(x, y, x+r.tl, y);
   ctx.closePath();
 }
 
@@ -682,12 +683,8 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   for (let i = 0; i < words.length; i++) {
     const test = line + words[i] + ' ';
     if (ctx.measureText(test).width > maxWidth && i > 0) {
-      ctx.fillText(line, x, y);
-      line = words[i] + ' ';
-      y += lineHeight;
-    } else {
-      line = test;
-    }
+      ctx.fillText(line, x, y); line = words[i] + ' '; y += lineHeight;
+    } else { line = test; }
   }
   ctx.fillText(line, x, y);
 }
