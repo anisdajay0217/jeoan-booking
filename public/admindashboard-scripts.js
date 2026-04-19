@@ -346,10 +346,11 @@ async function revertStatus(id) {
 }
 
 // ════════════════════════════════════════
-// RECEIPT — 1200×1200 square, high-res
-// Design in 600-unit space, scale ×2 for
-// crisp 1200px PNG output
+// RECEIPT — 1200×1200 · Coquette · Pink
+// Drop-in replacement for generateReceipt()
+// getPriceBreakdown() stays unchanged.
 // ════════════════════════════════════════
+
 async function downloadReceipt(id) {
   const all = await fetchBookingsRaw();
   const b = all.find(x => String(x.id) === String(id));
@@ -359,483 +360,293 @@ async function downloadReceipt(id) {
 
 function generateReceipt(b) {
   const canvas = document.getElementById('receiptCanvas');
-  const S = 1200; // output size — square, high-res
+  const S = 1200;
   canvas.width  = S;
   canvas.height = S;
   const ctx = canvas.getContext('2d');
-
-  // Design in 600×600 space, render at 2× for crispness
   ctx.scale(2, 2);
-  const D   = 600;
-  const PAD = 28;
 
-  // ── PALETTE ──────────────────────────────────────────
-  const C = {
-    bgTop:    '#fff4f7',
-    bgBot:    '#fce4ef',
-    white:    '#ffffff',
-    rose:     '#e0607a',
-    deepRose: '#c0405a',
-    roseText: '#a03050',
-    mauve:    '#9a6070',
-    ink:      '#2d1520',
-    green:    '#1a7a50',
-    border:   '#f0c0d0',
-    bar:      '#e8a0b8',
-  };
+  const D = 600, P = 38, W = D - P * 2;
 
-  // ── BACKGROUND gradient ──────────────────────────────
-  const bgG = ctx.createLinearGradient(0, 0, 0, D);
-  bgG.addColorStop(0, C.bgTop);
-  bgG.addColorStop(1, C.bgBot);
-  ctx.fillStyle = bgG;
+  // ── Palette (pink only) ───────────────────────────
+  const deep  = '#b83060';
+  const rose  = '#d4607a';
+  const mid   = '#e8a0b0';
+  const blush = '#fff5f7';
+  const light = '#fdeef2';
+  const ink   = '#2a1520';
+  const muted = '#b08090';
+
+  // ── Background ───────────────────────────────────
+  ctx.fillStyle = blush;
   ctx.fillRect(0, 0, D, D);
 
-  // ── SHAPE PRIMITIVES ─────────────────────────────────
-
-  function rr(x, y, w, h, r) {
-    if (typeof r === 'number') r = { tl:r, tr:r, br:r, bl:r };
-    ctx.beginPath();
-    ctx.moveTo(x+r.tl, y);
-    ctx.lineTo(x+w-r.tr, y);
-    ctx.quadraticCurveTo(x+w, y,   x+w, y+r.tr);
-    ctx.lineTo(x+w, y+h-r.br);
-    ctx.quadraticCurveTo(x+w, y+h, x+w-r.br, y+h);
-    ctx.lineTo(x+r.bl, y+h);
-    ctx.quadraticCurveTo(x, y+h,   x, y+h-r.bl);
-    ctx.lineTo(x, y+r.tl);
-    ctx.quadraticCurveTo(x, y,     x+r.tl, y);
-    ctx.closePath();
-  }
-
-  function card(x, y, w, h, radius) {
-    ctx.save();
-    ctx.shadowColor   = 'rgba(200,100,130,0.13)';
-    ctx.shadowBlur    = 10;
-    ctx.shadowOffsetY = 3;
-    rr(x, y, w, h, radius);
-    ctx.fillStyle = C.white;
-    ctx.fill();
-    ctx.restore();
-    ctx.strokeStyle = C.border;
-    ctx.lineWidth   = 0.6;
-    rr(x, y, w, h, radius);
-    ctx.stroke();
-  }
-
-  function topBar(x, y, w, color) {
-    ctx.fillStyle = color;
-    rr(x, y, w, 5, { tl:14, tr:14, bl:0, br:0 });
-    ctx.fill();
-  }
-
-  function star(cx, cy, r, alpha, color) {
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle   = color;
-    ctx.beginPath();
-    for (let i = 0; i < 5; i++) {
-      const oa = (Math.PI/2) + i*(2*Math.PI/5);
-      const ia = oa + Math.PI/5;
-      const ir = r * 0.42;
-      const ox = cx + r*Math.cos(oa),  oy = cy - r*Math.sin(oa);
-      const ix = cx + ir*Math.cos(ia), iy = cy - ir*Math.sin(ia);
-      if (i===0) ctx.moveTo(ox, oy); else ctx.lineTo(ox, oy);
-      ctx.lineTo(ix, iy);
-    }
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function flower(cx, cy, r, alpha, color) {
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle   = color;
-    for (let i = 0; i < 4; i++) {
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(i * Math.PI/2);
+  // Subtle dot texture
+  ctx.save();
+  ctx.fillStyle   = mid;
+  ctx.globalAlpha = 0.06;
+  for (let x = P; x < D - P; x += 14)
+    for (let y = 60; y < D - 60; y += 14) {
       ctx.beginPath();
-      ctx.ellipse(0, -r*0.6, r*0.38, r*0.6, 0, 0, Math.PI*2);
+      ctx.arc(x, y, 0.7, 0, Math.PI * 2);
       ctx.fill();
-      ctx.restore();
     }
-    ctx.fillStyle   = '#f9a8c0';
-    ctx.globalAlpha = Math.min(alpha*1.3, 1);
-    ctx.beginPath();
-    ctx.arc(cx, cy, r*0.28, 0, Math.PI*2);
-    ctx.fill();
+  ctx.restore();
+
+  // Top & bottom bars
+  ctx.fillStyle = rose;
+  ctx.fillRect(0, 0, D, 5);
+  ctx.fillRect(0, D - 5, D, 5);
+
+  // ── Helpers ──────────────────────────────────────
+
+  function txt(s, x, y, font, color, align = 'left') {
+    ctx.save();
+    ctx.font      = font;
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.fillText(String(s || ''), x, y);
     ctx.restore();
   }
 
-  function diamond(cx, cy, r, alpha, color) {
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle   = color;
+  function rrect(x, y, w, h, r) {
     ctx.beginPath();
-    ctx.moveTo(cx, cy-r);
-    ctx.lineTo(cx+r*0.55, cy);
-    ctx.lineTo(cx, cy+r);
-    ctx.lineTo(cx-r*0.55, cy);
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function divLine(y) {
+    const cx = D / 2;
+    ctx.save();
+    ctx.strokeStyle = mid;
+    ctx.lineWidth   = 0.5;
+    ctx.beginPath(); ctx.moveTo(P + 6,    y); ctx.lineTo(cx - 10,    y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx + 10,  y); ctx.lineTo(D - P - 6,  y); ctx.stroke();
+    // Diamond centre
+    ctx.fillStyle   = rose;
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.moveTo(cx, y - 4); ctx.lineTo(cx + 3, y);
+    ctx.lineTo(cx, y + 4); ctx.lineTo(cx - 3, y);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
   }
 
-  function hline(y, x1, x2) {
-    ctx.strokeStyle = C.border;
-    ctx.lineWidth   = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(x1, y);
-    ctx.lineTo(x2, y);
-    ctx.stroke();
-  }
-
-  // ── BACKGROUND SCATTER ────────────────────────────────
-  [
-    ['star',    26,   26,   7,  0.16, C.rose],
-    ['flower',  D-26, 26,   6,  0.13, C.rose],
-    ['star',    D-26, D-26, 7,  0.16, C.rose],
-    ['flower',  26,   D-26, 6,  0.13, C.rose],
-    ['diamond', D/2,  14,   4,  0.15, C.deepRose],
-    ['diamond', D/2,  D-14, 4,  0.15, C.deepRose],
-    ['star',    14,   D*0.38, 4, 0.11, C.rose],
-    ['flower',  14,   D*0.63, 4, 0.10, C.rose],
-    ['star',    D-14, D*0.38, 4, 0.11, C.rose],
-    ['flower',  D-14, D*0.63, 4, 0.10, C.rose],
-  ].forEach(([t,x,y,r,a,col]) => {
-    if (t==='star')    star(x,y,r,a,col);
-    if (t==='flower')  flower(x,y,r,a,col);
-    if (t==='diamond') diamond(x,y,r,a,col);
-  });
-
-  // ── LAYOUT CONSTANTS ──────────────────────────────────
-  const L   = PAD;
-  const CW  = D - PAD*2;
-  const C1  = PAD + 12;
-  const C2  = D/2 + 8;
-  const CW2 = D/2 - PAD - 20;
-  const RE  = D - PAD - 12;
-
-  // ── TEXT HELPERS ──────────────────────────────────────
-  function spaceLabel(text, x, y) {
+  // Coquette bow
+  function bow(cx, cy, s) {
     ctx.save();
-    ctx.font      = '700 7.5px Arial, sans-serif';
-    ctx.fillStyle = C.rose;
-    ctx.textAlign = 'left';
-    let cx = x;
-    text.toUpperCase().split('').forEach(ch => {
-      ctx.fillText(ch, cx, y);
-      cx += ctx.measureText(ch).width + 1;
-    });
+    ctx.fillStyle   = rose;
+    ctx.globalAlpha = 0.7;
+    // Left wing
+    ctx.beginPath();
+    ctx.moveTo(cx - 2*s, cy);
+    ctx.bezierCurveTo(cx -  9*s, cy - 9*s, cx - 22*s, cy - 4*s, cx - 14*s, cy + 2*s);
+    ctx.bezierCurveTo(cx - 22*s, cy + 8*s, cx -  9*s, cy + 9*s, cx -  2*s, cy);
+    ctx.closePath();
+    ctx.fill();
+    // Right wing
+    ctx.beginPath();
+    ctx.moveTo(cx + 2*s, cy);
+    ctx.bezierCurveTo(cx +  9*s, cy - 9*s, cx + 22*s, cy - 4*s, cx + 14*s, cy + 2*s);
+    ctx.bezierCurveTo(cx + 22*s, cy + 8*s, cx +  9*s, cy + 9*s, cx +  2*s, cy);
+    ctx.closePath();
+    ctx.fill();
+    // Centre knot
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 4 * s, 4.5 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
   }
 
-  function fieldPair(lbl, val, x, y, maxW) {
-    spaceLabel(lbl, x, y);
-    ctx.font      = '400 12.5px Georgia, serif';
-    ctx.fillStyle = C.ink;
-    ctx.textAlign = 'left';
-    let v = String(val || '—');
-    if (maxW) {
-      while (ctx.measureText(v).width > maxW && v.length > 2) v = v.slice(0,-1);
-      if (v !== String(val||'—')) v += '…';
-    }
-    ctx.fillText(v, x, y+16);
+  // Heart bullet
+  function heart(cx, cy, r) {
+    ctx.save();
+    ctx.fillStyle   = rose;
+    ctx.globalAlpha = 0.55;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + r * 0.9);
+    ctx.bezierCurveTo(cx + r*2.1, cy + r*0.3, cx + r*2.1, cy - r*0.9, cx, cy - r*0.1);
+    ctx.bezierCurveTo(cx - r*2.1, cy - r*0.9, cx - r*2.1, cy + r*0.3, cx, cy + r*0.9);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
   }
 
-  function sectionHead(text, x, y) {
-    ctx.font      = '700 8.5px Arial, sans-serif';
-    ctx.fillStyle = C.roseText;
-    ctx.textAlign = 'left';
-    ctx.fillText(text, x, y);
-    hline(y+4, x, RE);
+  // Truncate text to fit maxW
+  function trunc(s, maxW) {
+    let v = String(s || '—');
+    while (ctx.measureText(v).width > maxW && v.length > 2) v = v.slice(0, -1);
+    if (v !== String(s || '—')) v += '…';
+    return v;
   }
 
-  // ── CARD CURSOR ──────────────────────────────────────
-  let cy = PAD;
+  // Font helpers — Palatino for elegance
+  const serif  = sz => `${sz}px 'Palatino Linotype',Palatino,Georgia,serif`;
+  const serifI = sz => `italic ${sz}px 'Palatino Linotype',Palatino,Georgia,serif`;
 
-  // ════════════════════════
-  // CARD 1 — HEADER  h=108
-  // ════════════════════════
-  const H1 = 108;
-  card(L, cy, CW, H1, 14);
-  topBar(L, cy, CW, C.bar);
-  star(C1+4,  cy+2.5, 3,   0.55, '#fff');
-  star(D/2,   cy+2.5, 2.5, 0.40, '#fff');
-  star(RE-4,  cy+2.5, 3,   0.50, '#fff');
+  function field(label, value, x, y, maxW) {
+    txt(label.toUpperCase(), x, y, '500 7px Arial,sans-serif', muted);
+    ctx.font = serif(13);
+    txt(trunc(value, maxW || W * 0.45), x, y + 15, serif(13), ink);
+  }
 
-  // brand
-  ctx.fillStyle = C.deepRose;
-  ctx.font      = 'bold 20px Georgia, serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('Jeoan Gwyneth Dajay Gran', C1, cy+28);
+  // ── HEADER ───────────────────────────────────────
+  let cy = 18;
+  const HW = W / 2 - 10;
 
-  ctx.font      = '400 9.5px Arial, sans-serif';
-  ctx.fillStyle = C.mauve;
-  ctx.fillText('Singer & Host for Hire  ·  South Cotabato  ·  0912 797 7245', C1, cy+43);
+  txt('BOOKING RECEIPT', D/2, cy, '500 7.5px Arial', mid, 'center');
 
-  hline(cy+53, C1, RE);
-  flower(C1-4, cy+53, 3.5, 0.22, C.rose);
-  flower(RE+4, cy+53, 3.5, 0.22, C.rose);
+  cy += 22;
+  bow(D/2, cy, 1.3);
+  cy += 28;
 
-  // confirmed badge
-  ctx.fillStyle = '#e6f5ee';
-  rr(C1, cy+62, 155, 22, 7);
+  txt('Jeoan Gwyneth Dajay Gran', D/2, cy, serifI(21), deep, 'center');
+  cy += 13;
+  txt('Singer & Host for Hire  ·  South Cotabato  ·  0912 797 7245', D/2, cy, '400 8.5px Arial', muted, 'center');
+
+  cy += 16;
+  // Confirmed pill
+  ctx.save();
+  ctx.fillStyle   = light;
+  ctx.strokeStyle = mid;
+  ctx.lineWidth   = 0.7;
+  rrect(P, cy - 11, 106, 15, 7);
   ctx.fill();
-  ctx.strokeStyle = '#9dd4b8'; ctx.lineWidth = 0.6;
-  rr(C1, cy+62, 155, 22, 7);
   ctx.stroke();
-  ctx.fillStyle = C.green;
-  ctx.font      = 'bold 9px Arial, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('✓  BOOKING CONFIRMED', C1+9, cy+77);
-
-  ctx.font      = '8.5px Arial, sans-serif';
-  ctx.fillStyle = C.mauve;
-  ctx.textAlign = 'right';
-  ctx.fillText(
-    'Issued ' + new Date().toLocaleDateString('en-PH',{month:'long',day:'numeric',year:'numeric'}),
-    RE, cy+77
+  ctx.restore();
+  txt('✓  Confirmed', P + 9, cy, serifI(9.5), rose);
+  txt(
+    'Issued ' + new Date().toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' }),
+    D - P, cy, '400 8px Arial', muted, 'right'
   );
 
-  cy += H1 + 8;
+  cy += 14;
+  divLine(cy);
 
-  // ════════════════════════
-  // CARD 2 — DETAILS  h=178
-  // ════════════════════════
-  const H2 = 178;
-  card(L, cy, CW, H2, 14);
-  topBar(L, cy, CW, C.bar);
-  star(C1+4,  cy+2.5, 3,   0.50, '#fff');
-  flower(D/2, cy+2.5, 3,   0.38, '#fff');
-  star(RE-4,  cy+2.5, 3,   0.45, '#fff');
+  // ── BOOKING DETAILS ──────────────────────────────
+  cy += 16;
+  txt('Booking Details', P, cy, serifI(10), rose);
 
-  sectionHead('BOOKING DETAILS', C1, cy+18);
-
-  let fy = cy + 33;
-  const FR = 40;
-
-  fieldPair('Client Name',      b.name,            C1, fy, CW2);
-  fieldPair('Event Date',       b.date,             C2, fy, CW2);
-  fy += FR;
-  fieldPair('Contact Number',   b.phone || '—',    C1, fy, CW2);
-  fieldPair('Performance Time', b.perfTime || '—', C2, fy, CW2);
-  fy += FR;
-  fieldPair('Occasion',         b.occasion,         C1, fy, CW2);
-  fieldPair('Package',          b.package,          C2, fy, CW2);
-  fy += FR;
-  fieldPair('Venue',            b.venue,            C1, fy, CW-24);
-  fy += 28;
+  cy += 18;
+  field('Client Name',      b.name,     P,       cy, HW + 30);
+  field('Event Date',       b.date,     D/2 + 4, cy, HW);
+  cy += 30;
+  field('Contact',          b.phone,    P,       cy, HW);
+  field('Performance Time', b.perfTime, D/2 + 4, cy, HW);
+  cy += 30;
+  field('Occasion',         b.occasion, P,       cy, HW);
+  field('Package',          b.package,  D/2 + 4, cy, HW + 10);
+  cy += 30;
+  field('Venue',            b.venue,    P,       cy, W);
 
   if (b.notes) {
-    ctx.font      = 'italic 10.5px Georgia, serif';
-    ctx.fillStyle = C.mauve;
-    ctx.textAlign = 'left';
-    ctx.fillText('" ' + b.notes + ' "', C1, fy);
+    cy += 26;
+    txt('"' + b.notes + '"', D/2, cy, serifI(9.5), muted, 'center');
   }
 
-  // small dividers between rows
-  [cy+72, cy+112, cy+152].forEach(sy => {
-    diamond(D/2-7, sy, 2, 0.13, C.rose);
-    diamond(D/2,   sy, 2, 0.13, C.rose);
-    diamond(D/2+7, sy, 2, 0.13, C.rose);
-  });
+  cy += 16;
+  divLine(cy);
 
-  cy += H2 + 8;
-
-  // ════════════════════════
-  // CARD 3 — PAYMENT  h=100
-  // ════════════════════════
-  const H3 = 100;
-  card(L, cy, CW, H3, 14);
-  topBar(L, cy, CW, C.rose);
-  star(C1+4,  cy+2.5, 3,   0.55, '#fff');
-  flower(D/2, cy+2.5, 3,   0.42, '#fff');
-  star(RE-4,  cy+2.5, 3,   0.50, '#fff');
-
-  sectionHead('PAYMENT SUMMARY', C1, cy+18);
+  // ── PAYMENT SUMMARY ──────────────────────────────
+  cy += 16;
+  txt('Payment Summary', P, cy, serifI(10), rose);
 
   const bd = getPriceBreakdown(b);
 
-  ctx.font      = '400 11px Arial, sans-serif';
-  ctx.fillStyle = C.mauve; ctx.textAlign = 'left';
-  ctx.fillText('Package Total', C1, cy+38);
-  ctx.font      = '500 11.5px Arial, sans-serif';
-  ctx.fillStyle = C.ink;  ctx.textAlign = 'right';
-  ctx.fillText(bd.totalStr, RE, cy+38);
+  cy += 20;
+  txt('Package total',            P,   cy, '400 10.5px Arial', muted);
+  txt(bd.totalStr,            D - P,   cy, serif(11.5),         ink,  'right');
 
-  ctx.font      = '400 11px Arial, sans-serif';
-  ctx.fillStyle = C.mauve; ctx.textAlign = 'left';
-  ctx.fillText('Downpayment Paid (GCash)', C1, cy+54);
-  ctx.font      = '600 11px Arial, sans-serif';
-  ctx.fillStyle = C.green; ctx.textAlign = 'right';
-  ctx.fillText('− ' + bd.dpStr, RE, cy+54);
+  cy += 18;
+  txt('Downpayment paid (GCash)', P,   cy, '400 10.5px Arial', muted);
+  txt('− ' + bd.dpStr,        D - P,   cy, '500 11px Arial',   rose, 'right');
 
-  ctx.strokeStyle = C.border; ctx.lineWidth = 0.8;
-  ctx.setLineDash([3,3]);
-  ctx.beginPath(); ctx.moveTo(C1, cy+63); ctx.lineTo(RE, cy+63); ctx.stroke();
+  cy += 12;
+  ctx.save();
+  ctx.strokeStyle = mid;
+  ctx.lineWidth   = 0.6;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(P, cy); ctx.lineTo(D - P, cy); ctx.stroke();
   ctx.setLineDash([]);
+  ctx.restore();
 
-  ctx.font      = '700 9.5px Arial, sans-serif';
-  ctx.fillStyle = C.deepRose; ctx.textAlign = 'left';
-  ctx.fillText('Remaining Balance', C1, cy+84);
-  ctx.font      = 'bold 20px Georgia, serif';
-  ctx.fillStyle = C.deepRose; ctx.textAlign = 'right';
-  ctx.fillText(bd.balanceStr, RE, cy+88);
+  cy += 20;
+  txt('Remaining Balance', P,   cy + 4, '600 9px Arial',    rose);
+  txt(bd.balanceStr,     D - P, cy + 6, `500 ${serif(22)}`, deep, 'right');
 
-  cy += H3 + 8;
+  cy += 24;
+  divLine(cy);
 
-  // ════════════════════════
-  // CARD 4 — T&C  h=130
-  // ════════════════════════
-  const H4 = 130;
-  card(L, cy, CW, H4, 14);
-  topBar(L, cy, CW, '#f5c0d0');
-  star(C1+4,  cy+2.5, 3,   0.50, C.deepRose);
-  flower(D/2, cy+2.5, 3,   0.38, C.deepRose);
-  star(RE-4,  cy+2.5, 3,   0.45, C.deepRose);
+  // ── TERMS & CONDITIONS ───────────────────────────
+  cy += 16;
+  txt('Terms & Conditions', P, cy, serifI(10), rose);
 
-  sectionHead('TERMS & CONDITIONS', C1, cy+18);
-
-  // 6 terms in 2 columns × 3 rows
   const terms = [
-    { label: 'Downpayment:',  text: '₱200 non-refundable to lock in your date. Deducted from total.' },
-    { label: 'Payment:',      text: 'Remaining balance via Cash or GCash right after the performance.' },
-    { label: 'Tech Check:',   text: 'Venue must provide a working sound system and microphone.' },
-    { label: 'Early Bird:',   text: 'She arrives 30 minutes early for soundcheck.' },
-    { label: 'Cancellations:',text: 'Client cancels = DP forfeited. She cancels due to emergency = 100% refund.' },
-    { label: 'Safety First:', text: 'Outdoor venues MUST have a covered area for the performer.' },
+    '₱200 downpayment is non-refundable and deducted from total.',
+    'Balance due via cash or GCash right after the performance.',
+    'Venue must provide a working sound system and microphone.',
+    'Client cancels: DP forfeited. She cancels due to emergency: full refund.',
   ];
 
-  const TL1  = C1;
-  const TL2  = D/2 + 4;
-  const TMAX = CW/2 - 18;
-  const TRH  = 17;
+  cy += 16;
+  ctx.font = '9.5px Arial,sans-serif';
 
-  terms.forEach((t, i) => {
-    const col = i % 2 === 0 ? TL1 : TL2;
-    const row = Math.floor(i / 2);
-    const ty  = cy + 30 + row * 32;
+  terms.forEach(term => {
+    heart(P + 4, cy - 3, 1.6);
 
-    // dot
-    ctx.save();
-    ctx.fillStyle   = C.rose;
-    ctx.globalAlpha = 0.65;
-    ctx.beginPath();
-    ctx.arc(col, ty-4, 2, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-
-    // bold label
-    ctx.font      = '700 8.5px Arial, sans-serif';
-    ctx.fillStyle = C.deepRose;
-    ctx.textAlign = 'left';
-    ctx.fillText(t.label, col+6, ty);
-
-    // body — fit into TMAX, wrap to 2 lines
-    ctx.font = '400 8.5px Arial, sans-serif';
-    ctx.fillStyle = C.ink;
-    const words = t.text.split(' ');
+    // Word-wrap to 2 lines max
+    const words = term.split(' ');
     let l1 = '', l2 = '', broken = false;
     for (const w of words) {
       const test = (broken ? l2 : l1) + w + ' ';
-      if (!broken && ctx.measureText(test).width > TMAX) {
-        broken = true; l2 = w + ' ';
+      if (!broken && ctx.measureText(test).width > W - 18) {
+        broken = true;
+        l2 = w + ' ';
       } else if (broken) {
-        if (ctx.measureText(l2 + w + ' ').width < TMAX) l2 += w + ' ';
-        // else drop — 2 lines max
+        if (ctx.measureText(l2 + w + ' ').width < W - 18) l2 += w + ' ';
       } else {
         l1 = test;
       }
     }
-    ctx.fillText(l1.trim(), col+6, ty + TRH - 4);
-    if (l2.trim()) ctx.fillText(l2.trim(), col+6, ty + TRH*2 - 8);
-  });
-
-  cy += H4 + 8;
-
-  // ════════════════════════
-  // CARD 5 — FOOTER  fills rest
-  // ════════════════════════
-  const H5 = D - cy - PAD;
-  const ftG = ctx.createLinearGradient(0, cy, 0, cy+H5);
-  ftG.addColorStop(0, '#fde0ec');
-  ftG.addColorStop(1, '#f9c8d8');
-  ctx.save();
-  ctx.shadowColor   = 'rgba(200,100,130,0.13)';
-  ctx.shadowBlur    = 10;
-  ctx.shadowOffsetY = 3;
-  rr(L, cy, CW, H5, 14);
-  ctx.fillStyle = ftG;
-  ctx.fill();
-  ctx.restore();
-  ctx.strokeStyle = C.border; ctx.lineWidth = 0.6;
-  rr(L, cy, CW, H5, 14);
-  ctx.stroke();
-
-  topBar(L, cy, CW, C.rose);
-  [C1+4, D/2-28, D/2, D/2+28, RE-4].forEach((sx, i) => {
-    star(sx, cy+2.5, i===2?4:2.8, 0.55, '#fff');
-  });
-
-  // dot texture
-  ctx.save();
-  ctx.globalAlpha = 0.07;
-  ctx.fillStyle   = '#fff';
-  for (let dx = L+16; dx < L+CW-10; dx+=18) {
-    for (let dy = cy+12; dy < cy+H5-6; dy+=18) {
-      ctx.beginPath(); ctx.arc(dx,dy,1.3,0,Math.PI*2); ctx.fill();
+    txt(l1.trim(), P + 13, cy,      '400 9.5px Arial,sans-serif', '#5a2535');
+    if (l2.trim()) {
+      cy += 13;
+      txt(l2.trim(), P + 13, cy,    '400 9.5px Arial,sans-serif', '#5a2535');
     }
-  }
-  ctx.restore();
-
-  // side deco
-  flower(C1+8,  cy+H5*0.28, 4,   0.17, C.deepRose);
-  star(C1+8,    cy+H5*0.65, 3.5, 0.15, C.deepRose);
-  flower(RE-8,  cy+H5*0.28, 4,   0.17, C.deepRose);
-  star(RE-8,    cy+H5*0.65, 3.5, 0.15, C.deepRose);
-
-  const fm = cy + H5/2;
-
-  ctx.font      = '26px serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('🎤', D/2, fm-14);
-
-  ctx.fillStyle = C.deepRose;
-  ctx.font      = 'bold 22px Georgia, serif';
-  ctx.textAlign = 'center';
-  const firstName = (b.name || 'dear').split(' ')[0];
-  ctx.fillText('Thank you, ' + firstName + '!', D/2, fm+8);
-
-  ctx.font      = 'italic 11px Georgia, serif';
-  ctx.fillStyle = C.roseText;
-  ctx.textAlign = 'center';
-  ctx.fillText("Can't wait to perform for your special day!", D/2, fm+24);
-
-  [-48,-24,0,24,48].forEach((ox,i) => {
-    star(D/2+ox, fm+38, i===2?5:3.2, i===2?0.40:0.22, C.deepRose);
+    cy += 18;
   });
 
-  ctx.font      = '9px Arial, sans-serif';
-  ctx.fillStyle = '#b06080';
-  ctx.textAlign = 'center';
-  ctx.fillText('0912 797 7245  ·  South Cotabato', D/2, fm+54);
+  cy += 4;
+  divLine(cy);
 
-  [-68,-34,0,34,68].forEach(ox => {
-    flower(D/2+ox, fm+68, 3.5, 0.17, C.rose);
-  });
+  // ── FOOTER (generous margin) ──────────────────────
+  cy += 32;
+  const firstName = (b.name || 'Guest').split(' ')[0];
+  txt('Thank you, ' + firstName + '!',             D/2, cy,      serifI(20),        deep, 'center');
+  cy += 18;
+  txt("Can't wait to perform for your special day!", D/2, cy,      serifI(10),        rose, 'center');
+  cy += 16;
+  txt('0912 797 7245  ·  South Cotabato',           D/2, cy,      '400 8.5px Arial', muted,'center');
+  cy += 16;
+  [-36, -18, 0, 18, 36].forEach(ox => heart(D/2 + ox, cy, 2));
 
-  // ── DOWNLOAD ─────────────────────────────────────────
-  const link = document.createElement('a');
-  const safeName = (b.name || 'client').replace(/[^a-z0-9]/gi,'_');
-  const safeDate = (b.date || 'booking').replace(/[^a-z0-9]/gi,'_');
-  link.download = 'Receipt_' + safeName + '_' + safeDate + '.png';
-  link.href = canvas.toDataURL('image/png');
+  // ── Download ─────────────────────────────────────
+  const link     = document.createElement('a');
+  const safeName = (b.name  || 'client' ).replace(/[^a-z0-9]/gi, '_');
+  const safeDate = (b.date  || 'booking').replace(/[^a-z0-9]/gi, '_');
+  link.download  = 'Receipt_' + safeName + '_' + safeDate + '.png';
+  link.href      = canvas.toDataURL('image/png');
   link.click();
 }
-
 // ════════════════════════════════════════
 // SCHEDULES TAB
 // ════════════════════════════════════════
