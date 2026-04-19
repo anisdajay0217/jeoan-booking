@@ -354,3 +354,176 @@ function openOccasionModal() {
   document.getElementById('occasionConfirmBtn').disabled = !_selOccasion;
   document.getElementById('occasionModal').classList.add('show');
 }
+
+/* ══════════════════════════════════════════════════════════════
+   VENUE MODAL  —  add this block to clientdashboard-modals.js
+   (paste at the very bottom of the file)
+══════════════════════════════════════════════════════════════ */
+
+var VENUE_BARANGAYS = {
+  'Koronadal City': [
+    'Assumption','Avanceña','Cacub','Caloocan','Carpenter Hill',
+    'Concepcion','Esperanza','General Paulino Santos','Mabini',
+    'Magsaysay','Mambucal','Morales','New Pangasinan','Namnama',
+    'Paraiso','Rotonda','San Isidro','San Jose','San Roque',
+    'Santa Cruz','Santo Niño','Saravia','Topland','Zulueta'
+  ],
+  'General Santos City': [
+    'Apopong','Baluan','Batomelong','Buayan','Bula','Calumpang',
+    'City Heights','Conel','Dadiangas East','Dadiangas North',
+    'Dadiangas South','Dadiangas West','Fatima','Katangawan',
+    'Lagao (1st)','Lagao (2nd)','Lagao (3rd)','Labangal',
+    'Ligaya','Mabuhay','Olympog','San Isidro','San Jose',
+    'Sinawal','Tambler','Tinagacan','Upper Labay'
+  ],
+  'Polomolok': [
+    'Bentung','Cannery Site','Glamang','Kinilis','Klinan 6',
+    'Koronadal Proper','Landan','Lapuz','Lumakil','Maligo',
+    'Malingao','Polo','Poblacion','Rubber','Saravia',
+    'Silway 7','Silway 8','Sulit','Sumbakil','Tampakan',
+    'Tinago','Tomado','Tupi','Upper Klinan','Validated'
+  ],
+  'Tupi': [
+    'Acmonan','Bololmailom','Bunao','Cebuano','Crossing Palkan',
+    'Kablon','Kalkam','Linan','Lunen','Magsaysay',
+    'Maltana','Naci','New Iloilo','New Lagao','Palkan',
+    'Poblacion','Polonuling','Simbo','Tubeng'
+  ],
+  'Surallah': [
+    'Bentung','Buenavista','Dajay','Duengas','Lambontong',
+    'Lamian','Lamsugod','Libertad','Little Baguio','Moloy',
+    'Naci','Palumbi','Poblacion','Rublo','Single','Tinongcop'
+  ],
+  'Lake Sebu': [
+    'Bacdulong','Denlag','Halilan','Hanoon','Klubi',
+    'Lahpoong','Lake Lahit','Lake Moocan','Lake Sebu (Pob.)','Lamcade',
+    'Lamdalag','Lamfugon','Lamhako','Lamlahak','Lamlongon',
+    'Lamsiakan','Lamsugod','Mabiyang','Ned','Poblacion',
+    'Sinawal','Takunel','Talisay','Tasiman'
+  ],
+  'Tampakan': [
+    'Batang','Bulan','Buto','Danlag','Kapingkong',
+    'Lambayong','Lampitak','Lungkunon','Maltana','Palo',
+    'Poblacion','Rotonda','Santa Cruz','Santo Niño','Tablu'
+  ],
+  'Tantangan': [
+    'Bukay Pait','Central Glad','Glad','Kinayao','Libas',
+    'Liguasan','Magsaysay','Mamali','New Iloilo','New Panay',
+    'Patulang','Poblacion','San Felipe','San Juan','Tantangan'
+  ],
+  'Banga': [
+    'Benitez','Carbon','Dajay','Danao','Ilomavis',
+    'Kipalbig','Lam-caliaf','Lamba','Lamian','Lampari',
+    'Lamsugod','Libertad','Magsaysay','Ned','Olas',
+    'Pag-asa','Palumbi','Poblacion','Punong','Rizal',
+    'San Lorenzo','San Vicente','Seven Falls','Tinongcop'
+  ],
+  'Santo Niño': [
+    'Dumaguil','Esperanza','Idaoman','Idsaran','Kadingilan',
+    'Kamanga','Lam-apos','Lambuling','Lamcaliaf','Lambontong',
+    'Lamboyog','Lamlastog','Lamsadong','Lumabat','Maibo',
+    'Malitubog','Mangilala','Ned','Patulang','Poblacion',
+    'Polonuling','Santa Cruz','Santo Niño','Sinawal','Tinago'
+  ],
+  'Norala': [
+    'Antipas','Bagong Silang','Colongulo','Dajay','Dumaguil',
+    'Esperanza','Kibid','Liberty','Mabini','Maibo',
+    'Malubo','Norala (Pob.)','Pag-asa','Sinawal','Tinago'
+  ],
+  'Sto. Niño': [
+    'Dumaguil','Esperanza','Idaoman','Idsaran','Kadingilan',
+    'Kamanga','Lam-apos','Lambuling','Lamcaliaf','Lambontong',
+    'Maibo','Malitubog','Mangilala','Ned','Poblacion',
+    'Polonuling','Santa Cruz','Sinawal','Tinago'
+  ],
+};
+
+/* All cities flat list for the city datalist */
+var VENUE_CITIES = Object.keys(VENUE_BARANGAYS);
+
+/* ── helpers ──────────────────────────────────────────────── */
+function _buildDatalist(id, items) {
+  var dl = document.getElementById(id);
+  if (!dl) return;
+  dl.innerHTML = '';
+  items.forEach(function(v) {
+    var o = document.createElement('option');
+    o.value = v;
+    dl.appendChild(o);
+  });
+}
+
+function _refreshBarangayList() {
+  var cityVal = (document.getElementById('venueCity').value || '').trim();
+  /* exact match first, then partial */
+  var list = VENUE_BARANGAYS[cityVal];
+  if (!list) {
+    var lower = cityVal.toLowerCase();
+    var key = VENUE_CITIES.find(function(c) { return c.toLowerCase().includes(lower); });
+    list = key ? VENUE_BARANGAYS[key] : [];
+  }
+  _buildDatalist('barangayList', list);
+}
+
+function updateVenuePreview() {
+  var city   = (document.getElementById('venueCity').value   || '').trim();
+  var brgy   = (document.getElementById('venueBarangay').value || '').trim();
+  var street = (document.getElementById('venueStreet').value  || '').trim();
+  var specs  = (document.getElementById('venueSpecs').value   || '').trim();
+
+  var parts = [];
+  if (street) parts.push(street);
+  if (brgy)   parts.push('Brgy. ' + brgy);
+  if (city)   parts.push(city);
+  if (specs)  parts.push('(' + specs + ')');
+
+  var preview    = document.getElementById('venuePreview');
+  var confirmBtn = document.getElementById('venueConfirmBtn');
+
+  if (city) {
+    preview.textContent = parts.join(', ');
+    confirmBtn.disabled = false;
+  } else {
+    preview.textContent = 'No venue locked in yet 🌷';
+    confirmBtn.disabled = true;
+  }
+}
+
+/* ── open / close ─────────────────────────────────────────── */
+function openVenueModal() {
+  _buildDatalist('cityList', VENUE_CITIES);
+  _refreshBarangayList();
+  document.getElementById('venueModal').classList.add('show');
+  updateVenuePreview();
+}
+
+function closeVenueModal() {
+  document.getElementById('venueModal').classList.remove('show');
+}
+
+/* ── confirm ──────────────────────────────────────────────── */
+function confirmVenueModal() {
+  var city   = (document.getElementById('venueCity').value   || '').trim();
+  var brgy   = (document.getElementById('venueBarangay').value || '').trim();
+  var street = (document.getElementById('venueStreet').value  || '').trim();
+  var specs  = (document.getElementById('venueSpecs').value   || '').trim();
+
+  if (!city) return;
+
+  var parts = [];
+  if (street) parts.push(street);
+  if (brgy)   parts.push('Brgy. ' + brgy);
+  parts.push(city);
+  if (specs)  parts.push('(' + specs + ')');
+
+  var full = parts.join(', ');
+
+  document.getElementById('venue').value = full;
+
+  var display = document.getElementById('venueDisplay');
+  display.textContent = full;
+  display.classList.add('selected');
+
+  closeVenueModal();
+  if (typeof checkSubmit === 'function') checkSubmit();
+}
