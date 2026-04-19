@@ -74,17 +74,17 @@ function switchRate() {
 /* ── SHOW PRICE ───────────────────────────────────────────── */
 function showPrice(type) {
   if (type === 'song') {
-    var sel  = document.getElementById('songPkg');
-    var box  = document.getElementById('songPrice');
-    if (!sel.value) { box.classList.remove('show'); return; }
-    var parts = sel.value.split('|');
+    var val = document.getElementById('songPkg').value;
+    var box = document.getElementById('songPrice');
+    if (!val) { box.classList.remove('show'); return; }
+    var parts = val.split('|');
     box.innerHTML = '<strong>' + parts[1] + '</strong><span>' + parts[0] + '</span>';
     box.classList.add('show');
   } else {
-    var sel2  = document.getElementById('hourPkg');
-    var box2  = document.getElementById('hourPrice');
-    if (!sel2.value) { box2.classList.remove('show'); return; }
-    var parts2 = sel2.value.split('|');
+    var val2 = document.getElementById('hourPkg').value;
+    var box2 = document.getElementById('hourPrice');
+    if (!val2) { box2.classList.remove('show'); return; }
+    var parts2 = val2.split('|');
     box2.innerHTML = '<strong>' + parts2[1] + '</strong><span>' + parts2[0] + '</span>';
     box2.classList.add('show');
   }
@@ -92,12 +92,26 @@ function showPrice(type) {
 }
 
 function showHostPrice() {
-  var sel = document.getElementById('hostPkg');
+  var val = document.getElementById('hostPkg').value;
   var box = document.getElementById('hostPrice');
-  if (!sel.value) { box.classList.remove('show'); return; }
-  var parts = sel.value.split('|');
+  if (!val) { box.classList.remove('show'); return; }
+  var parts = val.split('|');
   box.innerHTML = '<strong>' + parts[1] + '</strong><span>' + parts[0] + '</span>';
   box.classList.add('show');
+  checkSubmit();
+}
+
+/* ── PHONE VALIDATION ─────────────────────────────────────── */
+function validatePhone(input) {
+  var err = document.getElementById('phoneError');
+  var val = input.value;
+  if (val.length > 0 && !val.startsWith('09')) {
+    err.textContent = '⚠️ Number must start with 09';
+  } else if (val.length > 0 && val.length < 11) {
+    err.textContent = '⚠️ Must be exactly 11 digits (e.g. 09XXXXXXXXX)';
+  } else {
+    err.textContent = '';
+  }
   checkSubmit();
 }
 
@@ -131,59 +145,8 @@ function reuploadScreenshot() {
   checkSubmit();
 }
 
-/* ── checkSubmit — base version (steps.js will override) ─── */
-function checkSubmit() {
-  /* Overridden by clientdashboard-steps.js after load.
-     This stub exists so calls before steps.js loads don't crash. */
-}
-
-/* ── PHONE VALIDATION ─────────────────────────────────────── */
-function validatePhone(input) {
-  var err = document.getElementById('phoneError');
-  var val = input.value;
-  if (val.length > 0 && !val.startsWith('09')) {
-    err.textContent = '⚠️ Number must start with 09';
-  } else if (val.length > 0 && val.length < 11) {
-    err.textContent = '⚠️ Must be exactly 11 digits (e.g. 09XXXXXXXXX)';
-  } else {
-    err.textContent = '';
-  }
-  checkSubmit();
-}
-
-/* ── EVENT DATE — POPULATE DAYS ───────────────────────────── */
-function populateDays() {
-  var daySelect = document.getElementById('eventDay');
-  daySelect.innerHTML = '<option value="" disabled selected>💕 Day</option>';
-  for (var i = 1; i <= 31; i++) {
-    var opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = i;
-    daySelect.appendChild(opt);
-  }
-}
-
-/* ── EVENT DATE — POPULATE YEARS ──────────────────────────── */
-function populateYears() {
-  var yearSelect = document.getElementById('eventYear');
-  yearSelect.innerHTML = '<option value="" disabled selected>✨ Year</option>';
-  var currentYear = new Date().getFullYear();
-  for (var y = currentYear; y <= currentYear + 3; y++) {
-    var opt = document.createElement('option');
-    opt.value = y;
-    opt.textContent = y;
-    yearSelect.appendChild(opt);
-  }
-}
-
-/* ── EVENT DATE — SYNC HIDDEN INPUT ───────────────────────── */
-function syncEventDate() {
-  var m = document.getElementById('eventMonth').value;
-  var d = document.getElementById('eventDay').value;
-  var y = document.getElementById('eventYear').value;
-  document.getElementById('eventDate').value = (m && d && y) ? m + ' ' + d + ', ' + y : '';
-  checkSubmit();
-}
+/* ── checkSubmit stub (overridden by steps.js) ────────────── */
+function checkSubmit() {}
 
 /* ── BUILD PACKAGE STRING ─────────────────────────────────── */
 function buildPackageInfo() {
@@ -228,7 +191,7 @@ function submitForm() {
     phone:           document.getElementById('clientPhone').value.trim(),
     date:            document.getElementById('eventDate').value.trim(),
     perfTime:        document.getElementById('perfTime').value.trim(),
-    occasion:        document.getElementById('occasion').value,
+    occasion:        document.getElementById('occasion').value.trim(),
     venue:           document.getElementById('venue').value.trim(),
     rateType:        pkgInfo.rateType,
     package:         pkgInfo.pkg,
@@ -313,36 +276,42 @@ function closeCancelModal() {
 }
 function doCancelForm() {
   closeCancelModal();
-  // Reset to step 1
   if (typeof goToStep === 'function') {
     document.getElementById('step' + currentStep).classList.remove('active');
     currentStep = 1;
     document.getElementById('step1').classList.add('active');
     if (typeof updateProgress === 'function') updateProgress();
   }
-  // Go back to welcome
+
   document.getElementById('dashPage').style.display = 'none';
   var wp = document.getElementById('welcomePage');
   wp.style.display = '';
   wp.classList.remove('hide');
 
-  // Reset text fields
-  ['clientName', 'clientPhone', 'venue', 'notes'].forEach(function(id) {
+  /* Reset text fields */
+  ['clientName','venue','notes'].forEach(function(id) {
     document.getElementById(id).value = '';
   });
+  document.getElementById('clientPhone').value = '';
   document.getElementById('phoneError').textContent = '';
 
-  // Reset date dropdowns
-  document.getElementById('eventMonth').value = '';
-  document.getElementById('eventDay').value   = '';
-  document.getElementById('eventYear').value  = '';
-  document.getElementById('eventDate').value  = '';
+  /* Reset modal-driven hidden fields & displays */
+  document.getElementById('eventDate').value           = '';
+  document.getElementById('eventDateDisplay').textContent = 'Pick your date, babe~ 🌸';
+  document.getElementById('eventDateDisplay').classList.remove('selected');
+  _selMonth = null; _selDay = null; _selYear = null;
 
-  // Reset time & occasion
-  document.getElementById('perfTime').value  = '';
-  document.getElementById('occasion').value  = '';
+  document.getElementById('perfTime').value            = '';
+  document.getElementById('perfTimeDisplay').textContent = 'Pick a time, babe~ ✨';
+  document.getElementById('perfTimeDisplay').classList.remove('selected');
+  _selTime = null;
 
-  // Reset category / rate
+  document.getElementById('occasion').value            = '';
+  document.getElementById('occasionDisplay').textContent = 'Pick your vibe — 💅';
+  document.getElementById('occasionDisplay').classList.remove('selected');
+  _selOccasion = null;
+
+  /* Reset category / rate */
   document.querySelectorAll('input[name="categoryType"]').forEach(function(r) { r.checked = false; });
   document.querySelectorAll('input[name="rateType"]').forEach(function(r) { r.checked = false; });
   document.getElementById('songPkg').value  = '';
@@ -356,7 +325,7 @@ function doCancelForm() {
   document.getElementById('hourPrice').classList.remove('show');
   document.getElementById('hostPrice').classList.remove('show');
 
-  // Reset checkbox
+  /* Reset checkbox */
   document.getElementById('agreeCheck').checked = false;
   document.getElementById('customCB').classList.remove('checked');
 
@@ -375,16 +344,11 @@ function showToast(msg) {
 /* ── INIT ─────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   spawnWelcomePetals();
-  populateDays();
-  populateYears();
 
-  // Text field listeners
-  ['clientName', 'venue', 'notes'].forEach(function(id) {
+  ['clientName','venue','notes'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', checkSubmit);
   });
-
-  // Phone — validation handled by oninput in HTML; also wire checkSubmit
   var phone = document.getElementById('clientPhone');
   if (phone) phone.addEventListener('input', checkSubmit);
 });
