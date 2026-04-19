@@ -120,7 +120,7 @@
           <p class="field-hint">Choose your slay package 💅 — rates pop-up will appear!</p>
           <div class="category-toggle">
             <div class="category-btn">
-              <input type="radio" name="categoryType" id="catSinger" value="singer" onchange="switchCategory()"/>
+              <input type="radio" name="categoryType" id="catSinger" value="singer" onclick="switchCategory()"/>
               <label class="category-label" for="catSinger">
                 <span class="cat-icon">🎤</span>
                 <span class="cat-name">Singer Only</span>
@@ -128,7 +128,7 @@
               </label>
             </div>
             <div class="category-btn">
-              <input type="radio" name="categoryType" id="catHost" value="host" onchange="switchCategory()"/>
+              <input type="radio" name="categoryType" id="catHost" value="host" onclick="switchCategory()"/>
               <label class="category-label" for="catHost">
                 <span class="cat-icon">🎤🎙️</span>
                 <span class="cat-name">Singer + Host</span>
@@ -142,17 +142,17 @@
               <label>Rate Type</label>
               <div class="rate-toggle">
                 <div class="rate-btn">
-                  <input type="radio" name="rateType" id="rateSong" value="song" onchange="switchRate()"/>
+                  <input type="radio" name="rateType" id="rateSong" value="song" onclick ="switchRate()"/>
                   <label class="rate-label" for="rateSong"><span class="rb"></span> 🎵 Per Song</label>
                 </div>
                 <div class="rate-btn">
-                  <input type="radio" name="rateType" id="rateHour" value="hour" onchange="switchRate()"/>
+                  <input type="radio" name="rateType" id="rateHour" value="hour" onclick ="switchRate()"/>
                   <label class="rate-label" for="rateHour"><span class="rb"></span> ⏱️ Per Hour</label>
                 </div>
               </div>
               <div class="pkg-box" id="songBox">
                 <p class="field-hint">Pick your song count 🎶</p>
-                <select id="songPkg" onchange="showPrice('song')">
+                <select id="songPkg" onclick ="showPrice('song')">
                   <option value="" disabled selected>— Choose your bop package —</option>
                   <option value="1–6 Songs|₱300">1–6 Songs — ₱300</option>
                   <option value="1–10 Songs|₱350">1–10 Songs — ₱350</option>
@@ -163,7 +163,7 @@
               </div>
               <div class="pkg-box" id="hourBox">
                 <p class="field-hint">How many hours of pure slay? ⏱️</p>
-                <select id="hourPkg" onchange="showPrice('hour')">
+                <select id="hourPkg" onclick ="showPrice('hour')">
                   <option value="" disabled selected>— Pick your hours —</option>
                   <option value="1 Hour|₱400">1 Hour — ₱400</option>
                   <option value="1 Hr 30 Mins|₱450">1 Hour 30 Mins — ₱450</option>
@@ -176,7 +176,7 @@
 
           <div class="category-box" id="hostBox">
             <p class="field-hint">She'll sing AND host — full package energy! 🎙️✨</p>
-            <select id="hostPkg" onchange="showHostPrice()">
+            <select id="hostPkg" onclick ="showHostPrice()">
               <option value="" disabled selected>— Choose your full-glam package —</option>
               <option value="1 Hour|₱800">1 Hour — ₱800</option>
               <option value="2 Hours|₱900">2 Hours — ₱900</option>
