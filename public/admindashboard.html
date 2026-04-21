@@ -28,6 +28,10 @@
         <span class="ni">📅</span> Schedules
         <span class="nav-badge" id="navBadgeSchedules">0</span>
       </button>
+      <button class="nav-item" id="navCalendar" onclick="switchTab('calendar')">
+        <span class="ni">🩷</span> Calendar
+        <span class="nav-badge" id="navBadgeCalendar">0</span>
+      </button>
       <button class="nav-item" id="navArchive" onclick="switchTab('archive')">
         <span class="ni">🗂️</span> Archive
         <span class="nav-badge" id="navBadgeArchive">0</span>
@@ -49,7 +53,6 @@
           <div class="page-subtitle">Tap a card below to filter · manage all incoming requests</div>
         </div>
       </div>
-      <!-- Stat cards double as filter buttons -->
       <div class="stats-row">
         <div class="stat-card" id="filterAll" onclick="setFilter('all',this)">
           <span class="stat-num" id="statTotal">0</span>
@@ -84,6 +87,10 @@
       <div class="bookings-scroll" id="schedulesArea">
         <div class="empty-state"><span class="ei">📅</span><p>No confirmed bookings yet.<br>Confirmed bookings will appear here!</p></div>
       </div>
+    </div>
+
+    <!-- ── CALENDAR VIEW ── -->
+    <div id="viewCalendar" style="display:none;flex-direction:column;flex:1;min-height:0;overflow-y:auto;">
     </div>
 
     <!-- ── ARCHIVE VIEW ── -->
@@ -151,5 +158,23 @@
 <canvas id="receiptCanvas" style="display:none;"></canvas>
 
 <script src="admindashboard-scripts.js"></script>
+<script src="admindashboard-calendar.js"></script>
+
+<script>
+  // ── Override switchTab to include calendar ──
+  const _origSwitchTab = switchTab;
+  switchTab = function(tab) {
+    ['bookings','schedules','calendar','archive'].forEach(t => {
+      const nav  = document.getElementById('nav'  + t.charAt(0).toUpperCase() + t.slice(1));
+      const view = document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1));
+      if (nav)  nav.classList.toggle('active', t === tab);
+      if (view) view.style.display = t === tab ? 'flex' : 'none';
+    });
+    if (tab === 'schedules') renderSchedules();
+    if (tab === 'archive')   renderArchive();
+    if (tab === 'calendar')  renderCalendar();
+  };
+</script>
+
 </body>
 </html>
