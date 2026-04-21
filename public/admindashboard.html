@@ -6,12 +6,347 @@
   <title>Jeoan Admin — Dashboard 🎀</title>
   <link rel="stylesheet" href="admindashboard-styles.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    /* ═══════════════════════════════
+       MOBILE TOP BAR
+    ═══════════════════════════════ */
+    .mobile-topbar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 18px;
+      background: linear-gradient(135deg, #b83a58, var(--rose));
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 2px 16px rgba(180,50,80,.22);
+    }
+    .mobile-topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .mobile-topbar-logo {
+      font-size: 22px;
+      animation: sway 3s ease-in-out infinite;
+    }
+    .mobile-topbar-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+    .mobile-topbar-sub {
+      font-size: 8px;
+      color: rgba(255,255,255,.55);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* ═══════════════════════════════
+       HAMBURGER BUTTON
+    ═══════════════════════════════ */
+    .hamburger-btn {
+      background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.25);
+      border-radius: 11px;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      padding: 0;
+      transition: background .18s;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .hamburger-btn:hover { background: rgba(255,255,255,.25); }
+    .hamburger-btn .hb-line {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: #fff;
+      border-radius: 2px;
+      transition: transform .25s ease, opacity .2s ease, width .2s ease;
+      transform-origin: center;
+    }
+    .hamburger-btn.open .hb-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger-btn.open .hb-line:nth-child(2) { opacity: 0; width: 0; }
+    .hamburger-btn.open .hb-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Red dot alert on hamburger when there are pending bookings */
+    .hamburger-alert {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      border-radius: 50%;
+      border: 1.5px solid var(--rose);
+      display: none;
+    }
+    .hamburger-alert.show {
+      display: block;
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: .7; }
+    }
+
+    /* ═══════════════════════════════
+       DRAWER OVERLAY
+    ═══════════════════════════════ */
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(45,21,32,.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 149;
+      opacity: 0;
+      transition: opacity .25s;
+    }
+    .drawer-overlay.open {
+      display: block;
+      opacity: 1;
+    }
+
+    /* ═══════════════════════════════
+       DRAWER PANEL
+    ═══════════════════════════════ */
+    .drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 265px;
+      max-width: 85vw;
+      background: linear-gradient(180deg, #b83a58 0%, var(--rose) 40%, var(--ribbon) 80%, #a83050 100%);
+      z-index: 150;
+      transform: translateX(110%);
+      transition: transform .28s cubic-bezier(.4,0,.2,1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -4px 0 32px rgba(180,50,80,.28);
+    }
+    .drawer-panel.open { transform: translateX(0); }
+
+    .drawer-header {
+      padding: 32px 22px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.13);
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+    .drawer-logo {
+      font-size: 30px;
+      animation: sway 3s ease-in-out infinite;
+    }
+    .drawer-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .drawer-role {
+      font-size: 8.5px;
+      color: rgba(255,255,255,.5);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .drawer-nav {
+      flex: 1;
+      padding: 18px 14px;
+      overflow-y: auto;
+    }
+    .drawer-nav-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.38);
+      padding: 0 10px;
+      margin-bottom: 8px;
+      margin-top: 16px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .drawer-nav-label:first-child { margin-top: 0; }
+
+    .drawer-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 13px 14px;
+      border-radius: 13px;
+      color: rgba(255,255,255,.75);
+      font-size: 13.5px;
+      font-weight: 400;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: 'DM Sans', sans-serif;
+      letter-spacing: .3px;
+      transition: all .18s;
+      margin-bottom: 3px;
+    }
+    .drawer-nav-item:hover { background: rgba(255,255,255,.14); color: #fff; }
+    .drawer-nav-item.active {
+      background: rgba(255,255,255,.22);
+      color: #fff;
+      font-weight: 500;
+      box-shadow: 0 2px 10px rgba(0,0,0,.12);
+    }
+    .drawer-nav-item .dni {
+      font-size: 17px;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .drawer-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,.22);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 100px;
+      min-width: 22px;
+      text-align: center;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .drawer-badge.alert { background: #fff; color: var(--rose); }
+
+    .drawer-footer {
+      padding: 16px 14px 30px;
+      border-top: 1px solid rgba(255,255,255,.13);
+    }
+    .drawer-bow {
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 14px;
+      opacity: .4;
+      letter-spacing: 8px;
+    }
+    .drawer-logout-btn {
+      width: 100%;
+      padding: 13px 14px;
+      background: rgba(255,255,255,.1);
+      border: 1.5px solid rgba(255,255,255,.22);
+      border-radius: 13px;
+      color: rgba(255,255,255,.85);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all .18s;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .drawer-logout-btn:hover { background: rgba(255,255,255,.2); color: #fff; }
+
+    /* ═══════════════════════════════
+       MOBILE BREAKPOINT
+    ═══════════════════════════════ */
+    @media (max-width: 640px) {
+      .mobile-topbar { display: flex; }
+      .sidebar { display: none !important; }
+      #dashboardPage.show { flex-direction: column; }
+      .main-content { overflow: visible; }
+      .stats-row { grid-template-columns: repeat(2,1fr); padding: 12px 16px; }
+      .bookings-scroll { padding: 14px 16px; }
+      .page-header { padding: 14px 18px; }
+      .schedule-card { flex-direction: column; }
+      .schedule-date-col {
+        flex-direction: row; gap: 10px; min-width: auto;
+        padding: 10px 14px; justify-content: flex-start;
+      }
+      .schedule-day { font-size: 22px; }
+      .schedule-actions { flex-direction: row; padding: 0 14px 12px; flex-wrap: wrap; }
+    }
+
+    @media (min-width: 641px) {
+      .mobile-topbar { display: none !important; }
+      .drawer-overlay,
+      .drawer-panel { display: none !important; }
+    }
+  </style>
 </head>
 <body>
 
+<!-- ── MOBILE TOP BAR ── -->
+<div class="mobile-topbar">
+  <div class="mobile-topbar-brand">
+    <span class="mobile-topbar-logo">🎀</span>
+    <div>
+      <div class="mobile-topbar-title">Jeoan Gwyneth</div>
+      <div class="mobile-topbar-sub">Admin Portal</div>
+    </div>
+  </div>
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleDrawer()" aria-label="Open menu">
+    <span class="hb-line"></span>
+    <span class="hb-line"></span>
+    <span class="hb-line"></span>
+    <span class="hamburger-alert" id="hamburgerAlert"></span>
+  </button>
+</div>
+
+<!-- ── DRAWER OVERLAY ── -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- ── DRAWER PANEL ── -->
+<div class="drawer-panel" id="drawerPanel">
+  <div class="drawer-header">
+    <span class="drawer-logo">🎀</span>
+    <div>
+      <div class="drawer-name">Jeoan Gwyneth</div>
+      <div class="drawer-role">Admin Portal</div>
+    </div>
+  </div>
+  <div class="drawer-nav">
+    <div class="drawer-nav-label">Management</div>
+    <button class="drawer-nav-item active" id="drawerNavBookings" onclick="switchTab('bookings');closeDrawer()">
+      <span class="dni">📋</span> Bookings
+      <span class="drawer-badge" id="drawerBadgePending">0</span>
+    </button>
+    <button class="drawer-nav-item" id="drawerNavSchedules" onclick="switchTab('schedules');closeDrawer()">
+      <span class="dni">📅</span> Schedules
+      <span class="drawer-badge" id="drawerBadgeSchedules">0</span>
+    </button>
+    <button class="drawer-nav-item" id="drawerNavCalendar" onclick="switchTab('calendar');closeDrawer()">
+      <span class="dni">🩷</span> Calendar
+      <span class="drawer-badge" id="drawerBadgeCalendar">0</span>
+    </button>
+    <button class="drawer-nav-item" id="drawerNavArchive" onclick="switchTab('archive');closeDrawer()">
+      <span class="dni">🗂️</span> Archive
+      <span class="drawer-badge" id="drawerBadgeArchive">0</span>
+    </button>
+  </div>
+  <div class="drawer-footer">
+    <div class="drawer-bow">🎀 🌸 🎀</div>
+    <button class="drawer-logout-btn" onclick="closeDrawer();confirmLogout()">↩ Sign Out</button>
+  </div>
+</div>
+
+<!-- ── DASHBOARD SHELL ── -->
 <div id="dashboardPage" class="show">
 
-  <!-- SIDEBAR -->
+  <!-- DESKTOP SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-brand">
       <span class="sidebar-logo">🎀</span>
@@ -90,8 +425,7 @@
     </div>
 
     <!-- ── CALENDAR VIEW ── -->
-    <div id="viewCalendar" style="display:none;flex-direction:column;flex:1;min-height:0;overflow-y:auto;">
-    </div>
+    <div id="viewCalendar" style="display:none;flex-direction:column;flex:1;min-height:0;overflow-y:auto;"></div>
 
     <!-- ── ARCHIVE VIEW ── -->
     <div id="viewArchive" style="display:none;flex-direction:column;flex:1;min-height:0">
@@ -154,27 +488,79 @@
   </div>
 </div>
 
-<!-- RECEIPT CANVAS (hidden, used for image generation) -->
+<!-- RECEIPT CANVAS (hidden) -->
 <canvas id="receiptCanvas" style="display:none;"></canvas>
 
 <script src="admindashboard-scripts.js"></script>
 <script src="admindashboard-calendar.js"></script>
-
 <script>
-  // ── Override switchTab to include calendar ──
-  const _origSwitchTab = switchTab;
-  switchTab = function(tab) {
-    ['bookings','schedules','calendar','archive'].forEach(t => {
-      const nav  = document.getElementById('nav'  + t.charAt(0).toUpperCase() + t.slice(1));
-      const view = document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1));
+  // ══════════════════════════════════════════
+  // DRAWER
+  // ══════════════════════════════════════════
+  function toggleDrawer() {
+    const btn     = document.getElementById('hamburgerBtn');
+    const overlay = document.getElementById('drawerOverlay');
+    const panel   = document.getElementById('drawerPanel');
+    const isOpen  = panel.classList.contains('open');
+    btn.classList.toggle('open', !isOpen);
+    overlay.classList.toggle('open', !isOpen);
+    panel.classList.toggle('open', !isOpen);
+    document.body.style.overflow = isOpen ? '' : 'hidden';
+  }
+  function closeDrawer() {
+    document.getElementById('hamburgerBtn').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+    document.getElementById('drawerPanel').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ══════════════════════════════════════════
+  // TAB SWITCHING — replaces the one in admindashboard-scripts.js
+  // ══════════════════════════════════════════
+  const ALL_TABS = ['bookings', 'schedules', 'calendar', 'archive'];
+
+  switchTab = function (tab) {
+    ALL_TABS.forEach(t => {
+      const cap  = t.charAt(0).toUpperCase() + t.slice(1);
+      // Desktop sidebar
+      const nav  = document.getElementById('nav'  + cap);
+      const view = document.getElementById('view' + cap);
       if (nav)  nav.classList.toggle('active', t === tab);
       if (view) view.style.display = t === tab ? 'flex' : 'none';
+      // Drawer
+      const dNav = document.getElementById('drawerNav' + cap);
+      if (dNav) dNav.classList.toggle('active', t === tab);
     });
     if (tab === 'schedules') renderSchedules();
     if (tab === 'archive')   renderArchive();
     if (tab === 'calendar')  renderCalendar();
   };
-</script>
 
+  // ══════════════════════════════════════════
+  // SYNC DRAWER BADGES  (runs after every updateStats call)
+  // ══════════════════════════════════════════
+  const _origUpdateStats = updateStats;
+  updateStats = async function () {
+    await _origUpdateStats();
+    const pairs = [
+      ['navBadgePending',   'drawerBadgePending'],
+      ['navBadgeSchedules', 'drawerBadgeSchedules'],
+      ['navBadgeCalendar',  'drawerBadgeCalendar'],
+      ['navBadgeArchive',   'drawerBadgeArchive'],
+    ];
+    pairs.forEach(([src, dst]) => {
+      const s = document.getElementById(src);
+      const d = document.getElementById(dst);
+      if (s && d) {
+        d.textContent = s.textContent;
+        d.className   = 'drawer-badge' + (s.classList.contains('alert') ? ' alert' : '');
+      }
+    });
+    // Pulse dot on hamburger when pending > 0
+    const pending = parseInt(document.getElementById('navBadgePending').textContent) || 0;
+    const alertDot = document.getElementById('hamburgerAlert');
+    if (alertDot) alertDot.classList.toggle('show', pending > 0);
+  };
+</script>
 </body>
 </html>
