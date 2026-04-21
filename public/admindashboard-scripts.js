@@ -368,6 +368,261 @@ function generateReceipt(b) {
 
   const D = 600, P = 38, W = D - P * 2;
 
+// ════════════════════════════════════════
+// FULLY PAID RECEIPT (Archive)
+// ════════════════════════════════════════
+function downloadFullyPaidReceipt(id) {
+  const archived = getArchive();
+  const b = archived.find(x => String(x.id) === String(id));
+  if (!b) { showToast('❌ Could not find booking data.'); return; }
+  generateFullyPaidReceipt(b);
+}
+
+function generateFullyPaidReceipt(b) {
+  const canvas = document.getElementById('receiptCanvas');
+  const S = 1200;
+  canvas.width  = S;
+  canvas.height = S;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+
+  const D = 600, P = 38, W = D - P * 2;
+
+  // ── Palette ──────────────────────────────────────
+  const deep  = '#b83060';
+  const rose  = '#d4607a';
+  const mid   = '#e8a0b0';
+  const blush = '#fff5f7';
+  const light = '#fdeef2';
+  const ink   = '#2a1520';
+  const muted = '#b08090';
+  const green = '#2e7d52';
+  const greenPale = '#edf7f1';
+
+  // ── Background ───────────────────────────────────
+  ctx.fillStyle = blush;
+  ctx.fillRect(0, 0, D, D);
+
+  // Dot texture
+  ctx.save();
+  ctx.fillStyle   = mid;
+  ctx.globalAlpha = 0.06;
+  for (let x = P; x < D - P; x += 14)
+    for (let y = 60; y < D - 60; y += 14) {
+      ctx.beginPath(); ctx.arc(x, y, 0.7, 0, Math.PI * 2); ctx.fill();
+    }
+  ctx.restore();
+
+  // Top & bottom bars
+  ctx.fillStyle = rose; ctx.fillRect(0, 0, D, 5);
+  ctx.fillStyle = rose; ctx.fillRect(0, D - 5, D, 5);
+
+  // ── Helpers ──────────────────────────────────────
+  function txt(s, x, y, font, color, align = 'left') {
+    ctx.save(); ctx.font = font; ctx.fillStyle = color;
+    ctx.textAlign = align; ctx.fillText(String(s || ''), x, y); ctx.restore();
+  }
+
+  function rrect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function divLine(y) {
+    const cx = D / 2;
+    ctx.save();
+    ctx.strokeStyle = mid; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(P + 6, y); ctx.lineTo(cx - 10, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx + 10, y); ctx.lineTo(D - P - 6, y); ctx.stroke();
+    ctx.fillStyle = rose; ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.moveTo(cx, y - 4); ctx.lineTo(cx + 3, y);
+    ctx.lineTo(cx, y + 4); ctx.lineTo(cx - 3, y);
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+
+  function bow(cx, cy, s) {
+    ctx.save(); ctx.fillStyle = rose; ctx.globalAlpha = 0.7;
+    ctx.beginPath();
+    ctx.moveTo(cx - 2*s, cy);
+    ctx.bezierCurveTo(cx - 9*s, cy - 9*s, cx - 22*s, cy - 4*s, cx - 14*s, cy + 2*s);
+    ctx.bezierCurveTo(cx - 22*s, cy + 8*s, cx - 9*s, cy + 9*s, cx - 2*s, cy);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(cx + 2*s, cy);
+    ctx.bezierCurveTo(cx + 9*s, cy - 9*s, cx + 22*s, cy - 4*s, cx + 14*s, cy + 2*s);
+    ctx.bezierCurveTo(cx + 22*s, cy + 8*s, cx + 9*s, cy + 9*s, cx + 2*s, cy);
+    ctx.closePath(); ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.ellipse(cx, cy, 4*s, 4.5*s, 0, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  function heart(cx, cy, r) {
+    ctx.save(); ctx.fillStyle = rose; ctx.globalAlpha = 0.55;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + r * 0.9);
+    ctx.bezierCurveTo(cx + r*2.1, cy + r*0.3, cx + r*2.1, cy - r*0.9, cx, cy - r*0.1);
+    ctx.bezierCurveTo(cx - r*2.1, cy - r*0.9, cx - r*2.1, cy + r*0.3, cx, cy + r*0.9);
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+
+  function trunc(s, maxW) {
+    let v = String(s || '—');
+    while (ctx.measureText(v).width > maxW && v.length > 2) v = v.slice(0, -1);
+    if (v !== String(s || '—')) v += '…';
+    return v;
+  }
+
+  const serif  = sz => `${sz}px 'Palatino Linotype',Palatino,Georgia,serif`;
+  const serifI = sz => `italic ${sz}px 'Palatino Linotype',Palatino,Georgia,serif`;
+
+  function field(label, value, x, y, maxW) {
+    txt(label.toUpperCase(), x, y, '500 7px Arial,sans-serif', muted);
+    txt(trunc(value, maxW || W * 0.45), x, y + 15, serif(13), ink);
+  }
+
+  // ── HEADER ───────────────────────────────────────
+  let cy = 18;
+  txt('BOOKING RECEIPT', D/2, cy, '500 7.5px Arial', mid, 'center');
+
+  cy += 22;
+  bow(D/2, cy, 1.3);
+  cy += 28;
+
+  txt('Jeoan Gwyneth Dajay Gran', D/2, cy, serifI(21), deep, 'center');
+  cy += 13;
+  txt('Singer & Host for Hire  ·  South Cotabato  ·  0912 797 7245', D/2, cy, '400 8.5px Arial', muted, 'center');
+
+  cy += 16;
+  // Confirmed pill
+  ctx.save(); ctx.fillStyle = light; ctx.strokeStyle = mid; ctx.lineWidth = 0.7;
+  rrect(P, cy - 11, 106, 15, 7); ctx.fill(); ctx.stroke(); ctx.restore();
+  txt('✓  Confirmed', P + 9, cy, serifI(9.5), rose);
+  txt('Issued ' + new Date().toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' }),
+    D - P, cy, '400 8px Arial', muted, 'right');
+
+  cy += 14;
+  divLine(cy);
+
+  // ── BOOKING DETAILS ──────────────────────────────
+  cy += 16;
+  txt('Booking Details', P, cy, serifI(10), rose);
+  const HW = W / 2 - 10;
+  cy += 18;
+  field('Client Name',      b.name,     P,       cy, HW + 30);
+  field('Event Date',       b.date,     D/2 + 4, cy, HW);
+  cy += 30;
+  field('Contact',          b.phone,    P,       cy, HW);
+  field('Performance Time', b.perfTime, D/2 + 4, cy, HW);
+  cy += 30;
+  field('Occasion',         b.occasion, P,       cy, HW);
+  field('Package',          b.package,  D/2 + 4, cy, HW + 10);
+  cy += 30;
+  field('Venue',            b.venue,    P,       cy, W);
+
+  if (b.notes) { cy += 26; txt('"' + b.notes + '"', D/2, cy, serifI(9.5), muted, 'center'); }
+
+  cy += 16;
+  divLine(cy);
+
+  // ── PAYMENT SUMMARY — FULLY PAID ─────────────────
+  cy += 16;
+  txt('Payment Summary', P, cy, serifI(10), rose);
+
+  const bd = getPriceBreakdown(b);
+
+  cy += 20;
+  txt('Package total',            P,   cy, '400 10.5px Arial', muted);
+  txt(bd.totalStr,            D - P,   cy, serif(11.5),         ink,  'right');
+
+  cy += 18;
+  txt('Downpayment paid (GCash)', P,   cy, '400 10.5px Arial', muted);
+  txt('− ' + bd.dpStr,        D - P,   cy, '500 11px Arial',   rose, 'right');
+
+  cy += 18;
+  txt('Balance paid (Cash/GCash)',P,   cy, '400 10.5px Arial', muted);
+  txt('− ' + bd.balanceStr,   D - P,   cy, '500 11px Arial',   rose, 'right');
+
+  cy += 12;
+  ctx.save(); ctx.strokeStyle = mid; ctx.lineWidth = 0.6;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(P, cy); ctx.lineTo(D - P, cy); ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+
+  // ── FULLY PAID green badge ────────────────────────
+  cy += 14;
+  ctx.save();
+  ctx.fillStyle   = greenPale;
+  ctx.strokeStyle = '#a8d5bc';
+  ctx.lineWidth   = 1;
+  rrect(P, cy - 12, W, 30, 10);
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+  txt('✅  FULLY PAID', D/2, cy + 5, `600 13px Arial,sans-serif`, green, 'center');
+
+  cy += 34;
+  divLine(cy);
+
+  // ── TERMS ────────────────────────────────────────
+  cy += 16;
+  txt('Terms & Conditions', P, cy, serifI(10), rose);
+  const terms = [
+    '₱200 downpayment is non-refundable and deducted from total.',
+    'Balance due via cash or GCash right after the performance.',
+    'Venue must provide a working sound system and microphone.',
+    'Client cancels: DP forfeited. She cancels due to emergency: full refund.',
+  ];
+  cy += 16;
+  ctx.font = '9.5px Arial,sans-serif';
+  terms.forEach(term => {
+    heart(P + 4, cy - 3, 1.6);
+    const words = term.split(' ');
+    let l1 = '', l2 = '', broken = false;
+    for (const w of words) {
+      const test = (broken ? l2 : l1) + w + ' ';
+      if (!broken && ctx.measureText(test).width > W - 18) {
+        broken = true; l2 = w + ' ';
+      } else if (broken) {
+        if (ctx.measureText(l2 + w + ' ').width < W - 18) l2 += w + ' ';
+      } else { l1 = test; }
+    }
+    txt(l1.trim(), P + 13, cy, '400 9.5px Arial,sans-serif', '#5a2535');
+    if (l2.trim()) { cy += 13; txt(l2.trim(), P + 13, cy, '400 9.5px Arial,sans-serif', '#5a2535'); }
+    cy += 18;
+  });
+
+  cy += 4;
+  divLine(cy);
+
+  // ── FOOTER ───────────────────────────────────────
+  cy += 28;
+  const firstName = (b.name || 'Guest').split(' ')[0];
+  txt('Thank you, ' + firstName + '!',              D/2, cy,  serifI(20),        deep,  'center');
+  cy += 18;
+  txt('It was a joy performing for your special day!', D/2, cy, serifI(10),      rose,  'center');
+  cy += 16;
+  txt('0912 797 7245  ·  South Cotabato',            D/2, cy,  '400 8.5px Arial', muted, 'center');
+  cy += 16;
+  [-36, -18, 0, 18, 36].forEach(ox => heart(D/2 + ox, cy, 2));
+
+  // ── Download ─────────────────────────────────────
+  const link     = document.createElement('a');
+  const safeName = (b.name  || 'client' ).replace(/[^a-z0-9]/gi, '_');
+  const safeDate = (b.date  || 'booking').replace(/[^a-z0-9]/gi, '_');
+  link.download  = 'FullyPaid_Receipt_' + safeName + '_' + safeDate + '.png';
+  link.href      = canvas.toDataURL('image/png');
+  link.click();
+}
+  
   // ── Palette (pink only) ───────────────────────────
   const deep  = '#b83060';
   const rose  = '#d4607a';
@@ -771,6 +1026,7 @@ function buildArchiveCardHTML(b) {
         </div>
         ${b.gcashScreenshot ? `<div class="ss-section"><div class="ss-section-head">📸 GCash Screenshot</div><img class="ss-img" src="${b.gcashScreenshot}" alt="GCash"/></div>` : ''}
         <div class="action-row">
+          ${b.status === 'confirmed' ? `<button class="btn-receipt-sm" onclick="downloadFullyPaidReceipt(${b.id})" style="background:linear-gradient(135deg,#e8728a,#c94f6a);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:11px;font-weight:500;letter-spacing:1px;cursor:pointer;">📄 Receipt (Fully Paid)</button>` : ''}
           <button class="btn-restore" onclick="restoreBooking(${b.id})">↩️ Restore</button>
           <button class="btn-decline" onclick="permanentDelete(${b.id})" style="flex:0 0 auto;padding:12px 18px">🗑️ Delete</button>
         </div>
